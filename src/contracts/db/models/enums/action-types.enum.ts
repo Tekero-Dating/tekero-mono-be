@@ -1,0 +1,8 @@
+export enum ActionTypesEnum {
+  SEND_LIKE = 'SEND_LIKE',
+  SEND_SIGNED_LIKE = 'SEND_SIGNED_LIKE',
+  PUBLISH_AD = 'PUBLISH_AD',
+  TRAVEL_AD = 'TRAVEL_AD',
+  TOP_UP = 'TOP_UP',
+  GIFT = 'GIFT'
+}

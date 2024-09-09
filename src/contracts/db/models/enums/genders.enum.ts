@@ -1,0 +1,7 @@
+export enum GendersEnum {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  TRANS_MALE = 'TRANS_MALE',
+  TRANS_FEMALE = 'TRANS_FEMALE',
+  NON_BINARY = 'NON_BINARY'
+};

@@ -1,0 +1,43 @@
+{
+  "preset": "ts-jest",
+  "watchPathIgnorePatterns": [".*\\.json"],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/*.{ts,tsx,js,jsx}",
+    "!**/*.migrations.ts",
+    "!**/node_modules/**",
+    "!**/coverage/**",
+    "!**/cypress/**",
+    "!**/*.d.ts"
+  ],
+  "coverageThreshold": {
+  },
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/",
+    "/mongo/"
+  ],
+  "testEnvironment": "node",
+  "verbose": true,
+  "bail": false,"preset": "ts-jest",
+  "watchPathIgnorePatterns": [".*\\.json"],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/*.{ts,tsx,js,jsx}",
+    "!**/*.migrations.ts",
+    "!**/node_modules/**",
+    "!**/coverage/**",
+    "!**/cypress/**",
+    "!**/*.d.ts"
+  ],
+  "coverageThreshold": {
+  },
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/",
+    "/mongo/"
+  ],
+  "testEnvironment": "node",
+  "verbose": true,
+  "bail": false
+}

@@ -1,0 +1,6 @@
+export enum OrientationsEnum {
+  HETERO = 'HETERO',
+  HOMOSEXUAL = 'HOMOSEXUAL',
+  BISEXUAL = 'BISEXUAL',
+  HETERO_FLEXIBLE = 'HETERO_FLEXIBLE'
+}

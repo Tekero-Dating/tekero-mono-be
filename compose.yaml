@@ -1,0 +1,47 @@
+services:
+    postgres:
+        image: postgres
+        volumes:
+            - .:/postgres
+        ports:
+            - "5432:5432" # Expose PostgreSQL port
+        environment:
+            POSTGRES_USER: grinderdev
+            POSTGRES_PASSWORD: grinderdev
+            POSTGRES_DB: grinderdev
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U grinderdev"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    rabbitmq:
+        image: rabbitmq:management
+        volumes:
+            - .:/rmq
+        ports:
+            - "5672:5672" # RabbitMQ port
+            - "15672:15672" # RabbitMQ management UI port
+        environment:
+            RABBITMQ_DEFAULT_USER: grinderdev
+            RABBITMQ_DEFAULT_PASS: grinderdev
+        healthcheck:
+            test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    grinder_nest:
+        build: .
+        volumes:
+            - .:/app
+        environment:
+            FLASK_DEBUG: "true"
+        ports:
+            - "3000:3000"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+

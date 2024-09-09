@@ -1,0 +1,13 @@
+const { resolve } = require('path');
+
+require('ts-node').register({
+  transpileOnly: true,
+  project: resolve('tsconfig.json')
+});
+
+module.exports = {
+    'env': process.env.NODE_ENV || 'development',
+    'config': resolve('dist', 'src/config/migrations-sequelize.config.js'),
+    'seeders-path': resolve('dist', 'seeders'),
+    'migrations-path': resolve('dist', 'migrations')
+};
