@@ -2,7 +2,6 @@ import { Sequelize } from 'sequelize-typescript';
 
 export class SuperSequelize {
   dbOpts;
-  databaseName;
   sequelize
 
   constructor (dbOpts: {
@@ -11,22 +10,17 @@ export class SuperSequelize {
     database: string;
     host: string;
     post: number;
-    databaseName: string;
   } | any) {
-    this.dbOpts = {
-      ...dbOpts,
-      database: ''
-    };
-    this.databaseName = dbOpts.databaseName;
+    this.dbOpts = dbOpts;
     this.sequelize = new Sequelize(
-      '',
+      this.dbOpts.database,
       this.dbOpts.username,
       this.dbOpts.password,
       {
         host: this.dbOpts.host,
         port: this.dbOpts.port,
         dialect: 'postgres',
-        logging: false,
+        logging: false
       }
     );
   }
@@ -46,6 +40,38 @@ export class SuperSequelize {
       console.log(`Database ${name} dropped successfully.`);
     } catch (error) {
       console.error(`Error dropping database: ${error.message}`);
+    }
+  }
+
+  async dropDbToWhichConnected(): Promise<boolean> {
+    await this.close();
+    const AdminDB  = new Sequelize(
+      'postgres',
+      this.dbOpts.username,
+      this.dbOpts.password,
+      {
+        host: this.dbOpts.host,
+        port: this.dbOpts.port,
+        dialect: 'postgres',
+        logging: false,
+      }
+    );
+
+    const { database } = this.dbOpts;
+
+    try {
+      await AdminDB.query(
+        `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${database}';`
+      );
+      await AdminDB
+        .query(`DROP DATABASE IF EXISTS "${database}";`);
+      console.log(`Database "${database}" dropped successfully.`);
+      await AdminDB.close();
+      return true
+    } catch (error) {
+      console.error(`Error dropping database "${database}":`, error);
+      await AdminDB.close();
+      return false;
     }
   }
 

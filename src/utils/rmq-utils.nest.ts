@@ -1,5 +1,5 @@
 import { ClientProxy, ClientRMQ, RmqRecordBuilder, Transport } from '@nestjs/microservices';
-import { generalRmqOpts } from '../config/config';
+import { generalRmqOpts, RMQ_QUEUE_PREFIX } from '../config/config';
 import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
 import { Client } from '@nestjs/microservices/external/nats-client.interface';
 import { Observable } from 'rxjs';
@@ -22,7 +22,7 @@ export const generateRmqOptions = (queues: string[] = [], serviceName?: string):
       name: serviceName || 'no-name',
       options: {
         urls: generalRmqOpts.options?.urls,
-        queue
+        queue: `${RMQ_QUEUE_PREFIX}${queue}`
       }
     })
   );
@@ -35,7 +35,7 @@ const connectToRMQWithRetry = async (app, queue, rmqOpts, retries = 5, delayMs =
       transport: Transport.RMQ,
       options: {
         ...rmqOpts.options,
-        queue
+        queue: `${RMQ_QUEUE_PREFIX}${queue}`
       }
     });
   } catch (err) {

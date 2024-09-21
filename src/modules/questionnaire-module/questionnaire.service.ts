@@ -1,8 +1,11 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Questionnaire } from '../../contracts/db/models/questionnaire.entity';
 import { QuestionnaireSteps } from '../../contracts/db/models/questionnaire-steps.entity';
-import { IGetQuestionnaire } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
+import {
+  IGetQuestionnaire,
+  ISubmitQuestionByShortcode,
+} from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 
 @Injectable()
 export class QuestionnaireService {
@@ -24,8 +27,6 @@ export class QuestionnaireService {
       await this.questionnaireStepsRepository
        .findAll()
     ]);
-
-    this.logger.debug({ questions }, { questionnaireStatus });
 
     if (!questionnaireStatus) {
       this.logger.error(`Status not found for user`, { userId });
@@ -76,5 +77,69 @@ export class QuestionnaireService {
     ];
 
     return result;
+  }
+
+  async submitQuestionByShortcode(
+    userId: number,
+    response: ISubmitQuestionByShortcode.Request['response']
+  ) {
+    const { shortcode, response: answer  } = response;
+    // console.log({ userId, shortcode, answer });
+    const questionnaireStep = await this.questionnaireStepsRepository
+      .findOne({
+        where: {
+          'question.shortcode': shortcode
+        }
+      });
+
+    if (!questionnaireStep) {
+      throw new NotFoundException('Question with given shortcode not found');
+    }
+
+    const { active, question } = questionnaireStep;
+    if (!active) {
+      throw new BadRequestException('Trying to submit response to inactive question');
+    } else if (question.type !== typeof answer) {
+      throw new BadRequestException('Response provided in wrong format');
+    }
+
+    let usersQuestionnaire: Questionnaire;
+    try {
+      usersQuestionnaire = await this.questionnaireRepository
+        .findOne<Questionnaire>({
+          where: { user_id: userId },
+          rejectOnEmpty: true
+        });
+    } catch (_e) {
+      throw new NotFoundException('Can not find the users questionnaire');
+    }
+    let updated = await this.questionnaireRepository.update(
+      {
+        responses: {
+          ...usersQuestionnaire.responses,
+          ...{ [shortcode]: answer },
+        },
+        ...(!Object.keys(usersQuestionnaire.responses).length ? { questionnaire_started: true } : {})
+      },
+      {
+        where: { id: usersQuestionnaire.id },
+        returning: true
+      }
+    );
+
+    const totalActiveQuestions = await this.questionnaireStepsRepository
+      .findAll({ where: { active: true } });
+
+    if (
+      updated[0] && Object.keys(usersQuestionnaire.responses).length + 1 === totalActiveQuestions.length
+    ) {
+      updated = await this.questionnaireRepository.update({
+        is_completed: true
+      } as Questionnaire, {
+        where: { id: usersQuestionnaire.id },
+        returning: true
+      });
+    }
+    return updated[1][0];
   }
 }

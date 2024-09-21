@@ -184,6 +184,7 @@ module.exports = {
         }
       }));
 
+    await sequelize.close();
     console.log('migration applied');
   },
 

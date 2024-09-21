@@ -8,8 +8,8 @@ const copyEmptyDirs = (sourceDir: string, destDir: string, rootDir: string) => {
     const srcPath = path.join(sourceDir, item);
     const destPath = path.join(destDir, item);
 
-    // Exclude the dist directory and any sub-directories within it
-    if (srcPath.startsWith(rootDir + '/dist')) {
+    // Exclude the dist and node_modules directories and any sub-directories within them
+    if (srcPath.startsWith(rootDir + '/dist') || srcPath.startsWith(rootDir + '/node_modules')) {
       return;
     }
 
@@ -29,7 +29,7 @@ const copyEmptyDirs = (sourceDir: string, destDir: string, rootDir: string) => {
   }
 };
 
-// Define the root,w source, and destination directories
+// Define the root, source, and destination directories
 const rootDir = path.resolve(__dirname); // Root directory of the project
 const sourceDir = rootDir; // Source is the root directory of the project
 const destDir = path.join(rootDir, 'dist'); // Destination is the dist directory

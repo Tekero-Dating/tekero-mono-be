@@ -22,23 +22,17 @@ const questionSchema: JSONSchemaType<IQuestion> = {
   additionalProperties: false,
 };
 
-type ResponseInnerObject = Record<string, string | number | boolean>;
-const responseSchema: JSONSchemaType<Record<string, ResponseInnerObject>> = {
-  type: 'object',
+const responseSchema: JSONSchemaType<Record<string, string | number | boolean>> = {
+  type: "object",
   additionalProperties: {
-    type: 'object',
-    additionalProperties: {
-      oneOf: [
-        { type: 'string' },
-        { type: 'number' },
-        { type: 'boolean' },
-      ],
-    },
-    required: []
+    oneOf: [
+      { type: "string" },
+      { type: "number" },
+      { type: "boolean" }
+    ]
   },
   required: []
 };
-
 
 export const validateQuestion = ajv.compile(questionSchema);
 export const validateResponse = ajv.compile(responseSchema);

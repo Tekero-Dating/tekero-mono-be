@@ -25,6 +25,10 @@ describe('RMQ', () => {
       await this.client.connect();
     }
 
+    async onApplicationShutdown(signal?: string) {
+      await this.client.close();
+    }
+
     async sendTestMessage() {
       await rmqSend(
         this.client,
@@ -58,6 +62,10 @@ describe('RMQ', () => {
 
     async onApplicationBootstrap() {
       await this.client.connect();
+    }
+
+    async onApplicationShutdown(signal?: string) {
+      await this.client.close();
     }
 
     @MessagePattern('test-message')

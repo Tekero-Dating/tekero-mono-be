@@ -80,7 +80,6 @@ module.exports = {
             question: JSON.stringify(question.question),
           })),
       );
-
     console.log("migration applied");
   },
 

@@ -10,7 +10,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiService } from './api.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import { UpdateProfileDTO } from '../../contracts/api-interface/api.dto';

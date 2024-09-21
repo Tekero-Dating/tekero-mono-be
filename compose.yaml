@@ -32,11 +32,14 @@ services:
             retries: 10
 
     grinder_nest:
-        build: .
+        build:
+            context: .
+            dockerfile: Dockerfile.${NODE_ENV}
         volumes:
             - .:/app
         environment:
             FLASK_DEBUG: "true"
+            NODE_ENV: ${NODE_ENV}
         ports:
             - "3000:3000"
         depends_on:

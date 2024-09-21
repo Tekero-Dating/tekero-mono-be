@@ -29,19 +29,19 @@ export namespace IGetQuestionnaire {
   }
 };
 
-export namespace ISubmitQuestionsByStepId {
+export namespace ISubmitQuestionByShortcode {
   export interface Request {
     userId: number;
-    responses: {
-      stepId: QuestionnaireSteps['id'];
+    response: {
+      shortcode: QuestionnaireSteps['question']['shortcode'];
       response:  string | number | boolean;
-    }[]
+    }
   };
   export interface Response {
     success: boolean;
     result?: {
-      completed: boolean;
-    };
+      questionnaireStatus: Questionnaire;
+    } | IGetQuestionnaire.Response['result'];
     error?: Record<string, any> | {
       status: number;
       message: string;
@@ -51,5 +51,5 @@ export namespace ISubmitQuestionsByStepId {
 
 export interface IQuestionnaireController {
   getQuestionnaire: (payload: IGetQuestionnaire.Request, context: RmqContext) => Promise<IGetQuestionnaire.Response>
-  submitQuestionsByStepId: (payload: ISubmitQuestionsByStepId.Request, context: RmqContext) => Promise<ISubmitQuestionsByStepId.Response>
+  submitQuestionByShortcode: (payload: ISubmitQuestionByShortcode.Request, context: RmqContext) => Promise<ISubmitQuestionByShortcode.Response>
 };

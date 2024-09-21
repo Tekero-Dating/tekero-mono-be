@@ -5,6 +5,8 @@
 1. Local
 2. Docker 
 3. Docker-compose
+4. Migrations and seeders
+5. Testing
 
 #### 2. Docker
 ```
@@ -16,15 +18,20 @@ docker run -p 3000:3000 grinder_nest
 docker run -p 3000:3000 -v $(pwd):/app grinder_nest
 ```
 
-#### 3. Docker-compose
+#### 3. Docker-compose (*recommended*)
 ```
-docker compose up
+NODE_ENV=development docker compose up --build
 ```
 
-#### 4. Migrations and seeds
+#### 4. Migrations and seeders
 Migrations and seeders apply on `docker compose up` due to Dockerfile configuration. 
-`npx sequelize-cli db:seed:all --url 'postgres://grinderdev:grinderdev@localhost:5432/grinderdev'
+`npx sequelize-cli db:seed:all --url 'postgres://username:password@localhost:5432/dbname'
 `
+
+#### 5. Testing
+To run tests you need all infrastructure uo and running (RMQ, PSQL). Tests are running using real environment because mocked data and responses aren't actually test anything. 
+
+To run tests localy you need to use file `.env.test.local` for env variables declaration. Npm command to run local tests is `npm run test:local`. Pay attention to startup scripts for jest: `jest-setup.js` and `jest-teardown.js` - they are preparing database, running migration, creating and deleting testing databases. 
 
 # New endpoints creation  
 All business chunks of the app working through `api` module which acts as a `proxy-api` layer that communicates with all other services through RMQ. 

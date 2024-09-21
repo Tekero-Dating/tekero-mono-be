@@ -7,7 +7,6 @@ import { User, UserRepository } from '../src/contracts/db/models/user.entity';
 import { GendersEnum } from '../src/contracts/db/models/enums';
 import { SuperSequelize } from './helpers/control-over-db';
 
-
 const db = new SuperSequelize(dbOpts);
 
 describe('DB connection', () => {
@@ -52,8 +51,6 @@ describe('DB connection', () => {
   let testUserId: number;
 
   beforeAll(async () => {
-
-    await db.createDatabase(dbOpts.database);
     app = await NestFactory.create(TestModule);
     await app.init(); // Correct initialization step
   });
@@ -64,8 +61,6 @@ describe('DB connection', () => {
       await testService.deleteUser(testUserId);
     }
     await app.close();
-    await db.dropDatabase(dbOpts.database);
-    await db.close()
   });
 
   it('Should be able to create and read records in DB', async () => {

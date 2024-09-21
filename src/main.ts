@@ -7,6 +7,16 @@ import { ADS_MODULE_QUEUES } from './contracts/ads-interface/ads.constants';
 import { USER_PROFILES_MODULE_QUEUES } from './contracts/uesr-profiles-interface/user-profiles.constants';
 import { QUESTIONNAIRE_MODULE_QUEUES } from './contracts/questionnaire-interface/questionnaire.constants';
 
+export {
+// @ts-ignore
+  bootstrap
+};
+
+/* istanbul ignore next Use forktTs */
+if (require.main === module)
+  bootstrap()
+
+// @ts-ignore
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await createRmqMicroservices(app, [
@@ -22,4 +32,3 @@ export async function bootstrap() {
   // const api = app.get(QuestionnaireController);
   // await api.getQuestionnaire({ userId: 6 }, RmqContext as unknown as RmqContext);
 }
-bootstrap();

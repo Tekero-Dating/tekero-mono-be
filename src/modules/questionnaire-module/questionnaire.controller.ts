@@ -25,12 +25,13 @@ export class QuestionnaireController implements IQuestionnaireController {
     const { userId } = data;
     try {
       const result = await this.questionnaireService.getQuestionnaire(userId);
+      this.logger.log(`Request processes successfully`, { userId });
       return {
         success: true,
         result
       };
     } catch (e) {
-      this.logger.error(e);
+      this.logger.error(e, { userId });
       return {
         success: false,
         error: e
@@ -39,9 +40,22 @@ export class QuestionnaireController implements IQuestionnaireController {
   }
 
   @MessagePattern(QUESTIONNAIRE_MSG_PATTERNS.SUBMIT_QUESTIONNAIRE)
-  async submitQuestionsByStepId(@Payload() data, @Ctx() context: RmqContext) {
-    return {
-      success: true
-    };
+  async submitQuestionByShortcode(@Payload() data, @Ctx() context: RmqContext) {
+    const { userId, response } = data;
+    try {
+      const questionnaireStatus = await this.questionnaireService.submitQuestionByShortcode(userId, response);
+      return {
+        success: true,
+        result: {
+          questionnaireStatus
+        }
+      };
+    } catch (e) {
+      this.logger.error(e, { userId });
+      return {
+        success: false,
+        error: e
+      }
+    }
   }
 }

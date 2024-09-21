@@ -6,6 +6,7 @@ dotenv.config({
   path: `.env.${process.env.NODE_ENV}`
 })
 
+console.log(`.env.${process.env.NODE_ENV}`);
 const sequelize = {
   [process.env.NODE_ENV as string]: {
     dialect: 'postgres' as Dialect,

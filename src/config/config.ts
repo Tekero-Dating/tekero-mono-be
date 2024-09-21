@@ -23,7 +23,8 @@ const {
   DB_PASSWORD,
   RMQ_URL,
   APP_MODE,
-  APP_PORT
+  APP_PORT,
+  RMQ_QUEUE_PREFIX
 } = process.env;
 
 const validate = ajv.compile<EnvSchema>(envSchema);
@@ -58,4 +59,4 @@ export const generalRmqOpts: IRmqOptions = {
 };
 
 export const rmqUrl = RMQ_URL;
-export { APP_PORT }
+export { APP_PORT, RMQ_QUEUE_PREFIX }
