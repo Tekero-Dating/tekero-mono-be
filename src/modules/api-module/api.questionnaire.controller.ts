@@ -49,7 +49,6 @@ export class ApiQuestionnaireController {
     @Res() res
   ) {
     this.logger.log(`API request getQuestionnaire`);
-    // console.log({ body });
     rmqSend<ISubmitQuestionByShortcode.Request, ISubmitQuestionByShortcode.Response>(
       this.client,
       QUESTIONNAIRE_MSG_PATTERNS.SUBMIT_QUESTIONNAIRE,

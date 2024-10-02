@@ -17,6 +17,12 @@ import {
   QUESTIONNAIRE_MODULE_QUEUES,
   QUESTIONNAIRE_SERVICE_NAME,
 } from '../../contracts/questionnaire-interface/questionnaire.constants';
+import { MediaService } from '../media-module/media.service';
+import { MediaRepository } from '../../contracts/db/models/mdeia.entity';
+import { ApiMediaController } from './api.media.controller';
+import { S3Service } from '../media-module/s3.service';
+import { MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME } from '../../contracts/media-interface/media.constants';
+import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.entity';
 
 @Module({
   imports: [
@@ -31,17 +37,25 @@ import {
     ),
     ClientsModule.register(
       generateRmqOptions(QUESTIONNAIRE_MODULE_QUEUES, QUESTIONNAIRE_SERVICE_NAME)
+    ),
+    ClientsModule.register(
+      generateRmqOptions(MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME)
     )
   ],
   controllers: [
     ApiController,
     ApiUserProfileController,
     ApiAdsController,
-    ApiQuestionnaireController
+    ApiQuestionnaireController,
+    ApiMediaController
   ],
   providers: [
     ApiService,
-    UserRepository
+    MediaService,
+    S3Service,
+    UserRepository,
+    MediaRepository,
+    MediaAccessRepository
   ],
 })
 export class ApiModule {}

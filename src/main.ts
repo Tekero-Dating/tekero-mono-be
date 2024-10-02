@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ADS_MODULE_QUEUES } from './contracts/ads-interface/ads.constants';
 import { USER_PROFILES_MODULE_QUEUES } from './contracts/uesr-profiles-interface/user-profiles.constants';
 import { QUESTIONNAIRE_MODULE_QUEUES } from './contracts/questionnaire-interface/questionnaire.constants';
+import { MEDIA_MODULE_QUEUES } from './contracts/media-interface/media.constants';
 
 export {
 // @ts-ignore
@@ -22,7 +23,8 @@ export async function bootstrap() {
   await createRmqMicroservices(app, [
     ...ADS_MODULE_QUEUES,
     ...USER_PROFILES_MODULE_QUEUES,
-    ...QUESTIONNAIRE_MODULE_QUEUES
+    ...QUESTIONNAIRE_MODULE_QUEUES,
+    ...MEDIA_MODULE_QUEUES
   ], generalRmqOpts);
   app.useGlobalPipes(new ValidationPipe());
   await app.startAllMicroservices();

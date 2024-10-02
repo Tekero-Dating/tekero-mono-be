@@ -76,6 +76,13 @@ export class QuestionnaireService {
       }))
     ];
 
+    if (
+      result.questions
+        .filter(q => q.answered === true).length === result.questions.length
+    ) {
+      result.completed = true;
+    }
+
     return result;
   }
 
@@ -84,12 +91,9 @@ export class QuestionnaireService {
     response: ISubmitQuestionByShortcode.Request['response']
   ) {
     const { shortcode, response: answer  } = response;
-    // console.log({ userId, shortcode, answer });
     const questionnaireStep = await this.questionnaireStepsRepository
       .findOne({
-        where: {
-          'question.shortcode': shortcode
-        }
+        where: { 'question.shortcode': shortcode }
       });
 
     if (!questionnaireStep) {

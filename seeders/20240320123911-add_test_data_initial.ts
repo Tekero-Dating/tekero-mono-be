@@ -80,35 +80,30 @@ module.exports = {
     const mediaSeeders: ModelAttributes<Media>[] = [
       {
         private: false,
-        hot: false,
         url: 'image1.url',
         user_id: 4,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: true,
-        hot: false,
         url: 'image2.url',
         user_id: 2,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
-        hot: false,
         url: 'image3.url',
         user_id: 2,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
-        hot: true,
         url: 'image4.url',
         user_id: 1,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
-        hot: false,
         url: 'image5.url',
         user_id: 1,
         createdAt: new Date('2024-03-15'),

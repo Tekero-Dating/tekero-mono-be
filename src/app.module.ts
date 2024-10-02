@@ -10,6 +10,7 @@ import { ProfilesModule } from './modules/profiles-module/profiles.module';
 import { ExpensesModule } from './modules/expenses-module/expenses.module';
 import { ActionsModule } from './modules/actions-module/actions.module';
 import { QuestionnaireModule } from './modules/questionnaire-module/questionnaire.module';
+import { MediaModule } from './modules/media-module/media.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { QuestionnaireModule } from './modules/questionnaire-module/questionnair
     AdsModule,
     ExpensesModule,
     ActionsModule,
-    QuestionnaireModule
+    QuestionnaireModule,
+    MediaModule
   ],
   controllers: [
     AppController

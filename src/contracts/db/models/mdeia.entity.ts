@@ -17,7 +17,10 @@ export class Media extends Model {
   private: boolean;
 
   @Column
-  hot: boolean;
+  expiration?: number;
+
+  @Column
+  opened?: boolean;
 
   @IsUrl
   @Column

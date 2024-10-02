@@ -24,7 +24,11 @@ const {
   RMQ_URL,
   APP_MODE,
   APP_PORT,
-  RMQ_QUEUE_PREFIX
+  RMQ_QUEUE_PREFIX,
+  AWS_S3_BUCKET,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
+  AWS_REGION
 } = process.env;
 
 const validate = ajv.compile<EnvSchema>(envSchema);
@@ -59,4 +63,11 @@ export const generalRmqOpts: IRmqOptions = {
 };
 
 export const rmqUrl = RMQ_URL;
-export { APP_PORT, RMQ_QUEUE_PREFIX }
+export {
+  APP_PORT,
+  RMQ_QUEUE_PREFIX,
+  AWS_S3_BUCKET,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
+  AWS_REGION
+}

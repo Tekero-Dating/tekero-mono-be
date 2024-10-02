@@ -8,7 +8,7 @@
 4. Migrations and seeders
 5. Testing
 
-#### 2. Docker
+#### 2. Docker (you need all infrastructure to be installed)
 ```
 docker build -t grinder_nest .
 
@@ -20,7 +20,7 @@ docker run -p 3000:3000 -v $(pwd):/app grinder_nest
 
 #### 3. Docker-compose (*recommended*)
 ```
-NODE_ENV=development docker compose up --build
+NODE_ENV=development docker compose --env-file .env.development up --build
 ```
 
 #### 4. Migrations and seeders
@@ -66,6 +66,12 @@ export namespace IEditAdv {
 }
 ``` 
 Then implement this abstract class.
+```typescript
+export interface IQuestionnaireController {
+  getQuestionnaire: (payload: IGetQuestionnaire.Request, context: RmqContext) => Promise<IGetQuestionnaire.Response>
+  submitQuestionByShortcode: (payload: ISubmitQuestionByShortcode.Request, context: RmqContext) => Promise<ISubmitQuestionByShortcode.Response>
+};
+```
 
 #### 2. Build module with controller that implements an abstract class
 ```typescript

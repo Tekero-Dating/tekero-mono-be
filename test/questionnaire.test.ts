@@ -1,18 +1,15 @@
 import request from 'supertest';
 import { closeApp, getApp } from './helpers/get-app';
 import * as bodyParser from 'body-parser';
+import { wait } from '../src/utils/wait';
 
 describe('Test suite for questionnaire of Tekero', () => {
   let App;
-
   beforeAll(async () => {
     App = await getApp();
-    App.use(bodyParser.json())
   });
 
-  afterAll(async () => {
-    await closeApp();
-  });
+  afterAll(async () => {});
 
   describe('User first time opens the app and completes whole questionnaire step by step', () => {
     it('Confirm that users has correct state of questionnaire', async () => {
@@ -48,24 +45,13 @@ describe('Test suite for questionnaire of Tekero', () => {
       for await (const question of questions) {
         const { question: q } = question;
         let answer;
-        console.log('test', { type: q.type });
         if (q.type === 'string') {
-          console.log('type string');
           answer = 'MALE';
-          console.log({ answer });
         } else if (q.type === 'number') {
-          console.log('type number');
           answer = 5;
-          console.log({ answer });
         } else if (q.type === 'boolean') {
-          console.log('type bool');
           answer = true;
-          console.log({ answer });
         }
-        console.log('TEST', {
-          shortcode: q.shortcode,
-          response: answer
-        });
         await request(App.getHttpServer())
           .post('/api/questionnaire/submit-question/2')
           .send({
@@ -82,23 +68,46 @@ describe('Test suite for questionnaire of Tekero', () => {
   });
 
   describe('User opens the app and complete questionnaire partially, then return to complete other steps', () => {
-    it('Submit questionnaire remaining steps successfully', () => {
-
-    });
-  });
-
-  describe('User continue completing the questionnaire but then want to edit some of his answers from prev steps', () => {
-    it('Submit questionnaire step tnen back to prev step and then complete 2 steps, then go 1 step back and submit successfully', () => {
-
+    it('Submit questionnaire remaining steps successfully', async () => {
+      const qUser2 = await request(App.getHttpServer())
+        .get('/api/questionnaire/get-questionnaire/2').expect(200);
+      const { questions } = qUser2.body;
+      const middleQuestionOfQuestionnaireIndex =
+        Math.floor(questions.length / 2) === 0
+          ? 0
+          : Math.floor(questions.length / 2) - 1
+      const middleQuestion = questions[middleQuestionOfQuestionnaireIndex];
+      let middleQuestionAnswer;
+      if (middleQuestion.question.type === 'string') {
+        middleQuestionAnswer = 'FEMALE';
+      } else if (middleQuestion.question.type === 'number') {
+        middleQuestionAnswer = 6;
+      } else if (middleQuestion.question.type === 'boolean') {
+        middleQuestionAnswer = false;
+      }
+      console.log({ middleQuestion, middleQuestionAnswer, middleQuestionOfQuestionnaireIndex, questions });
+      await request(App.getHttpServer())
+        .post('/api/questionnaire/submit-question/2')
+        .send({
+          shortcode: middleQuestion.question.shortcode,
+          response: middleQuestionAnswer
+        })
+        .expect(200);
+      const qUser2AfterSubmitPart = await request(App.getHttpServer())
+        .get('/api/questionnaire/get-questionnaire/2').expect(200);
+      expect(middleQuestion.answered).toBe(true);
+      expect(qUser2AfterSubmitPart.body
+        .questions[middleQuestionOfQuestionnaireIndex].response
+      ).not.toEqual(middleQuestion.question.response);
+      expect(qUser2AfterSubmitPart.body
+        .questions[middleQuestionOfQuestionnaireIndex].response
+      ).toEqual(middleQuestionAnswer);
+      expect(qUser2AfterSubmitPart.body.started).toEqual(true);
     });
   });
 
   describe('Negative cases', () => {
     it('User try to submit incorrect data and receives bad data error from server', () => {
-
-    });
-
-    it('User try to submit over 1 step of questionnaire and receives not allowed error from server', () => {
 
     });
   })

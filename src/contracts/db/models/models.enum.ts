@@ -9,6 +9,7 @@ import { ActionsList } from './actions-list.entity';
 import { Operation } from './operation.entity';
 import { Questionnaire } from './questionnaire.entity';
 import { QuestionnaireSteps } from './questionnaire-steps.entity';
+import { MediaAccess } from './mdeia-access.entity';
 
 export const DB_MODELS: ModelCtor[] = [
   User,
@@ -16,6 +17,7 @@ export const DB_MODELS: ModelCtor[] = [
   UserSettings,
   Advertisement,
   Media,
+  MediaAccess,
   AdvertisementMedia,
   ActionsList,
   Operation,
@@ -28,6 +30,7 @@ export const MODELS_REPOSITORIES_ENUM = {
   GRINDER: 'GRINDER_REPOSITORY',
   USER_PROFILE: 'USER_PROFILE_REPOSITORY',
   MEDIA: 'MEDIA_REPOSITORY',
+  MEDIA_ACCESS: 'MEDIA_ACCESS_REPOSITORY',
   LIKE: 'LIKE_REPOSITORY',
   USER_SETTINGS: 'USER_SETTINGS_REPOSITORY',
   ADVERTISEMENTS: 'ADVERTISEMENTS_REPOSITORY',
