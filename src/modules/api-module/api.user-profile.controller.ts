@@ -28,6 +28,10 @@ export class ApiUserProfileController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @Get('get/:userId')
   @UsePipes(new ValidationPipe({
     transform: true

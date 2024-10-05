@@ -1,7 +1,5 @@
 import request from 'supertest';
 import { closeApp, getApp } from './helpers/get-app';
-import * as bodyParser from 'body-parser';
-import { wait } from '../src/utils/wait';
 
 describe('Test suite for questionnaire of Tekero', () => {
   let App;
@@ -9,7 +7,9 @@ describe('Test suite for questionnaire of Tekero', () => {
     App = await getApp();
   });
 
-  afterAll(async () => {});
+  afterAll(async () => {
+    await closeApp();
+  });
 
   describe('User first time opens the app and completes whole questionnaire step by step', () => {
     it('Confirm that users has correct state of questionnaire', async () => {

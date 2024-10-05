@@ -19,6 +19,10 @@ export class AdsController implements IAdsController{
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @MessagePattern(ADS_MSG_PATTERNS.CREATE)
   async createAdv(
     @Payload() payload: ICreateAdv.Request, @Ctx() context: RmqContext

@@ -23,6 +23,10 @@ export class ProfilesController implements IUserProfileController{
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @MessagePattern(USER_PROFILES_MSG_PATTERNS.GET)
   async getUserProfile(@Payload() data, @Ctx() context: RmqContext) {
     try {

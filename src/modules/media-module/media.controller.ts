@@ -27,6 +27,10 @@ export class MediaController implements IMediaController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @MessagePattern(MEDIA_MSG_PATTERNS.GET_MEDIA)
   async getMedia (@Payload() payload: IGetMedia.Request, @Ctx() context: RmqContext): Promise<IGetMedia.Response> {
     this.logger.log('getMedia', { payload });

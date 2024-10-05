@@ -20,6 +20,10 @@ export class ApiQuestionnaireController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @Get('get-questionnaire/:userId')
   async getQuestionnaire(
     @Param('userId') userId: number,

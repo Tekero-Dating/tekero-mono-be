@@ -12,96 +12,101 @@ import { NestFactory } from '@nestjs/core';
 import { createRmqMicroservices, generateRmqOptions, rmqSend } from '../src/utils/rmq-utils.nest';
 import { wait } from '../src/utils/wait';
 
-describe('RMQ', () => {
-  @Controller()
-  class PublisherController<T> {
-    constructor (
-      @Inject('test-service') private client: ClientProxy
-    ) {}
+@Controller()
+class PublisherController<T> {
+  constructor (
+    @Inject('test-service') private client: ClientProxy
+  ) {}
 
-    successCount: number = 0;
+  successCount: number = 0;
 
-    async onApplicationBootstrap() {
-      await this.client.connect();
-    }
+  async onApplicationBootstrap() {
+    await this.client.connect();
+  }
 
-    async onApplicationShutdown(signal?: string) {
-      await this.client.close();
-    }
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
 
-    async sendTestMessage() {
-      await rmqSend(
-        this.client,
-        'test-message',
-        'test message 1',
-        (response) => {
-          response.success && this.successCount++;
-        }
-      );
-    }
-
-    async sendWrongMessage() {
-      return await rmqSend(
-        this.client,
-        'test-wrong-message',
-        'wrong message 1',
-        (response) => {
-          response.success && this.successCount++;
-        }
-      );
-    }
-  };
-
-  @Controller()
-  class ConsumerController<T> {
-    constructor (
-      @Inject('test-service') private client: ClientProxy
-    ) {}
-
-    messagesCount: number = 0;
-
-    async onApplicationBootstrap() {
-      await this.client.connect();
-    }
-
-    async onApplicationShutdown(signal?: string) {
-      await this.client.close();
-    }
-
-    @MessagePattern('test-message')
-    async receiveTestMessage(@Payload() data) {
-      this.messagesCount++;
-      return Promise.resolve({ success: true });
-    }
-  };
-
-  @Module({
-    imports: [
-      ClientsModule.register(
-        generateRmqOptions(['test'], 'test-service')
-      )
-    ],
-    controllers: [ ConsumerController, PublisherController ]
-  })
-  class TestModule {}
-
-  const clientRmqConfig: RmqOptions = {
-    transport: Transport.RMQ,
-    options: {
-      "queue": 'test',
-      "urls": [rmqUrl!],
-      "queueOptions": {
-        "durable": true,
-        "noAck": false,
-        "persistent": true
+  async sendTestMessage() {
+    await rmqSend(
+      this.client,
+      'test-message',
+      'test message 1',
+      (response) => {
+        response.success && this.successCount++;
       }
+    );
+  }
+
+  async sendWrongMessage() {
+    return rmqSend(
+      this.client,
+      'test-wrong-message',
+      'wrong message 1',
+      (response) => {
+        response.success && this.successCount++;
+      }
+    );
+  }
+};
+
+@Controller()
+class ConsumerController<T> {
+  constructor (
+    @Inject('test-service') private client: ClientProxy
+  ) {}
+
+  messagesCount: number = 0;
+
+  async onApplicationBootstrap() {
+    await this.client.connect();
+  }
+
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
+  @MessagePattern('test-message')
+  async receiveTestMessage(@Payload() data) {
+    this.messagesCount++;
+    return Promise.resolve({ success: true });
+  }
+
+  @MessagePattern('test-wrong-message')
+  async handleWrongMessage(@Payload() data) {
+    return Promise.resolve({ success: false });
+  }
+};
+
+@Module({
+  imports: [
+    ClientsModule.register(
+      generateRmqOptions(['test'], 'test-service')
+    )
+  ],
+  controllers: [ ConsumerController, PublisherController ]
+})
+class TestModule {}
+
+const clientRmqConfig: RmqOptions = {
+  transport: Transport.RMQ,
+  options: {
+    "queue": 'test',
+    "urls": [rmqUrl!],
+    "queueOptions": {
+      "durable": true,
+      "noAck": true,
+      "persistent": false
     }
-  };
+  }
+};
 
-  let app: INestApplication,
-      consumerController: ConsumerController<{"index": number}>,
-      publisherController: PublisherController<any>
+let app: INestApplication,
+  consumerController: ConsumerController<{"index": number}>,
+  publisherController: PublisherController<any>
 
+describe('RMQ', () => {
   beforeAll(async () => {
     app = await NestFactory.create(TestModule);
     await createRmqMicroservices(app, ['test'], clientRmqConfig);
@@ -111,7 +116,9 @@ describe('RMQ', () => {
     publisherController = app.get(PublisherController);
   });
   afterAll(async () => {
+    await wait(200);
     await app.close();
+    await wait(200);
   })
 
   afterEach(() => {
@@ -130,6 +137,7 @@ describe('RMQ', () => {
 
   it(`Consumer don't consumes amessages with wrong message pattern`, async () => {
     await publisherController.sendWrongMessage();
+    await wait(200);
     expect(publisherController.successCount).toEqual(0);
   });
 });

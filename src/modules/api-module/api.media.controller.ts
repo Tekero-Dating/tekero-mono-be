@@ -47,6 +47,10 @@ export class ApiMediaController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @Post('upload-media/:userId')
   @UseInterceptors(FileInterceptor('file'))
   async uploadMedia(

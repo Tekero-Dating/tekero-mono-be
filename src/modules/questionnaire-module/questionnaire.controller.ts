@@ -19,6 +19,10 @@ export class QuestionnaireController implements IQuestionnaireController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @MessagePattern(QUESTIONNAIRE_MSG_PATTERNS.GET_QUESTIONNAIRE)
   async getQuestionnaire(@Payload() data, @Ctx() context: RmqContext) {
     this.logger.log('Received request');

@@ -27,6 +27,10 @@ export class ApiAdsController {
     await this.client.connect();
   }
 
+  async onApplicationShutdown(signal?: string) {
+    await this.client.close();
+  }
+
   @Post('create/:userId')
   @UsePipes(new ValidationPipe({
     transform: true
