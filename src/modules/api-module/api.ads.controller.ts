@@ -1,17 +1,17 @@
 import {
   BadRequestException,
   Body,
-  Controller,
+  Controller, Delete, Get,
   Inject,
   Param,
-  Post,
+  Post, Put,
   Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ADS_SERVICE_NAME } from '../../contracts/ads-interface/ads.constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateAdvDTO } from '../../contracts/api-interface/api.dto';
+import { CreateAdvDTO, EditAdvDTO } from '../../contracts/ads-interface/ads.api.dto';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import { ADS_MSG_PATTERNS, ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
@@ -51,7 +51,7 @@ export class ApiAdsController {
       { fields: payload, userId },
       ({ success, result, error }) => {
         if (success) {
-          return res.status(200).send(result);
+          return res.status(201).send(result);
         } else {
           const { status, message } = TekeroError(error);
           res.status(status).send(message);
@@ -60,13 +60,14 @@ export class ApiAdsController {
     )
   }
 
-  @Post('edit/:advId')
+  @Put('edit/:userId/:advId')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
   async editAd(
     @Param('advId') advId: number,
-    @Body() payload: CreateAdvDTO,
+    @Param('userId') userId: number,
+    @Body() payload: EditAdvDTO,
     @Res() res
   ) {
     if (!Object.keys(payload).length) {
@@ -77,7 +78,7 @@ export class ApiAdsController {
     rmqSend<IEditAdv.Request, IEditAdv.Response>(
       this.client,
       ADS_MSG_PATTERNS.EDIT,
-      { fields: payload, advId },
+      { fields: payload, advId, userId },
       ({ success, result, error }) => {
         if (success) {
           return res.status(200).send(result);
@@ -87,5 +88,62 @@ export class ApiAdsController {
         }
       }
     )
+  }
+
+  @Post('publish/:userId/:advId')
+  @UsePipes(new ValidationPipe({
+    transform: true
+  }))
+  async publishAdvertisement(
+    @Param('advId') advId: number,
+    @Param('userId') userId: number,
+    @Res() res
+  ) {
+    rmqSend(
+      this.client,
+      ADS_MSG_PATTERNS.ACTIVATE_ADV,
+      { userId, advId },
+      ({ success, result, error }) => {
+        if (success) {
+          return res.status(200).send(result);
+        } else {
+          const { status, message } = TekeroError(error);
+          res.status(status).send(message);
+        }
+      },
+    );
+  }
+
+  @Delete('archive/:userId/:advId')
+  @UsePipes(new ValidationPipe({
+    transform: true
+  }))
+  async archiveAdvertisement(
+    @Param('advId') advId: number,
+    @Param('userId') userId: number,
+    @Res() res
+  ) {
+    rmqSend(
+      this.client,
+      ADS_MSG_PATTERNS.ARCHIVE,
+      { userId, advId },
+      ({ success, result, error }) => {
+        if (success) {
+          return res.status(200).send(result);
+        } else {
+          const { status, message } = TekeroError(error);
+          res.status(status).send(message);
+        }
+      },
+    );
+  }
+
+  @Get('suitable-advertisements/:userId')
+  async getSuitableAdvertisements(
+    @Param('userId') userId: number,
+    @Body() payload,
+    @Res() res
+  ) {
+
   }
 }

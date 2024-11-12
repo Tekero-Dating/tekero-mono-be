@@ -24,7 +24,7 @@ describe('Media module testing suite', () => {
         .query({ expiration: 100 })
         .expect(201);
       mediaId = uploadMediaBody.result.mediaId;
-    })
+    });
 
     it('Get media successfully', async () => {
       const { body: getMediaBody } = await request(App.getHttpServer())
@@ -83,6 +83,6 @@ describe('Media module testing suite', () => {
       await request(App.getHttpServer())
         .get(`/api/media/get-media/1/${mediaId}`)
         .expect(404);
-    })
+    });
   });
 });

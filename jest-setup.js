@@ -2,13 +2,20 @@ const { SuperSequelize } = require('./test/helpers/control-over-db');
 const { dbOpts } = require('./src/config/config');
 const { exec } = require('child_process');
 
+/**
+ *  Current script make up and running a DB connection by
+ *  creating a test db for running test with real DB
+ *  but in isolated environment
+ */
 module.exports = async () => {
   const db = new SuperSequelize({
     ...dbOpts,
     database: 'postgres'
   });
   try {
-    await db.createDatabase(dbOpts.database);
+    await db.createDatabase(dbOpts.database, 'template_postgis');
+    await db.applyPostgis();
+    console.log('Test database created and postgis extension applied');
   } catch (e) {
     console.log({ e });
   }

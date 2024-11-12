@@ -7,7 +7,7 @@ import {
   ForeignKey, AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
-import { validateQuestion, validateResponse } from './validators/questionnaire.validator';
+import { validateResponse } from './validators/questionnaire.validator';
 
 @Table({ modelName: 'questionnaire' })
 export class Questionnaire extends Model {
@@ -26,7 +26,7 @@ export class Questionnaire extends Model {
 
   @Column({
     type: DataType.JSON,
-    allowNull: true, // or false based on your requirement
+    allowNull: true,
     validate: {
       async validateJSON(value: any) {
         const valid = validateResponse(value);

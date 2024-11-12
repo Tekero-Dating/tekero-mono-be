@@ -7,10 +7,9 @@ export const ADS_MSG_PATTERNS = {
   CREATE: 'create',
   EDIT: 'edit',
   ARCHIVE: 'archive',
-  ACTIVITY: 'activity',
-  STATS: 'stats'
+  SUIT_ADS: 'suitable_ads',
+  ACTIVATE_ADV: 'activate_adv'
 };
-
 
 export namespace ICreateAdv {
   export interface Request {
@@ -25,30 +24,35 @@ export namespace ICreateAdv {
       message: string;
     };
   }
-}
+};
+
+export interface IAdvFilters {
+  gender?: GendersEnum[];
+  genderExpressionFrom?: number;
+  genderExpressionTo?: number;
+  orientationFrom?: number;
+  orientationTo?: number;
+  distance?: number;
+  ageFrom?: number;
+  ageTo?: number;
+  heightFrom?: number;
+  heightTo?: number;
+  constitution?: ConstitutionsEnum[];
+};
 
 export interface IAdvFields {
   text?: string;
   photos?: number[];
   type: AdTypesEnum;
-  filter?: {
-    gender?: GendersEnum[];
-    sexualityFrom?: number;
-    sexualityTo?: number;
-    orientationFrom?: number;
-    orientationTo?: number;
-    location?: number | string;
-    ageFrom?: number;
-    ageTo?: number;
-    constitution?: ConstitutionsEnum[];
-  };
+  targetFilters?: IAdvFilters;
   opener?: OpenersEnum;
-  openerQuestion?: string;
   song?: string;
-}
+  location: { type: 'Point'; coordinates: [number, number] };
+};
 
 export namespace IEditAdv {
   export interface Request {
+    userId: number;
     advId: number;
     fields: Partial<IAdvFields>;
   };
@@ -60,13 +64,12 @@ export namespace IEditAdv {
       message: string;
     };
   }
-}
+};
 
 export namespace IArchiveAdv {
   export interface Request {
     userId: number;
     advId: number;
-    reason: string;
   };
   export interface Response {
     success: boolean;
@@ -75,50 +78,66 @@ export namespace IArchiveAdv {
       message: string;
     };
   }
-}
+};
 
-export namespace IGetAdvActivity {
+export namespace IPublishAdv {
   export interface Request {
     userId: number;
     advId: number;
   };
   export interface Response {
     success: boolean;
-    result?: IAdvActivity;
     error?: Record<string, any> | {
       status: number;
       message: string;
     };
   }
-}
+};
 
-export interface IAdvLikes {
-  userId: number;
-  fullName: string;
-  dob: string;
-  message?: string;
-  expirationDate: number;
-}
-
-export interface IAdvActivity {
-  likes: IAdvLikes[];
-  matches: IAdvLikes[];
-}
-
-export interface IAdvStats {
-  likes: IAdvLikes[];
-  matches: IAdvLikes[];
-  visits: {
+export namespace IGetSuitableAds {
+  export interface Request {
     userId: number;
-    date: number;
-  }[];
-}
+    filters: IAdvFilters;
+  };
+  export interface Response {
+    success: boolean;
+    result?: {
+      advertisements: Advertisement[];
+    };
+    error?: Record<string, any> | {
+      status: number;
+      message: string;
+    };
+  }
+};
 
 export interface IAdsController {
-  createAdv: (payload: ICreateAdv.Request, context: RmqContext) => Promise<ICreateAdv.Response>
-  editAdv: (payload: IEditAdv.Request, context: RmqContext) => Promise<IEditAdv.Response>
-  archiveAdv: (payload: IArchiveAdv.Request, context: RmqContext) => Promise<IArchiveAdv.Response>
+  /**
+   * Creates an advertisement
+   */
+  createAdv: (payload: ICreateAdv.Request, context: RmqContext) => Promise<ICreateAdv.Response>;
 
-  getAdvActivity: (payload: IGetAdvActivity.Request, context: RmqContext) => Promise<IGetAdvActivity.Response> // TODO: replace with actual activity
-  getAdvStats: (payload: IGetAdvActivity.Request, context: RmqContext) => Promise<IGetAdvActivity.Response> // TODO: replace with actual stats
+  /**
+   * Edits an advertisement
+   */
+  editAdv: (payload: IEditAdv.Request, context: RmqContext) => Promise<IEditAdv.Response>;
+
+  /**
+   * Change status of advertisement to archive
+   * Notice that adv could be only archived and
+   * can't be restored
+   */
+  archiveAdv: (payload: IArchiveAdv.Request, context: RmqContext) => Promise<IArchiveAdv.Response>;
+
+  /**
+   * Get advertisements that are suitable
+   * according to the expectations of the user
+   * who search for adv and user who posts the adv
+   */
+  getSuitableAdvertisements: (payload: IGetSuitableAds.Request, context: RmqContext) => Promise<IGetSuitableAds.Response>;
+
+  /**
+   * Publishing created advertisement
+   */
+  publishAdv: (payload: IPublishAdv.Request, context: RmqContext) => Promise<IPublishAdv.Response>;
 };

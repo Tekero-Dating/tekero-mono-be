@@ -14,11 +14,16 @@ import { AdTypesEnum } from './enums/ad-types.enum';
 import { Media } from './mdeia.entity';
 import { AdvertisementMedia } from './junctions/advertisement-media.entity';
 import { AdStatusesEnum } from './enums/ad-statuses.enum';
+import { validateAdvFilter } from './validators/advertisement.validator';
 
 @Table({ modelName: 'advertisement' })
 export class Advertisement extends Model {
   @Column
   active: boolean;
+
+  @AllowNull(true)
+  @Column
+  activated: Date;
 
   @Column({
     type: DataType.ENUM,
@@ -34,33 +39,42 @@ export class Advertisement extends Model {
 
   @Column({
     type: DataType.JSON,
+    validate: {
+      async validateJSON(value: any) {
+        const valid = validateAdvFilter(value);
+        if (!valid) {
+          throw new Error(`Invalid response format: ${JSON.stringify(validateAdvFilter.errors)}`);
+        }
+      }
+    }
   })
   filter: {
-    gender?: GendersEnum[];
-    sexualityFrom?: number;
-    sexualityTo?: number;
-    orientationFrom?: number;
-    orientationTo?: number;
-    location?: number | string;
-    ageFrom?: number;
-    ageTo?: number;
-    constitution?: ConstitutionsEnum[];
+    gender: GendersEnum[];
+    genderExpressionFrom: number;
+    genderExpressionTo: number;
+    orientationFrom: number;
+    orientationTo: number;
+    distance: number;
+    ageFrom: number;
+    ageTo: number;
+    heightFrom: number;
+    heightTo: number;
+    constitution: ConstitutionsEnum[];
   }
 
   @Column
   text: string;
 
-  @Column
-  location: string;
+  @Column({
+    type: DataType.GEOGRAPHY('POINT', 4326)
+  })
+  location: { type: 'Point'; coordinates: [number, number] };
 
   @Column({
     type: DataType.ENUM,
     values: Object.keys(OpenersEnum)
   })
   opener: OpenersEnum;
-
-  @Column
-  openerQuestion: string;
 
   @Column
   song: string;

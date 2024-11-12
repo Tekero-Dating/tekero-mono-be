@@ -1,8 +1,9 @@
 services:
     postgres:
-        image: postgres
+        image: postgis/postgis:16-3.5
         volumes:
             - .:/postgres
+            - ./postgis-init.sql:/docker-entrypoint-initdb.d/postgis-init.sql
         ports:
             - "5432:5432"
         env_file: ".env.${NODE_ENV}"

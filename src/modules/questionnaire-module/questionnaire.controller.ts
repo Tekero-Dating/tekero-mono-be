@@ -18,18 +18,17 @@ export class QuestionnaireController implements IQuestionnaireController {
   async onApplicationBootstrap() {
     await this.client.connect();
   }
-
   async onApplicationShutdown(signal?: string) {
     await this.client.close();
   }
 
   @MessagePattern(QUESTIONNAIRE_MSG_PATTERNS.GET_QUESTIONNAIRE)
   async getQuestionnaire(@Payload() data, @Ctx() context: RmqContext) {
-    this.logger.log('Received request');
+    this.logger.log('getQuestionnaire Received request');
     const { userId } = data;
     try {
       const result = await this.questionnaireService.getQuestionnaire(userId);
-      this.logger.log(`Request processes successfully`, { userId });
+      this.logger.log(`getQuestionnaire Request processes successfully`, { userId });
       return {
         success: true,
         result
@@ -46,8 +45,10 @@ export class QuestionnaireController implements IQuestionnaireController {
   @MessagePattern(QUESTIONNAIRE_MSG_PATTERNS.SUBMIT_QUESTIONNAIRE)
   async submitQuestionByShortcode(@Payload() data, @Ctx() context: RmqContext) {
     const { userId, response } = data;
+    this.logger.log('submitQuestionByShortcode Received request', { userId });
     try {
       const questionnaireStatus = await this.questionnaireService.submitQuestionByShortcode(userId, response);
+      this.logger.log(`submitQuestionByShortcode Request processes successfully`, { userId });
       return {
         success: true,
         result: {
@@ -55,7 +56,7 @@ export class QuestionnaireController implements IQuestionnaireController {
         }
       };
     } catch (e) {
-      this.logger.error(e, { userId });
+      this.logger.error('submitQuestionByShortcode', { e, userId, response });
       return {
         success: false,
         error: e

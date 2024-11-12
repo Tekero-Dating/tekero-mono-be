@@ -1,5 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
 
+
+/**
+ * It's just a wrapper to have shortened access to internal
+ * sequlelize methods though simplified api
+ */
 export class SuperSequelize {
   dbOpts;
   sequelize
@@ -25,12 +30,24 @@ export class SuperSequelize {
     );
   }
 
-  async createDatabase(name: string) {
+  async createDatabase(name: string, template?: string) {
     try {
-      await this.sequelize.query(`CREATE DATABASE "${name}"`);
+      const addTemplate = template ? `TEMPLATE ${template}` : '';
+      await this.sequelize.query(`CREATE DATABASE "${name}" ${addTemplate}`);
       console.log(`Database ${name} created successfully.`);
     } catch (error) {
       console.error(`Error creating database: ${error.message}`);
+    }
+  }
+
+  async applyPostgis() {
+    try {
+      await this.sequelize.query(`
+        CREATE EXTENSION IF NOT EXISTS postgis;
+      `);
+      console.log('Postgis extension applied SUCCESSFULLY');
+    } catch(e) {
+      console.error('Can not apply postgis plugin', e);
     }
   }
 

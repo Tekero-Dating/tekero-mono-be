@@ -1,8 +1,11 @@
-const { wait } = require('./src/utils/wait');
 const { closeApp } = require('./test/helpers/get-app');
 const { SuperSequelize } = require('./test/helpers/control-over-db');
 const { dbOpts } = require('./src/config/config');
 
+/**
+ * Current script just killing existing DB connection
+ * with dropping test database
+ */
 module.exports = async () => {
   console.log("TEARDOWN started!!!!");
   const db = new SuperSequelize(dbOpts);

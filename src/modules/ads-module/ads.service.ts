@@ -1,4 +1,11 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Advertisement } from '../../contracts/db/models/advertisements.entity';
 import { ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
@@ -11,6 +18,7 @@ import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class AdsService {
+  private readonly logger = new Logger(AdsService.name);
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS)
     private advRepository: typeof Advertisement,
@@ -22,19 +30,21 @@ export class AdsService {
     private readonly sequelizeInstance: Sequelize
   ) {}
 
-
-  getHello(): Promise<any> {
-    return this.advRepository.findAll<Advertisement>();
-  }
-
+  /**
+   *  Checks can if the current user illegible to attach
+   *  these particular photos to his advertisement. Private
+   *  photos can't be attached.
+   */
   private async prepareMediaToAttach(mediaIds: number[] = [], userId: number) {
+    this.logger.log('prepareMediaToAttach', { userId, mediaIds });
     const mediaToAttach: number[] = [];
     if (mediaIds && mediaIds.length) {
       const medias = await this.mediaRepository.findAll<Media['id']>({
         attributes: ['id'],
         where: {
           id: { [Op.in]: mediaIds },
-          user_id: userId
+          user_id: userId,
+          private: false
         }
       });
       medias.forEach(media => {
@@ -48,22 +58,26 @@ export class AdsService {
     userId: number,
     payload: ICreateAdv.Request['fields']
   ): Promise<Advertisement> {
+    this.logger.log('createAd', { userId });
     const preConfiguredFields: Partial<Advertisement> = {
       status: AdStatusesEnum.DRAFT,
       type: AdTypesEnum.DATE,
       active: false,
-      duration: 168
+      duration: (1000 * 3600) * 168
     };
 
     let adv;
     const mediaToAttach: number[] = await this.prepareMediaToAttach(payload.photos, userId);
     const transaction = await this.sequelizeInstance.transaction();
+    const filter = payload.targetFilters;
 
     try {
       adv = await this.advRepository.create(
-        { ...preConfiguredFields, ...payload, user_id: userId },
+        { ...preConfiguredFields, ...payload, filter, user_id: userId },
         { transaction }
       );
+      this.logger.log('createAd created advertisement');
+
       await this.advMediaRepository.bulkCreate<AdvertisementMedia>(
         mediaToAttach.map(mediaId => ({
           advertisementId: adv.id,
@@ -71,9 +85,11 @@ export class AdsService {
         })),
         { transaction }
       );
+      this.logger.log('createAd attached media');
       await transaction.commit();
       return adv;
     } catch (error) {
+      this.logger.error('createAd failed', error);
       await transaction.rollback();
       throw {
         message: 'Error during ad creation',
@@ -83,20 +99,97 @@ export class AdsService {
   }
 
   async editAd(
+    userId: number,
     advId: number,
     payload: IEditAdv.Request['fields']
   ): Promise<Advertisement> {
-    const [numberOfAffectedRows, [updatedRecord]] = await this.advRepository.update(payload, {
-      where: { id: advId },
-      returning: true
+    this.logger.log('editAd', { userId, advId });
+    const originalAdv = await this.advRepository.findOne<Advertisement>({
+      where: {
+        id: advId,
+        user_id: userId
+      }
+    });
+    if (!originalAdv) {
+      throw new NotFoundException('There is no advertisement with the given ID for the current user.')
+    }
+
+    let newAdvertisement = {
+      ...originalAdv,
+      ...payload,
+      filter: {
+        ...originalAdv.filter,
+        ...payload.targetFilters
+      }
+    }
+
+    try {
+      const [numberOfAffectedRows, [updatedRecord]] = await this.advRepository.update(newAdvertisement, {
+        where: { id: advId },
+        returning: true
+      });
+      this.logger.log('editAd adv edited');
+
+      if (numberOfAffectedRows) {
+        return updatedRecord;
+      } else {
+        this.logger.error('editAd did not find any records to update', { userId, advId })
+        throw new NotFoundException('Record not found or update failed');
+      }
+    } catch (e) {
+      this.logger.error('editAd', { e, userId, advId, payload })
+      throw new BadRequestException('Update failed');
+    }
+  }
+
+  async publishAdv(userId: number, advId: number) {
+    this.logger.log('publishAdv', { userId, advId });
+    const advBelongedToUser = await this.advRepository.findOne({
+      where: { id: advId, user_id: userId }
     });
 
-    if (numberOfAffectedRows) {
-      console.log({ numberOfAffectedRows });
-      return updatedRecord;
-    } else {
-      // Handle the case where the record was not found or not updated
-      throw new BadRequestException('Record not found or update failed');
+    if (!advBelongedToUser) {
+      this.logger.error('publishAdv not found adv');
+      throw new NotFoundException('Advertisement not found');
+    }
+
+    try {
+      await this.advRepository.update({
+        status: AdStatusesEnum.ACTIVE,
+        active: true,
+        activated: Date.now()
+      }, {
+        where: { id: advId }
+      });
+      return;
+    } catch (error) {
+      this.logger.error('publishAdv', error);
+      throw new InternalServerErrorException('Can not activate advertisement');
+    }
+  }
+
+  async archiveAdv(userId: number, advId: number) {
+    this.logger.log('archiveAdv', { userId, advId });
+    const advBelongedToUser = await this.advRepository.findOne({
+      where: { id: advId, user_id: userId }
+    });
+
+    if (!advBelongedToUser) {
+      this.logger.error('archiveAdv not found adv');
+      throw new NotFoundException('Advertisement not found');
+    }
+
+    try {
+      await this.advRepository.update({
+        status: AdStatusesEnum.ARCHIVED,
+        active: false
+      }, {
+        where: { id: advId }
+      });
+      return;
+    } catch (error) {
+      this.logger.error('archiveAdv', { error, userId, advId });
+      throw new InternalServerErrorException('Can not archive advertisement');
     }
   }
 }

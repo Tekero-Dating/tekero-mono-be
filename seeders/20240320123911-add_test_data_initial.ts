@@ -4,7 +4,7 @@ import { User } from '../src/contracts/db/models/user.entity';
 import { Media } from '../src/contracts/db/models/mdeia.entity';
 import { Model } from 'sequelize';
 
-import { GendersEnum } from '../src/contracts/db/models/enums';
+import { ConstitutionsEnum, GendersEnum } from '../src/contracts/db/models/enums';
 import { UserProfile } from '../src/contracts/db/models/user-profile.entity';
 import { Questionnaire } from '../src/contracts/db/models/questionnaire.entity';
 import { Sequelize as SEQUELIZE } from 'sequelize-typescript';
@@ -128,11 +128,25 @@ module.exports = {
       }, {
         user_id: 3,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        orientation: 100,
+        sex: GendersEnum.MALE,
+        gender_expression: 99,
+        height: 185,
+        weight: 90,
+        bio: 'I am just a stranger, a real man that you need.',
+        constitution: ConstitutionsEnum.AVERAGE
       }, {
         user_id: 4,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        orientation: 70,
+        sex: GendersEnum.FEMALE,
+        gender_expression: 50,
+        height: 159,
+        weight: 50,
+        bio: 'Looking for a daddy to put me on his hands.',
+        constitution: ConstitutionsEnum.AVERAGE
       },
     ];
     await queryInterface.bulkInsert('user-profiles', userProfileSeeders);
@@ -154,18 +168,23 @@ module.exports = {
         updatedAt: new Date('2024-03-15')
       },  {
         user_id: 3,
-        questionnaire_started: false,
-        is_completed: false,
-        responses: {},
+        questionnaire_started: true,
+        is_completed: true,
+        responses: {
+          display_name: "Danya",
+          sex: 'MALE',
+          gender_expresion: 99
+        },
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       },  {
         user_id: 4,
         questionnaire_started: true,
-        is_completed: false,
+        is_completed: true,
         responses: {
           display_name: 'Lara K.',
-          sex: 'FEMALE'
+          sex: 'FEMALE',
+          gender_expresion: 50
         },
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
