@@ -1,0 +1,37 @@
+name: PR Testing Pipeline
+
+on:
+    pull_request:
+        branches:
+            - develop
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Export All Secrets and Variables to .env.test File
+              run: |
+                  touch .env.test
+                  for key in $(printenv | awk -F= '{print $1}'); do
+                    if [[ $key == GITHUB_* || $key == CI || $key == RUNNER* ]]; then
+                      continue
+                    fi
+                    echo "$key=${!key}" >> .env
+                  done
+
+            - name: Start Infrastructure with Docker Compose
+              run: |
+                  NODE_ENV=test docker compose --env-file .env.test up
+                  echo "Waiting for infrastructure to become healthy..."
+                  sleep 20
+
+            - name: Build and Test Application
+              run: npm run test
+
+            - name: Shutdown Infrastructure
+              if: always()
+              run: docker-compose --env-file .env.test -f compose.yml down

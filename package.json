@@ -14,7 +14,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "export NODE_ENV=test && npm run seed:test && jest --runInBand",
+    "test": "export NODE_ENV=test && jest --runInBand",
     "test:local": "export NODE_ENV=test.local && jest --runInBand",
     "test:watch": "export NODE_ENV=test && npm run seed:test && jest --watch",
     "test:watch-local": "export NODE_ENV=test.local && npm run seed:test-local && jest --watch",
