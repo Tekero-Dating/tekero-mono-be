@@ -15,6 +15,10 @@ export interface EnvSchema {
   AWS_ACCESS_KEY: string;
   AWS_SECRET_KEY: string;
   AWS_REGION: string;
+  SALT: string;
+  JWT_SECRET: string;
+  JWT_TOKEN_TTL: string;
+  JWT_REFRESH_TOKEN_TTL: string;
 };
 
 export const envSchema: JTDSchemaType<EnvSchema> = {
@@ -31,7 +35,11 @@ export const envSchema: JTDSchemaType<EnvSchema> = {
     AWS_S3_BUCKET: { type: 'string' },
     AWS_ACCESS_KEY: { type: 'string' },
     AWS_SECRET_KEY: { type: 'string' },
-    AWS_REGION: { type: 'string' }
+    AWS_REGION: { type: 'string' },
+    SALT: { type: 'string' },
+    JWT_SECRET: { type: 'string' },
+    JWT_TOKEN_TTL: { type: 'string' },
+    JWT_REFRESH_TOKEN_TTL: { type: 'string' }
   },
   optionalProperties: {
     APP_MODE: { enum: ['dev', 'stage', 'prod', 'test'] }

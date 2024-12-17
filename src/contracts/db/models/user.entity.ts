@@ -31,6 +31,9 @@ export class User extends Model {
   @Column
   email: string;
 
+  @Column
+  password: string;
+
   @AllowNull(true)
   @Column
   validated?: boolean;
@@ -46,6 +49,11 @@ export class User extends Model {
 
   @HasOne(() => UserProfile)
   userProfile: UserProfile;
+
+  @Column({
+    type: DataType.GEOGRAPHY('POINT', 4326)
+  })
+  location: { type: 'Point'; coordinates: [number, number] };
 }
 
 export const UserRepository = {

@@ -70,6 +70,25 @@ export class Advertisement extends Model {
   })
   location: { type: 'Point'; coordinates: [number, number] };
 
+  @AllowNull(true)
+  @Column({
+    type: DataType.GEOGRAPHY('POINT', 4326)
+  })
+  travels_to?: { type: 'Point'; coordinates: [number, number] };
+
+  @AllowNull(true)
+  @Column({
+    type: DataType.DATE
+  })
+  travel_date_from: Date;
+
+  @AllowNull(true)
+  @Column({
+    type: DataType.DATE
+  })
+  travel_date_to: Date;
+
+
   @Column({
     type: DataType.ENUM,
     values: Object.keys(OpenersEnum)

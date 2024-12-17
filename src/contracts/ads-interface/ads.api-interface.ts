@@ -48,6 +48,9 @@ export interface IAdvFields {
   opener?: OpenersEnum;
   song?: string;
   location: { type: 'Point'; coordinates: [number, number] };
+  travelsTo?: { type: 'Point'; coordinates: [number, number] };
+  travelDateFrom?: string;
+  travelDateTo?: string;
 };
 
 export namespace IEditAdv {

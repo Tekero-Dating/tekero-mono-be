@@ -44,38 +44,61 @@ module.exports = {
         lastName: 'Emelianenko',
         dob: new Date('1990-05-15'),
         email: 'fedya@test.com',
+        password: '$2b$12$DQHNyp1iCaeoVjuxcYQgge31P7.NGBsobyJi40/NXZuR67SXPEKAC',
         validated: false,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        location: {
+          "type": "Point", "coordinates": [2.186015, 41.388123]
+        }
       }, {
         firstName: 'Kira',
         lastName: 'Nightly',
         dob: new Date('2001-05-16'),
         email: 'kira@test.com',
+        password: '$2b$12$DQHNyp1iCaeoVjuxcYQgge31P7.NGBsobyJi40/NXZuR67SXPEKAC',
         validated: true,
         balance: 45,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        location: {
+          "type": "Point", "coordinates": [1.249594, 41.115696]
+        }
       }, {
         firstName: 'Daniil',
         lastName: 'Boris',
         dob: new Date('1995-01-11'),
         email: 'danya@test.com',
+        password: '$2b$12$DQHNyp1iCaeoVjuxcYQgge31P7.NGBsobyJi40/NXZuR67SXPEKAC',
         validated: true,
         balance: 20,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        location: {
+          "type": "Point", "coordinates": [-0.375000, 39.466667]
+        }
       }, {
         firstName: 'Larisa',
         lastName: 'Korvin',
         dob: new Date('2001-04-10'),
         email: 'korvin@test.com',
+        password: '$2b$12$DQHNyp1iCaeoVjuxcYQgge31P7.NGBsobyJi40/NXZuR67SXPEKAC',
         validated: false,
         balance: 20,
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        location: {
+          "type": "Point", "coordinates": [-3.703790, 40.416775]
+        }
       }];
-    await queryInterface.bulkInsert('users', userSeeds);
+    await queryInterface.bulkInsert('users',
+      userSeeds.map(seed => ({
+          ...seed,
+          location:
+            Sequelize.fn('ST_GeomFromGeoJSON', JSON.stringify(seed.location)),
+        }
+      ))
+    );
 
     const mediaSeeders: ModelAttributes<Media>[] = [
       {

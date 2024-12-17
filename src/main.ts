@@ -7,6 +7,7 @@ import { ADS_MODULE_QUEUES } from './contracts/ads-interface/ads.constants';
 import { USER_PROFILES_MODULE_QUEUES } from './contracts/uesr-profiles-interface/user-profiles.constants';
 import { QUESTIONNAIRE_MODULE_QUEUES } from './contracts/questionnaire-interface/questionnaire.constants';
 import { MEDIA_MODULE_QUEUES } from './contracts/media-interface/media.constants';
+import cookieParser from 'cookie-parser';
 
 export {
 // @ts-ignore
@@ -27,6 +28,7 @@ export async function bootstrap() {
     ...MEDIA_MODULE_QUEUES
   ], generalRmqOpts);
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
   await app.startAllMicroservices();
   console.log('bootstrap', new Date().toISOString(), process.pid, __filename);
   await app.listen(+APP_PORT!);

@@ -13,7 +13,7 @@ import { AdStatusesEnum } from '../../contracts/db/models/enums/ad-statuses.enum
 import { AdTypesEnum } from '../../contracts/db/models/enums/ad-types.enum';
 import { AdvertisementMedia } from '../../contracts/db/models/junctions/advertisement-media.entity';
 import { Media } from '../../contracts/db/models/mdeia.entity';
-import { Op } from 'sequelize'
+import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
@@ -61,7 +61,7 @@ export class AdsService {
     this.logger.log('createAd', { userId });
     const preConfiguredFields: Partial<Advertisement> = {
       status: AdStatusesEnum.DRAFT,
-      type: AdTypesEnum.DATE,
+      type: payload.type,
       active: false,
       duration: (1000 * 3600) * 168
     };
@@ -70,10 +70,27 @@ export class AdsService {
     const mediaToAttach: number[] = await this.prepareMediaToAttach(payload.photos, userId);
     const transaction = await this.sequelizeInstance.transaction();
     const filter = payload.targetFilters;
+    const travelFields: {
+      travels_to: { type: 'Point'; coordinates: [number, number] };
+      travel_date_from: Date;
+      travel_date_to: Date;
+    } = {} as any;
+
+    if (payload.type === AdTypesEnum.TRAVEL) {
+      travelFields.travels_to = payload.travelsTo!;
+      travelFields.travel_date_from = new Date(payload.travelDateFrom!);
+      travelFields.travel_date_to = new Date(payload.travelDateTo!);
+    }
 
     try {
       adv = await this.advRepository.create(
-        { ...preConfiguredFields, ...payload, filter, user_id: userId },
+        {
+          user_id: userId,
+          ...preConfiguredFields,
+          ...payload,
+          filter,
+          ...travelFields
+        },
         { transaction }
       );
       this.logger.log('createAd created advertisement');
@@ -114,13 +131,26 @@ export class AdsService {
       throw new NotFoundException('There is no advertisement with the given ID for the current user.')
     }
 
+    const travelFields: {
+      travels_to: { type: 'Point'; coordinates: [number, number] };
+      travel_date_from: Date;
+      travel_date_to: Date;
+    } = {} as any;
+
+    if (payload.type === AdTypesEnum.TRAVEL) {
+      travelFields.travels_to = payload.travelsTo!;
+      travelFields.travel_date_from = new Date(payload.travelDateFrom!);
+      travelFields.travel_date_to = new Date(payload.travelDateTo!);
+    }
+
     let newAdvertisement = {
       ...originalAdv,
       ...payload,
       filter: {
         ...originalAdv.filter,
         ...payload.targetFilters
-      }
+      },
+      ...travelFields
     }
 
     try {

@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller, Delete,
   Get,
   Inject,
@@ -8,17 +7,12 @@ import {
   Post,
   Query,
   Res,
-  UploadedFile,
+  UploadedFile, UseGuards,
   UseInterceptors, UsePipes, ValidationPipe,
 } from '@nestjs/common';
-import { QUESTIONNAIRE_SERVICE_NAME } from '../../contracts/questionnaire-interface/questionnaire.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
-import {
-  IGetQuestionnaire, ISubmitQuestionByShortcode,
-  QUESTIONNAIRE_MSG_PATTERNS,
-} from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 import { MediaService } from '../media-module/media.service';
 import {
   IEditMediaAccess,
@@ -34,6 +28,7 @@ import {
   GetMediaDto,
   SetMediaPrivacyDto,
 } from '../../contracts/media-interface/media.api.dto';
+import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
 
 @Controller('api/media')
 export class ApiMediaController {
@@ -46,11 +41,11 @@ export class ApiMediaController {
   async onApplicationBootstrap() {
     await this.client.connect();
   }
-
   async onApplicationShutdown(signal?: string) {
     await this.client.close();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('upload-media/:userId')
   @UseInterceptors(FileInterceptor('file'))
   async uploadMedia(
@@ -75,10 +70,11 @@ export class ApiMediaController {
     } catch (error) {
       const { status, message } = TekeroError(error);
       this.logger.error({ status, message });
-      return res.status(status).send(message);
+      return res.status(status).send({ success: false, error: { status, message } });
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get-media/:userId/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
@@ -95,16 +91,17 @@ export class ApiMediaController {
       { userId, mediaId },
       ({ success, result, error }) => {
         if (success) {
-          res.status(200).send(result);
+          return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          return res.status(status).send({ success: false, error: { status, message } });
         }
       }
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('delete-media/:userId/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
@@ -121,16 +118,17 @@ export class ApiMediaController {
       { userId, mediaId },
       ({ success, result, error }) => {
         if (success) {
-          res.status(204).send(result);
+          return res.status(204).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          res.status(status).send({ success: false, error: { message } });
         }
       }
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('update-privacy/:userId/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
@@ -147,16 +145,17 @@ export class ApiMediaController {
       { userId, mediaId },
       ({ success, result, error }) => {
         if (success) {
-          res.status(202).send(result);
+          return res.status(202).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          res.status(status).send({ success, error: { message } });
         }
       }
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('update-media-access/:ownerId/:accessorId/:giver')
   @UsePipes(new ValidationPipe({
     transform: true
@@ -173,11 +172,11 @@ export class ApiMediaController {
       { ownerId, accessorId, giver },
       ({ success, result, error }) => {
         if (success) {
-          res.status(202).send(result);
+          return res.status(202).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          res.status(status).send({ success, error: { message } });
         }
       }
     );

@@ -10,6 +10,8 @@ import { Operation } from './operation.entity';
 import { Questionnaire } from './questionnaire.entity';
 import { QuestionnaireSteps } from './questionnaire-steps.entity';
 import { MediaAccess } from './mdeia-access.entity';
+import { Session } from './sessions.entity';
+import { Like } from './like.entity';
 
 export const DB_MODELS: ModelCtor[] = [
   User,
@@ -22,7 +24,9 @@ export const DB_MODELS: ModelCtor[] = [
   ActionsList,
   Operation,
   Questionnaire,
-  QuestionnaireSteps
+  QuestionnaireSteps,
+  Session,
+  Like
 ];
 
 export const MODELS_REPOSITORIES_ENUM = {
@@ -38,5 +42,6 @@ export const MODELS_REPOSITORIES_ENUM = {
   ACTIONS_LIST: 'ACTIONS_LIST_REPOSITORY',
   OPERATION: 'OPERATIONS_REPOSITORY',
   QUESTIONNAIRE_STEPS: 'QUESTIONNAIRE_STEPS_REPOSITORY',
-  QUESTIONNAIRE: 'QUESTIONNAIRE_REPOSITORY'
+  QUESTIONNAIRE: 'QUESTIONNAIRE_REPOSITORY',
+  SESSIONS: 'SESSIONS_REPOSITORY'
 };
