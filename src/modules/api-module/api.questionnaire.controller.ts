@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Logger, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { QUESTIONNAIRE_SERVICE_NAME } from '../../contracts/questionnaire-interface/questionnaire.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { TekeroError } from '../../utils/error-handling-utils';
@@ -7,6 +7,7 @@ import {
   IGetQuestionnaire, ISubmitQuestionByShortcode,
   QUESTIONNAIRE_MSG_PATTERNS,
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
+import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
 
 @Controller('api/questionnaire')
 export class ApiQuestionnaireController {
@@ -19,11 +20,11 @@ export class ApiQuestionnaireController {
   async onApplicationBootstrap() {
     await this.client.connect();
   }
-
   async onApplicationShutdown(signal?: string) {
     await this.client.close();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get-questionnaire/:userId')
   async getQuestionnaire(
     @Param('userId') userId: number,
@@ -36,16 +37,17 @@ export class ApiQuestionnaireController {
       { userId },
       ({ success, result, error }) => {
         if (success) {
-          res.status(200).send(result);
+          return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          return res.status(status).send({ success: false, error: { status, message } });
         }
       }
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('submit-question/:userId')
   async submitQuestion(
     @Param('userId') userId: number,
@@ -59,11 +61,11 @@ export class ApiQuestionnaireController {
       { userId, response: body },
       ({ success, result, error }) => {
         if (success) {
-          res.status(200).send(result);
+          return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          res.status(status).send(message);
+          return res.status(status).send({ success, error: { status, message } });
         }
       }
     );

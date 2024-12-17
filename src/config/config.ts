@@ -3,11 +3,8 @@ import { Transport, RmqOptions } from '@nestjs/microservices';
 import { envSchema } from './env.schema';
 import type { EnvSchema } from './env.schema';
 import Ajv from 'ajv/dist/jtd';
-import { DB_MODELS, MODELS_REPOSITORIES_ENUM } from '../contracts/db/models/models.enum';
+import { DB_MODELS } from '../contracts/db/models/models.enum';
 import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
-import { Dialect } from 'sequelize';
-import { User } from '../contracts/db/models/user.entity';
-import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 
 dotenv.config({
   path: `.env.${process.env.NODE_ENV}`
@@ -22,13 +19,16 @@ const {
   DB_USERNAME,
   DB_PASSWORD,
   RMQ_URL,
-  APP_MODE,
   APP_PORT,
   RMQ_QUEUE_PREFIX,
   AWS_S3_BUCKET,
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
-  AWS_REGION
+  AWS_REGION,
+  SALT,
+  JWT_SECRET,
+  JWT_TOKEN_TTL,
+  JWT_REFRESH_TOKEN_TTL
 } = process.env;
 
 const validate = ajv.compile<EnvSchema>(envSchema);
@@ -69,5 +69,9 @@ export {
   AWS_S3_BUCKET,
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
-  AWS_REGION
+  AWS_REGION,
+  SALT,
+  JWT_SECRET,
+  JWT_TOKEN_TTL,
+  JWT_REFRESH_TOKEN_TTL
 }

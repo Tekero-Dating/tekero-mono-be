@@ -96,7 +96,7 @@ export class CreateAdvDTO implements IAdvFields {
   targetFilters: AdTargetFiltersDTO;
 
   @IsObject()
-  location: { type: 'Point'; coordinates: [number, number] };
+  location: { type: 'Point'; coordinates: [ number, number ] };
 
   @IsOptional()
   @IsEnum(OpenersEnum)
@@ -105,8 +105,19 @@ export class CreateAdvDTO implements IAdvFields {
   @IsOptional()
   @IsString()
   song?: string = "";
-};
 
+  @IsOptional()
+  @IsObject()
+  travelsTo?: { type: 'Point'; coordinates: [number, number] };
+
+  @IsOptional()
+  @IsString()
+  travelDateFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  travelDateTo?: string;
+};
 /**
  * Here the duplicated part comes TODO
  */
@@ -189,4 +200,16 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @IsOptional()
   @IsString()
   song?: string;
+
+  @IsOptional()
+  @IsObject()
+  travelsTo?: { type: 'Point'; coordinates: [number, number] };
+
+  @IsOptional()
+  @IsString()
+  travelDateFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  travelDateTo?: string;
 };

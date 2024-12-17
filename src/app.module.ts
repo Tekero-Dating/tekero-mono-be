@@ -11,10 +11,12 @@ import { ExpensesModule } from './modules/expenses-module/expenses.module';
 import { ActionsModule } from './modules/actions-module/actions.module';
 import { QuestionnaireModule } from './modules/questionnaire-module/questionnaire.module';
 import { MediaModule } from './modules/media-module/media.module';
+import { AuthModule } from './modules/auth-module/auth.module';
 
 @Module({
   imports: [
     getDbModule([dbOpts], true),
+    AuthModule,
     ApiModule,
     ProfilesModule,
     AdsModule,

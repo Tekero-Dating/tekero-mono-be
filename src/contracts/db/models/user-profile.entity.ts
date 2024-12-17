@@ -25,9 +25,6 @@ export class UserProfile extends Model {
   @Column
   home_location?: string;
 
-  @Column
-  location?: string;
-
   @Min(1)
   @Max(100)
   @Column
