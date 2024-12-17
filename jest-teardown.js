@@ -16,5 +16,4 @@ module.exports = async () => {
     console.log('TEARDOWN: cant close app', e);
   }
   console.log('TEARDOWN finished');
-  process.exit(0);
 }
