@@ -1,0 +1,42 @@
+name: PR Testing Pipeline
+
+on:
+    pull_request:
+        branches:
+            - develop
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Export All Secrets and Variables to .env.test File
+              uses: jakubcieslik99/secrets-vars-to-env-file-action@main
+              with:
+                  secrets: ${{ toJSON(secrets) }}
+                  vars: ${{ toJSON(vars) }}
+                  generate-file: .env.test
+
+            - name: Print Final .env File (remove in production)
+              run: cat .env.test
+
+            - name: Start Infrastructure with Docker Compose
+              run: |
+                  NODE_ENV=test docker compose --env-file .env.test up -d --build
+                  echo "Waiting for infrastructure to become healthy..."
+                  sleep 20
+
+            - name: Build and Test Application
+              run: |
+                npm ci
+                npm run build
+                npm run test
+              shell: bash
+              continue-on-error: false
+
+            - name: Shutdown Infrastructure
+              if: always()
+              run: docker compose --env-file .env.test -f compose.yaml down
