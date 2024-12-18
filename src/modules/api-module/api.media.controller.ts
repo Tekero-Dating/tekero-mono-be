@@ -5,7 +5,7 @@ import {
   Logger,
   Param, Patch,
   Post,
-  Query,
+  Query, Request,
   Res,
   UploadedFile, UseGuards,
   UseInterceptors, UsePipes, ValidationPipe,
@@ -29,6 +29,7 @@ import {
   SetMediaPrivacyDto,
 } from '../../contracts/media-interface/media.api.dto';
 import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
+import { JwtReq } from '../auth-module/auth.jwt.strategy';
 
 @Controller('api/media')
 export class ApiMediaController {
@@ -46,14 +47,15 @@ export class ApiMediaController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('upload-media/:userId')
+  @Post('upload-media')
   @UseInterceptors(FileInterceptor('file'))
   async uploadMedia(
-    @Param('userId') userId: number,
     @UploadedFile() file: Express.Multer.File,
+    @Request() req: JwtReq,
     @Res() res,
     @Query('expiration') expiration?: number
   ): Promise<IUploadMedia.Response> {
+    const { userId } = req.user;
     this.logger.log(`API request uploadImage`);
     try {
       const result = await this.mediaService.uploadMedia({
@@ -75,15 +77,17 @@ export class ApiMediaController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('get-media/:userId/:mediaId')
+  @Get('get-media/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
   async getMediaById(
     @Param() params: GetMediaDto,
+    @Request() req: JwtReq,
     @Res() res,
   ) {
-    const { mediaId, userId } = params;
+    const { userId } = req.user;
+    const { mediaId } = params;
     this.logger.log('getMediaById', { mediaId, userId });
     rmqSend<IGetMedia.Request, IGetMedia.Response>(
       this.client,
@@ -102,15 +106,17 @@ export class ApiMediaController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('delete-media/:userId/:mediaId')
+  @Delete('delete-media/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
   async deleteMediaById(
     @Param() params: DeleteMediaDto,
+    @Request() req: JwtReq,
     @Res() res,
   ) {
-    const { mediaId, userId } = params;
+    const { userId } = req.user;
+    const { mediaId } = params;
     this.logger.log('deleteMediaById', { mediaId, userId });
     rmqSend<IGetMedia.Request, IGetMedia.Response>(
       this.client,
@@ -129,15 +135,17 @@ export class ApiMediaController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('update-privacy/:userId/:mediaId')
+  @Patch('update-privacy/:mediaId')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
   async updatePrivacy(
     @Param() params: SetMediaPrivacyDto,
+    @Request() req: JwtReq,
     @Res() res,
   ) {
-    const { mediaId, userId } = params;
+    const { userId } = req.user;
+    const { mediaId } = params;
     this.logger.log('updatePrivacy', { mediaId, userId });
     rmqSend<ISetMediaPrivacy.Request, ISetMediaPrivacy.Response>(
       this.client,
@@ -156,15 +164,17 @@ export class ApiMediaController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('update-media-access/:ownerId/:accessorId/:giver')
+  @Patch('update-media-access/:accessorId/:giver')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
   async updateMediaAccess(
     @Param() params: EditMediaAccessDto,
+    @Request() req: JwtReq,
     @Res() res,
   ) {
-    const { ownerId, accessorId, giver } = params;
+    const { userId: ownerId } = req.user;
+    const { accessorId, giver } = params;
     this.logger.log('updateMediaAccess', { ownerId, accessorId, giver });
     rmqSend<IEditMediaAccess.Request, IEditMediaAccess.Response>(
       this.client,
