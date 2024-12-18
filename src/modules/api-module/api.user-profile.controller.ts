@@ -6,7 +6,7 @@ import {
   Inject,
   Param,
   Post,
-  Res, UseGuards,
+  Res, Request as Req, UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,6 +17,7 @@ import { USER_PROFILES_SERVICE_NAME } from '../../contracts/uesr-profiles-interf
 import { USER_PROFILES_MSG_PATTERNS } from '../../contracts/uesr-profiles-interface/user-profiles.api-interface';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
+import { JwtReq } from '../auth-module/auth.jwt.strategy';
 
 @Controller('api/user-profile')
 export class ApiUserProfileController {
@@ -57,11 +58,16 @@ export class ApiUserProfileController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('update/:userId')
+  @Post('update')
   @UsePipes(new ValidationPipe({
     transform: true
   }))
-  async updateUserProfile(@Body() payload: UpdateProfileDTO, @Param('userId') userId: number, @Res() res) {
+  async updateUserProfile(
+    @Body() payload: UpdateProfileDTO,
+    @Req() req: JwtReq,
+    @Res() res
+  ) {
+    const { userId } = req.user;
     if (!Object.keys(payload).length) {
       const { status, message } = TekeroError(new BadRequestException('There are nothing to update'));
       return res.status(status).send({ success: false, error: { status, message } });

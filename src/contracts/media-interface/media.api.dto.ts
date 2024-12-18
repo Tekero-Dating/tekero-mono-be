@@ -28,41 +28,25 @@ export class UploadMediaDto implements IUploadMedia.Request {
   file: Express.Multer.File;
 };
 
-export class GetMediaDto implements IGetMedia.Request {
-  @Type(() => Number)
-  @IsNumber()
-  userId: number;
-
+export class GetMediaDto implements Partial<IGetMedia.Request> {
   @Type(() => Number)
   @IsNumber()
   mediaId: number;
 };
 
-export class DeleteMediaDto implements IDeleteMedia.Request {
-  @Type(() => Number)
-  @IsNumber()
-  userId: number;
-
+export class DeleteMediaDto implements Partial<IDeleteMedia.Request> {
   @Type(() => Number)
   @IsNumber()
   mediaId: number;
 };
 
-export class SetMediaPrivacyDto implements ISetMediaPrivacy.Request {
-  @Type(() => Number)
-  @IsNumber()
-  userId: number;
-
+export class SetMediaPrivacyDto implements Partial<ISetMediaPrivacy.Request> {
   @Type(() => Number)
   @IsNumber()
   mediaId: number;
 };
 
-export class EditMediaAccessDto implements IEditMediaAccess.Request {
-  @Type(() => Number)
-  @IsNumber()
-  ownerId: number;
-
+export class EditMediaAccessDto implements Partial<IEditMediaAccess.Request> {
   @Type(() => Number)
   @IsNumber()
   accessorId: number;

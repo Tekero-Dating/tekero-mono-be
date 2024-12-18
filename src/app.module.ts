@@ -12,6 +12,9 @@ import { ActionsModule } from './modules/actions-module/actions.module';
 import { QuestionnaireModule } from './modules/questionnaire-module/questionnaire.module';
 import { MediaModule } from './modules/media-module/media.module';
 import { AuthModule } from './modules/auth-module/auth.module';
+import { MetricsModule } from './modules/metrics/metrics.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { MetricsInterceptor } from './modules/metrics/metrics.interceptor';
 
 @Module({
   imports: [
@@ -23,14 +26,19 @@ import { AuthModule } from './modules/auth-module/auth.module';
     ExpensesModule,
     ActionsModule,
     QuestionnaireModule,
-    MediaModule
+    MediaModule,
+    MetricsModule
   ],
   controllers: [
     AppController
   ],
   providers: [
     AppService,
-    UserRepository
+    UserRepository,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MetricsInterceptor
+    }
   ],
 })
 export class AppModule {}

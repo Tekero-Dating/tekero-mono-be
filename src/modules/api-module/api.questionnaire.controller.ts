@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Logger, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Logger, Param, Post, Res, Request,UseGuards } from '@nestjs/common';
 import { QUESTIONNAIRE_SERVICE_NAME } from '../../contracts/questionnaire-interface/questionnaire.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { TekeroError } from '../../utils/error-handling-utils';
@@ -8,6 +8,7 @@ import {
   QUESTIONNAIRE_MSG_PATTERNS,
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
+import { JwtReq } from '../auth-module/auth.jwt.strategy';
 
 @Controller('api/questionnaire')
 export class ApiQuestionnaireController {
@@ -25,11 +26,12 @@ export class ApiQuestionnaireController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('get-questionnaire/:userId')
+  @Get('get-questionnaire')
   async getQuestionnaire(
-    @Param('userId') userId: number,
+    @Request() req: JwtReq,
     @Res() res
   ) {
+    const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
     rmqSend<IGetQuestionnaire.Request, IGetQuestionnaire.Response>(
       this.client,
@@ -48,12 +50,13 @@ export class ApiQuestionnaireController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('submit-question/:userId')
+  @Post('submit-question')
   async submitQuestion(
-    @Param('userId') userId: number,
+    @Request() req: JwtReq,
     @Body() body: ISubmitQuestionByShortcode.Request['response'],
     @Res() res
   ) {
+    const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
     rmqSend<ISubmitQuestionByShortcode.Request, ISubmitQuestionByShortcode.Response>(
       this.client,
