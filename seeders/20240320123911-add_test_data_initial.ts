@@ -9,6 +9,7 @@ import { UserProfile } from '../src/contracts/db/models/user-profile.entity';
 import { Questionnaire } from '../src/contracts/db/models/questionnaire.entity';
 import { Sequelize as SEQUELIZE } from 'sequelize-typescript';
 import { dbOpts } from '../src/config/config';
+import { UserStats } from '../src/contracts/db/models/user-stats.entity';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -219,6 +220,46 @@ module.exports = {
           ...questionnaire,
           responses: JSON.stringify(questionnaire.responses)
         }
+      }));
+
+    const userStatsSeeders: Omit<ModelAttributes<UserStats>, 'profile_owner'>[] = [
+      {
+        user_id: 1,
+        active_chats: 0,
+        available_likes: 10,
+        available_likes_refilled_date: new Date(),
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      },
+      {
+        user_id: 2,
+        active_chats: 2,
+        available_likes: 10,
+        available_likes_refilled_date: new Date(),
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      },
+      {
+        user_id: 3,
+        active_chats: 1,
+        available_likes: 10,
+        available_likes_refilled_date: new Date(),
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      },
+      {
+        user_id: 4,
+        active_chats: 1,
+        available_likes: 10,
+        available_likes_refilled_date: new Date(),
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      }
+    ];
+
+    await queryInterface
+      .bulkInsert('user-stats', userStatsSeeders.map(userStats => {
+        return userStats
       }));
 
     await sequelize.close();

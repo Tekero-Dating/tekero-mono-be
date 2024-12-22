@@ -1,0 +1,7 @@
+export enum NotificationTypesEnum {
+  MESSAGE = 'MESSAGE',
+  COUPLE_ADV = 'COUPLE_ADV',
+  LIKE = 'LIKE',
+  PRIVATE_REQUEST = 'PRIVATE_REQUEST',
+  LIKES_REFILLED = 'LIKES_REFILLED'
+};

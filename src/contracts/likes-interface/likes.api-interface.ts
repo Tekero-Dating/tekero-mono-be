@@ -1,4 +1,11 @@
 import { RmqContext } from '@nestjs/microservices';
+import { Like } from '../db/models/like.entity';
+import { UserStats } from '../db/models/user-stats.entity';
+
+export const LIKES_MSG_PATTERNS = {
+  SEND_LIKE: 'SEND_LIKE',
+  DISMISS_LIKE: 'DISMISS_LIKE'
+};
 
 export namespace ILikeAd {
   export interface Request {
@@ -21,6 +28,10 @@ export namespace IUnlikeAd {
   };
   export interface Response {
     success: boolean;
+    result?: {
+      like: Like;
+      user_stats: UserStats;
+    };
     error?: Record<string, any> | {
       status: number;
       message: string;

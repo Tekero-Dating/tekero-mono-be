@@ -15,10 +15,13 @@ import { AuthModule } from './modules/auth-module/auth.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { MetricsInterceptor } from './modules/metrics/metrics.interceptor';
+import { LikesModule } from './modules/likes-module/likes.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     getDbModule([dbOpts], true),
+    ScheduleModule.forRoot(),
     AuthModule,
     ApiModule,
     ProfilesModule,
@@ -27,6 +30,7 @@ import { MetricsInterceptor } from './modules/metrics/metrics.interceptor';
     ActionsModule,
     QuestionnaireModule,
     MediaModule,
+    LikesModule,
     MetricsModule
   ],
   controllers: [
