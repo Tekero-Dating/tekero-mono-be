@@ -3,12 +3,21 @@ import {
   Column,
   Model,
   BelongsTo,
-  ForeignKey
+  ForeignKey, DataType,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Advertisement } from './advertisements.entity';
 
-@Table({ modelName: 'like' })
+@Table({
+  modelName: 'like',
+  indexes: [
+    {
+      unique: true,
+      fields: ['user_id', 'advertisement_id'],
+      name: 'unique_user_advertisement',
+    },
+  ]
+})
 export class Like extends Model {
   @ForeignKey(() => Advertisement)
   @Column
@@ -23,6 +32,11 @@ export class Like extends Model {
 
   @BelongsTo(() => User, 'user_id')
   userId!: User;
+
+  @Column({
+    type: DataType.DATE
+  })
+  expiration_date: Date;
 }
 
 export const LikeRepository = {

@@ -10,7 +10,7 @@ import {
   ForeignKey, AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
-import { ConstitutionsEnum, GendersEnum, OrientationsEnum } from './enums';
+import { ConstitutionsEnum, GendersEnum } from './enums';
 
 @Table({ modelName: 'user-profile' })
 export class UserProfile extends Model {

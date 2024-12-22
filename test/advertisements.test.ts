@@ -7,32 +7,10 @@ import { JwtAuthGuard } from '../src/modules/auth-module/jwt.auth-guard';
 import { AdsController } from '../src/modules/ads-module/ads.controller';
 import { AdTypesEnum } from '../src/contracts/db/models/enums/ad-types.enum';
 import { ConstitutionsEnum, GendersEnum, OpenersEnum } from '../src/contracts/db/models/enums';
+import { mockUserAdvRequest } from './mocks/advertisement.mock';
 
 jest.spyOn(JwtAuthGuard.prototype, 'canActivate')
   .mockImplementation(() => true);
-
-const mockUserAdvRequest = {
-  "text": "I just test the app",
-  "type": AdTypesEnum.DATE,
-  "opener": OpenersEnum.TEXT,
-  "photos": [2, 3],
-  "targetFilters": {
-    "gender": [GendersEnum.TRANS_FEMALE],
-    "genderExpressionFrom": 50,
-    "genderExpressionTo": 70,
-    "orientationFrom": 50,
-    "orientationTo": 70,
-    "ageFrom": 22,
-    "ageTo": 25,
-    "heightFrom": 150,
-    "heightTo": 170,
-    "distance": 100,
-    "constitution": [ConstitutionsEnum.CURVY, ConstitutionsEnum.AVERAGE, ConstitutionsEnum.SKINNY]
-  },
-  "location": {
-    "type": "Point", "coordinates": [429686.70192539, 4582259.1043529]
-  } as { type: "Point", coordinates: [number, number] }
-}
 
 describe('Advertisements module tests', () => {
   let App: INestApplication;

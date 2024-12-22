@@ -23,6 +23,8 @@ import { ApiMediaController } from './api.media.controller';
 import { S3Service } from '../media-module/s3.service';
 import { MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME } from '../../contracts/media-interface/media.constants';
 import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.entity';
+import { ApiLikesController } from './api.likes.controller';
+import { LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.constants';
 
 @Module({
   imports: [
@@ -40,6 +42,9 @@ import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.en
     ),
     ClientsModule.register(
       generateRmqOptions(MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME)
+    ),
+    ClientsModule.register(
+      generateRmqOptions(LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME)
     )
   ],
   controllers: [
@@ -47,7 +52,8 @@ import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.en
     ApiUserProfileController,
     ApiAdsController,
     ApiQuestionnaireController,
-    ApiMediaController
+    ApiMediaController,
+    ApiLikesController
   ],
   providers: [
     ApiService,

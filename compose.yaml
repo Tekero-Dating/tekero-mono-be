@@ -46,7 +46,7 @@ services:
         volumes:
             - grafana_data:/var/lib/grafana
 
-    grinder_nest:
+    tekro_nest:
         build:
             context: .
             dockerfile: Dockerfile.${NODE_ENV}
