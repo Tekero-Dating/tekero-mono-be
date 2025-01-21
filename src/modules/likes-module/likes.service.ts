@@ -22,9 +22,9 @@ export class LikesService {
     private userStatsRepository: typeof UserStats
   ) {}
 
-  async sendLike(user_id, advertisement_id) {
+  async sendLike(user_id: number, advertisement_id: number) {
     this.logger.log('Send like', { user_id, advertisement_id });
-    const userStats = await this.userStatsRepository.findOne({
+    const userStats = await this.userStatsRepository.findOne<UserStats>({
       where: {
         user_id
       }
@@ -110,7 +110,6 @@ export class LikesService {
       );
 
       if (users.length === 0) break;
-
       for (const user of users) {
         await this.refillUserLikes(user.id, 10);
         await new Promise((resolve) => setImmediate(resolve));

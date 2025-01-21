@@ -6,7 +6,7 @@ import { AuthLocalStrategy } from './auth.local.strategy';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET, JWT_TOKEN_TTL } from '../../config/config';
-import { AuthJwtStrategy } from './auth.jwt.strategy';
+import { AuthJwtStrategy } from '../../utils/auth.jwt.strategy';
 import { SessionsRepository } from '../../contracts/db/models/sessions.entity';
 
 @Module({

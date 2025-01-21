@@ -10,15 +10,6 @@ import { User } from './user.entity';
 
 @Table({ modelName: 'user-settings' })
 export class UserSettings extends Model {
-  @Column
-  hide_accurate_location: boolean;
-
-  @Column
-  tokens: number;
-
-  @Column
-  hide_activity_status: boolean;
-
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column

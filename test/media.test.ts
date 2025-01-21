@@ -3,7 +3,7 @@ import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { Media } from '../src/contracts/db/models/mdeia.entity';
 import { MediaAccess } from '../src/contracts/db/models/mdeia-access.entity';
-import { JwtAuthGuard } from '../src/modules/auth-module/jwt.auth-guard';
+import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { MediaController } from '../src/modules/media-module/media.controller';
 import { MediaService } from '../src/modules/media-module/media.service';
 

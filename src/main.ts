@@ -9,6 +9,7 @@ import { QUESTIONNAIRE_MODULE_QUEUES } from './contracts/questionnaire-interface
 import { MEDIA_MODULE_QUEUES } from './contracts/media-interface/media.constants';
 import cookieParser from 'cookie-parser';
 import { LIKES_MODULE_QUEUES } from './contracts/likes-interface/likes.constants';
+import { USERS_MODULE_QUEUES } from './contracts/users-interface/users.constants';
 
 export {
 // @ts-ignore
@@ -27,7 +28,8 @@ export async function bootstrap() {
     ...USER_PROFILES_MODULE_QUEUES,
     ...QUESTIONNAIRE_MODULE_QUEUES,
     ...MEDIA_MODULE_QUEUES,
-    ...LIKES_MODULE_QUEUES
+    ...LIKES_MODULE_QUEUES,
+    ...USERS_MODULE_QUEUES
   ], generalRmqOpts);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());

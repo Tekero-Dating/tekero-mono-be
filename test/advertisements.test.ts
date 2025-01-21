@@ -3,7 +3,7 @@ import { closeApp, getApp } from './helpers/get-app';
 import { Advertisement } from '../src/contracts/db/models/advertisements.entity';
 import { AdvertisementMedia } from '../src/contracts/db/models/junctions/advertisement-media.entity';
 import { AdStatusesEnum } from '../src/contracts/db/models/enums/ad-statuses.enum';
-import { JwtAuthGuard } from '../src/modules/auth-module/jwt.auth-guard';
+import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { AdsController } from '../src/modules/ads-module/ads.controller';
 import { AdTypesEnum } from '../src/contracts/db/models/enums/ad-types.enum';
 import { ConstitutionsEnum, GendersEnum, OpenersEnum } from '../src/contracts/db/models/enums';

@@ -25,6 +25,8 @@ import { MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME } from '../../contracts/media-i
 import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.entity';
 import { ApiLikesController } from './api.likes.controller';
 import { LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.constants';
+import { USERS_MODULE_QUEUES, USERS_SERVICE_NAME } from '../../contracts/users-interface/users.constants';
+import { ApiUsersController } from './api.users.controller';
 
 @Module({
   imports: [
@@ -45,6 +47,9 @@ import { LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME } from '../../contracts/likes-i
     ),
     ClientsModule.register(
       generateRmqOptions(LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME)
+    ),
+    ClientsModule.register(
+      generateRmqOptions(USERS_MODULE_QUEUES, USERS_SERVICE_NAME)
     )
   ],
   controllers: [
@@ -53,7 +58,8 @@ import { LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME } from '../../contracts/likes-i
     ApiAdsController,
     ApiQuestionnaireController,
     ApiMediaController,
-    ApiLikesController
+    ApiLikesController,
+    ApiUsersController
   ],
   providers: [
     ApiService,

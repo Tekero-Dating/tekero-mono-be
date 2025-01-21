@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { closeApp, getApp } from './helpers/get-app';
-import { JwtAuthGuard } from '../src/modules/auth-module/jwt.auth-guard';
+import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { QuestionnaireController } from '../src/modules/questionnaire-module/questionnaire.controller';
 import { GendersEnum } from '../src/contracts/db/models/enums';
 

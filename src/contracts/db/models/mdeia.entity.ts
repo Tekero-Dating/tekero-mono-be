@@ -5,20 +5,29 @@ import {
   BelongsTo,
   ForeignKey,
   AllowNull,
-  IsUrl, BelongsToMany,
+  IsUrl, BelongsToMany, DataType,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Advertisement } from './advertisements.entity';
 import { AdvertisementMedia } from './junctions/advertisement-media.entity';
+import { MediaTypesEnum } from './enums/media-types.enum';
 
 @Table({ modelName: 'media' })
 export class Media extends Model {
   @Column
   private: boolean;
 
+  @Column({
+    type: DataType.ENUM,
+    values: Object.keys(MediaTypesEnum)
+  })
+  media_type: MediaTypesEnum;
+
+  @AllowNull
   @Column
   expiration?: number;
 
+  @AllowNull
   @Column
   opened?: boolean;
 

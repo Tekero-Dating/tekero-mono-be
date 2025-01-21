@@ -17,6 +17,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { MetricsInterceptor } from './modules/metrics/metrics.interceptor';
 import { LikesModule } from './modules/likes-module/likes.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UsersModule } from './modules/users-module/users.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     ApiModule,
     ProfilesModule,
+    UsersModule,
     AdsModule,
     ExpensesModule,
     ActionsModule,

@@ -10,8 +10,8 @@ import {
   Inject,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
-import { JwtReq } from '../auth-module/auth.jwt.strategy';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
+import { JwtReq } from '../../utils/auth.jwt.strategy';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import { LIKES_MSG_PATTERNS } from '../../contracts/likes-interface/likes.api-interface';
 import { TekeroError } from '../../utils/error-handling-utils';

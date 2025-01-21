@@ -16,8 +16,8 @@ import { UpdateProfileDTO } from '../../contracts/api-interface/api.dto';
 import { USER_PROFILES_SERVICE_NAME } from '../../contracts/uesr-profiles-interface/user-profiles.constants';
 import { USER_PROFILES_MSG_PATTERNS } from '../../contracts/uesr-profiles-interface/user-profiles.api-interface';
 import { TekeroError } from '../../utils/error-handling-utils';
-import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
-import { JwtReq } from '../auth-module/auth.jwt.strategy';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
+import { JwtReq } from '../../utils/auth.jwt.strategy';
 
 @Controller('api/user-profile')
 export class ApiUserProfileController {
