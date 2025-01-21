@@ -14,6 +14,9 @@ import { Session } from './sessions.entity';
 import { Like } from './like.entity';
 import { UserStats } from './user-stats.entity';
 import { Notification } from './notification.entity';
+import { ChatUser } from './chat-user.entity';
+import { Chat } from './chat.entity';
+import { Message } from './message.entity';
 
 export const DB_MODELS: ModelCtor[] = [
   User,
@@ -30,7 +33,10 @@ export const DB_MODELS: ModelCtor[] = [
   Session,
   Like,
   UserStats,
-  Notification
+  Notification,
+  ChatUser,
+  Chat,
+  Message
 ];
 
 export const MODELS_REPOSITORIES_ENUM = {
@@ -49,5 +55,8 @@ export const MODELS_REPOSITORIES_ENUM = {
   QUESTIONNAIRE: 'QUESTIONNAIRE_REPOSITORY',
   SESSIONS: 'SESSIONS_REPOSITORY',
   USER_STATS: 'USER_STATS_REPOSITORY',
-  NOTIFICATION: 'NOTIFICATION_REPOSITORY'
+  NOTIFICATION: 'NOTIFICATION_REPOSITORY',
+  CHAT_USER: 'CHAT_USER_REPOSITORY',
+  CHAT: 'CHAT_REPOSITORY',
+  MESSAGE: 'MESSAGE_REPOSITORY'
 };

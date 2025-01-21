@@ -7,8 +7,8 @@ import {
   IGetQuestionnaire, ISubmitQuestionByShortcode,
   QUESTIONNAIRE_MSG_PATTERNS,
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
-import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
-import { JwtReq } from '../auth-module/auth.jwt.strategy';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
+import { JwtReq } from '../../utils/auth.jwt.strategy';
 
 @Controller('api/questionnaire')
 export class ApiQuestionnaireController {

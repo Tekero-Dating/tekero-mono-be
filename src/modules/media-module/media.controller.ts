@@ -1,10 +1,6 @@
 import {
   Controller, Inject, Logger,
-  Post,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
 import {
   IDeleteMedia, IEditMediaAccess,

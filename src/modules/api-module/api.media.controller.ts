@@ -28,8 +28,8 @@ import {
   GetMediaDto,
   SetMediaPrivacyDto,
 } from '../../contracts/media-interface/media.api.dto';
-import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
-import { JwtReq } from '../auth-module/auth.jwt.strategy';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
+import { JwtReq } from '../../utils/auth.jwt.strategy';
 
 @Controller('api/media')
 export class ApiMediaController {

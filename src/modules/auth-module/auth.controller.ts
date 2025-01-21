@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { Request as Req, Response } from 'express';
 import { durationToMilliseconds } from '../../utils/duration-converter';
 import { JWT_REFRESH_TOKEN_TTL, JWT_TOKEN_TTL } from '../../config/config';
-import { JwtAuthGuard } from './jwt.auth-guard';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { User } from '../../contracts/db/models/user.entity';
 

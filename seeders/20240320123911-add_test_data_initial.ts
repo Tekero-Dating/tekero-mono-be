@@ -10,6 +10,7 @@ import { Questionnaire } from '../src/contracts/db/models/questionnaire.entity';
 import { Sequelize as SEQUELIZE } from 'sequelize-typescript';
 import { dbOpts } from '../src/config/config';
 import { UserStats } from '../src/contracts/db/models/user-stats.entity';
+import { MediaTypesEnum } from '../src/contracts/db/models/enums/media-types.enum';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -104,30 +105,35 @@ module.exports = {
     const mediaSeeders: ModelAttributes<Media>[] = [
       {
         private: false,
+        media_type: MediaTypesEnum.PROFILE_IMAGE,
         url: 'image1.url',
         user_id: 4,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: true,
+        media_type: MediaTypesEnum.PROFILE_IMAGE,
         url: 'image2.url',
         user_id: 2,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
+        media_type: MediaTypesEnum.PROFILE_IMAGE,
         url: 'image3.url',
         user_id: 2,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
+        media_type: MediaTypesEnum.PROFILE_IMAGE,
         url: 'image4.url',
         user_id: 1,
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       }, {
         private: false,
+        media_type: MediaTypesEnum.PROFILE_IMAGE,
         url: 'image5.url',
         user_id: 1,
         createdAt: new Date('2024-03-15'),

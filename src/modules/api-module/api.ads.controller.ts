@@ -15,8 +15,8 @@ import { CreateAdvDTO, EditAdvDTO } from '../../contracts/ads-interface/ads.api.
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import { ADS_MSG_PATTERNS, ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
-import { JwtAuthGuard } from '../auth-module/jwt.auth-guard';
-import { JwtReq } from '../auth-module/auth.jwt.strategy';
+import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
+import { JwtReq } from '../../utils/auth.jwt.strategy';
 
 @Controller('api/ads')
 export class ApiAdsController {
@@ -60,7 +60,7 @@ export class ApiAdsController {
           return res.status(status).send({ success, error: { status, message } });
         }
       }
-    )
+    );
   }
 
   @UseGuards(JwtAuthGuard)

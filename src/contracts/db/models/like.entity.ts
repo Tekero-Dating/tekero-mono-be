@@ -37,6 +37,9 @@ export class Like extends Model {
     type: DataType.DATE
   })
   expiration_date: Date;
+
+  @Column
+  match: boolean;
 }
 
 export const LikeRepository = {

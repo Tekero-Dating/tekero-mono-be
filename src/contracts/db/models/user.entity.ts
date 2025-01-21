@@ -7,8 +7,6 @@ import {
   ForeignKey, DataType, Unique, AllowNull, HasOne,
 } from 'sequelize-typescript';
 import { Media } from './mdeia.entity';
-import { GendersEnum } from './enums';
-import { IsOptional } from 'class-validator';
 import { UserProfile } from './user-profile.entity';
 
 @Table({ modelName: 'user' })
@@ -40,7 +38,7 @@ export class User extends Model {
 
   @AllowNull(true)
   @Column
-  balance?: number;
+  balance?: number; // TODO: move to userStats
 
   @ForeignKey(() => Media)
   @AllowNull(true)

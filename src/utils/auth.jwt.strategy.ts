@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JWT_SECRET } from '../../config/config';
-import { areFingerprintsMatch } from '../../utils/compare-fingerprints';
-import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
-import { Session } from '../../contracts/db/models/sessions.entity';
-import { SessionStatesEnum } from '../../contracts/db/models/enums/session-states.enum';
+import { JWT_SECRET } from '../config/config';
+import { areFingerprintsMatch } from './compare-fingerprints';
+import { MODELS_REPOSITORIES_ENUM } from '../contracts/db/models/models.enum';
+import { Session } from '../contracts/db/models/sessions.entity';
+import { SessionStatesEnum } from '../contracts/db/models/enums/session-states.enum';
 import { Request } from 'express';
-import { extractUserFingerprint } from '../../utils/extract-metadata-from-request';
+import { extractUserFingerprint } from './extract-metadata-from-request';
 import { Op } from 'sequelize';
 
 export type JwtReq = Request & { user: { userId: number; email: string; } };
