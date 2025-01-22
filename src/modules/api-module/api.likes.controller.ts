@@ -82,4 +82,30 @@ export class ApiLikesController {
       }
     );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('match/:likeId')
+  @UsePipes(new ValidationPipe({
+    transform: true
+  }))
+  async match(
+    @Param('likeId') likeId: number,
+    @Req() req: JwtReq,
+    @Res() res
+  ) {
+    const { userId } = req.user;
+    await rmqSend(
+      this.client,
+      LIKES_MSG_PATTERNS.MATCH,
+      { userId, likeId },
+      ({ success, result, error}) => {
+        if (success) {
+          return res.status(200).send({ success, result });
+        } else {
+          const { status, message } = TekeroError(error);
+          return res.status(status).send({ success, error: { status, message } });
+        }
+      }
+    );
+  }
 }
