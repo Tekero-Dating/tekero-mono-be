@@ -53,8 +53,20 @@ export class LikesController implements ILikesController {
 
   @MessagePattern(LIKES_MSG_PATTERNS.MATCH)
   async makeMatch(
-
+    @Payload() payload: IMatchAd.Request
   ): Promise<IMatchAd.Response> {
-    return { success: true };
+    try {
+      const { userId, likeId } = payload;
+      const { chat, author_stats, liker_stats } = await this.likesService.match(userId, likeId);
+      return {
+        success: true,
+        result: { chat, author_stats, liker_stats }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error
+      }
+    }
   }
 }

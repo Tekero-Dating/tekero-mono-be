@@ -46,12 +46,12 @@ export namespace IMatchAd {
     userId: number;
     likeId: number;
   };
-
   export interface Response {
     success: boolean;
     result?: {
       chat: Chat;
-      user_stats: UserStats;
+      author_stats: UserStats;
+      liker_stats: UserStats;
     };
     error?: Record<string, any> | {
       status: number;
@@ -76,5 +76,5 @@ export interface ILikesController {
    * Match opens a chat with all users who
    * related to liked adv
    */
-  makeMatch: (paylad: IMatchAd.Request, context: RmqContext) => Promise<IMatchAd.Response>;
+  makeMatch: (payload: IMatchAd.Request, context: RmqContext) => Promise<IMatchAd.Response>;
 }

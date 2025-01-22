@@ -6,12 +6,18 @@ import { LikesController } from './likes.controller';
 import { LikesService } from './likes.service';
 import { LikeRepository } from '../../contracts/db/models/like.entity';
 import { UserStatsRepository } from '../../contracts/db/models/user-stats.entity';
+import { ChatRepository } from '../../contracts/db/models/chat.entity';
+import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
+import { getDbModule } from '../../utils/db-utils.nest';
+import { dbOpts } from '../../config/config';
+import { AdvertisementsRepository } from '../../contracts/db/models/advertisements.entity';
 
 @Module({
   imports: [
     ClientsModule.register(
       generateRmqOptions(LIKES_MODULE_QUEUES, LIKES_SERVICE_NAME)
-    )
+    ),
+    getDbModule([dbOpts], false)
   ],
   controllers: [
     LikesController
@@ -19,7 +25,10 @@ import { UserStatsRepository } from '../../contracts/db/models/user-stats.entity
   providers: [
     LikesService,
     LikeRepository,
-    UserStatsRepository
+    UserStatsRepository,
+    ChatRepository,
+    ChatUserRepository,
+    AdvertisementsRepository
   ]
 })
 export class LikesModule {}

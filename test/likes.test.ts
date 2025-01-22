@@ -6,6 +6,8 @@ import { mockUserAdvRequest } from './mocks/advertisement.mock';
 import { AdsController } from '../src/modules/ads-module/ads.controller';
 import { Like } from '../src/contracts/db/models/like.entity';
 import { UserStats } from '../src/contracts/db/models/user-stats.entity';
+import { Chat } from '../src/contracts/db/models/chat.entity';
+import { ChatUser } from '../src/contracts/db/models/chat-user.entity';
 
 describe('Likes testing suite', () => {
   let App: INestApplication;
@@ -101,5 +103,56 @@ describe('Likes testing suite', () => {
       userId: 2, advertisementId: adv.result!.id
     });
     expect(sendLikeResult.success).toBe(false);
+  });
+
+  it('Like should not be sent if user likes its own adv', async () => {
+    const adv = await advertisementController.createAdv(
+      { userId: 1, fields: mockUserAdvRequest },
+      null as any
+    );
+    const sendLikeResult = await likesController.sendLike({
+      userId: 1, advertisementId: adv.result!.id
+    });
+    expect(sendLikeResult.success).toBe(false);
+    expect(sendLikeResult.error!.status).toBe(400);
+  });
+
+  it('Advertisement owner should be able to match with user who liked', async () => {
+    const userStatsOfOwnerBefore = await UserStats.findOne({
+      where: { user_id: 1 }
+    });
+    const userStatsOfLikerBefore = await UserStats.findOne({
+      where: { user_id: 3 }
+    });
+    const adv = await advertisementController.createAdv(
+      { userId: 1, fields: mockUserAdvRequest },
+      null as any
+    );
+    await likesController.sendLike({
+      userId: 3, advertisementId: adv.result!.id
+    });
+    const like = await Like.findOne({
+      where: { advertisement_id: adv.result!.id }
+    });
+    await likesController.makeMatch({
+      userId: 1, likeId: like!.id
+    });
+    const chat = await Chat.findOne({
+      where: { advertisement_id: adv.result!.id }
+    });
+    const chatUsers = await ChatUser.findAll({
+      where: { chat_id: chat!.id }
+    });
+    const userStatsOfOwner = await UserStats.findOne({
+      where: { user_id: 1 }
+    });
+    const userStatsOfLiker = await UserStats.findOne({
+      where: { user_id: 3 }
+    });
+
+    expect(userStatsOfOwner!.active_chats).toBeGreaterThan(userStatsOfOwnerBefore!.active_chats);
+    expect(userStatsOfLiker!.active_chats).toBeGreaterThan(userStatsOfLikerBefore!.active_chats);
+    expect(chatUsers).toHaveLength(2);
+    expect(chat).toBeTruthy();
   });
 });
