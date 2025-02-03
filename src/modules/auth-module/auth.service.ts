@@ -40,7 +40,11 @@ export class AuthService {
     access_token: string,
     refresh_token: string
   } {
-    const payload = { email: user.email, sub: user.id };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      name: user.firstName
+    };
 
     return {
       access_token: this.jwtService.sign(payload),

@@ -10,6 +10,8 @@ import { MEDIA_MODULE_QUEUES } from './contracts/media-interface/media.constants
 import cookieParser from 'cookie-parser';
 import { LIKES_MODULE_QUEUES } from './contracts/likes-interface/likes.constants';
 import { USERS_MODULE_QUEUES } from './contracts/users-interface/users.constants';
+import { CHAT_MODULE_QUEUES } from './contracts/chats-interface/chats.constants';
+import cors from 'cors';
 
 export {
 // @ts-ignore
@@ -29,10 +31,12 @@ export async function bootstrap() {
     ...QUESTIONNAIRE_MODULE_QUEUES,
     ...MEDIA_MODULE_QUEUES,
     ...LIKES_MODULE_QUEUES,
-    ...USERS_MODULE_QUEUES
+    ...USERS_MODULE_QUEUES,
+    ...CHAT_MODULE_QUEUES
   ], generalRmqOpts);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  app.use(cors());
   await app.startAllMicroservices();
   console.log('bootstrap', new Date().toISOString(), process.pid, __filename);
   await app.listen(+APP_PORT!);

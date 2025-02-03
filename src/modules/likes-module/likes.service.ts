@@ -42,7 +42,7 @@ export class LikesService {
 
     if (!advertisement) {
       this.logger.error('Send like: advertisement does not exist', { user_id, advertisement_id });
-      throw new NotFoundException('Advertiement does not exist');
+      throw new NotFoundException('Advertisement does not exist');
     }
      if (advertisement.user_id === user_id) {
        this.logger.error('Send like: user trying to like his own ad', { user_id, advertisement_id });

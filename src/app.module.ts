@@ -18,6 +18,7 @@ import { MetricsInterceptor } from './modules/metrics/metrics.interceptor';
 import { LikesModule } from './modules/likes-module/likes.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './modules/users-module/users.module';
+import { ChatModule } from './modules/chat-module/chat.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { UsersModule } from './modules/users-module/users.module';
     QuestionnaireModule,
     MediaModule,
     LikesModule,
-    MetricsModule
+    MetricsModule,
+    ChatModule
   ],
   controllers: [
     AppController
