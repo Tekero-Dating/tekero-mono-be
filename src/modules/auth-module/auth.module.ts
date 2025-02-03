@@ -28,6 +28,7 @@ import { SessionsRepository } from '../../contracts/db/models/sessions.entity';
     AuthLocalStrategy,
     AuthJwtStrategy,
     SessionsRepository
-  ]
+  ],
+  exports: [JwtModule]
 })
 export class AuthModule {}

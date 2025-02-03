@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebSocket Chat with Image Preview</title>
+  <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .message {
+      border: 1px solid red;
+      width: 400px;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 20px;
+      background: #fff;
+    }
+    .my {
+      border-color: green;
+      margin-left: 80px;
+    }
+    #chat {
+      height: 500px;
+      overflow: scroll;
+      border: 1px solid #222222;
+      padding: 10px;
+      display: block;
+      width: 600px;
+      background: #efefef;
+    }
+    .input {
+      display: flex;
+      width: 600px;
+      justify-content: space-between;
+      padding-top: 10px;
+    }
+    .input input[type="text"] {
+      width: 100%;
+      line-height: 50px;
+      border-radius: 8px;
+      border: 1px solid #afd0bf;
+      margin-right: 10px;
+    }
+    .input button, .upload-btn {
+      background: #afd0bf;
+      border-radius: 8px;
+      border: 1px solid #259f61;
+      padding: 10px 20px;
+      transition: 0.3s;
+    }
+    .input button:hover, .upload-btn:hover {
+      background: #fff;
+      border: 1px solid #afd0bf;
+      cursor: pointer;
+    }
+    #photo {
+      display: none;
+    }
+    .photo {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+    .preview {
+      margin-top: 10px;
+    }
+    .preview img {
+      max-width: 150px;
+      max-height: 150px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+<h1>Tekero Chat</h1>
+<div id="chat"></div>
+
+<div class="input">
+  <input id="message" type="text" placeholder="Type a message..." />
+  <label for="photo" class="upload-btn">📸 Upload Photo</label>
+  <input id="photo" type="file" accept="image/*" />
+  <button id="send">Send</button>
+</div>
+
+<!-- Image Preview Section -->
+<div id="preview" class="preview"></div>
+
+<script>
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNoZWxzZWFAdGVzdC5jb20iLCJzdWIiOjUsIm5hbWUiOiJFcmlrYSIsImlhdCI6MTczODU5MTQwNiwiZXhwIjoxNzM4NTkzMjA2fQ.J2DkomEeFJu7QhouEXyZGtASu6hbrFq4g0d6EaNPuT4';
+
+  const socket = io('http://localhost:3000/chat', {
+    query: {
+      token,
+      chatId: 1
+    }
+  });
+
+  socket.emit('join', 1);
+
+  let id, name;
+
+  // Handle file selection for preview
+  document.getElementById('photo').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('preview');
+    previewContainer.innerHTML = ''; // Clear any existing preview
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.alt = 'Preview';
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Send message or image
+  document.getElementById('send').addEventListener('click', () => {
+    const message = document.getElementById('message').value;
+    const photoInput = document.getElementById('photo');
+    const previewContainer = document.getElementById('preview');
+
+    // Send photo if selected
+    if (photoInput.files.length > 0) {
+      const file = photoInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const base64Image = reader.result;
+        socket.emit('upload-image', {
+          mimeType: 'image',
+          filename: file.name,
+          image: base64Image
+        });
+
+        photoInput.value = ''; // Clear file input
+        previewContainer.innerHTML = ''; // Clear preview after sending
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // Send text message
+    if (message.trim() !== '') {
+      socket.emit('send', { message });
+      document.getElementById('message').value = '';
+    }
+  });
+
+  // Listen for incoming messages
+  socket.on('receiveMessage', async (data) => {
+    const chat = document.getElementById('chat');
+    const sender = data.result.user_id === id
+      ? `<p><b>${data.sender}:</b></p>`
+      : `<p>${data.sender}:</p>`;
+
+    let content;
+    if (data.result.media_id) {
+      let imageSrc;
+      try {
+        const response = await fetch(`http://localhost:3000/api/media/get-media/${data.result.media_id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const mediaData = await response.json(); // Assuming the response is JSON
+        imageSrc = mediaData.result.url;
+      } catch (error) {
+        console.error('Failed to fetch media:', error);
+      }
+      content = `<img src="${imageSrc}" class="photo" alt="Sent photo" />`;
+    } else {
+      content = `<p>${data.result.content}</p>`;
+    }
+
+    chat.innerHTML += `<div class="message ${data.result.user_id === id && "my"}">${sender}${content}</div>`;
+  });
+
+  socket.on('getHistory', (data) => {
+    const chat = document.getElementById('chat');
+    data.result.forEach(async (message) => {
+      const sender = message.user_id === id
+        ? `<p><b>${name}:</b></p>`
+        : `<p>${message.user.firstName}:</p>`;
+
+      let mediaUrl = null;
+      if (message.media_id) {
+        const response = await fetch(`http://localhost:3000/api/media/get-media/${message.media_id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const mediaData = await response.json(); // Assuming the response is JSON
+        mediaUrl = mediaData.result.url;
+       }
+      let content = mediaUrl
+        ? `<img src="${mediaUrl}" class="photo" alt="Sent photo" />`
+        : `<p>${message.content}</p>`;
+
+      chat.innerHTML += `<div class="message ${message.user_id === id && "my"}">${sender}${content}</div>`;
+    });
+  });
+
+  socket.on('getUserData', ({ id: uId, name: uName }) => {
+    id = uId;
+    name = uName;
+    console.log({ id, name });
+  });
+</script>
+</body>
+</html>

@@ -28,6 +28,7 @@ export class AuthJwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, payload) {
+    console.log('validate');
     const userSession = await this.sessionsRepository.findOne({
       where: {
         user_id: payload.sub,
@@ -37,11 +38,11 @@ export class AuthJwtStrategy extends PassportStrategy(Strategy) {
         }
       }
     });
-
     if (userSession) {
       const newFingerprint = extractUserFingerprint(req);
       const matchOfFingerprints = areFingerprintsMatch(userSession!.fingerprint, newFingerprint);
-      if (!matchOfFingerprints) return null;
+      console.log({ matchOfFingerprints })
+      // if (!matchOfFingerprints) return null;
       return { userId: payload.sub, email: payload.email };
     }
     return null;

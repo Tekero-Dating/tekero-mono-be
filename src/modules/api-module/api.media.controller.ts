@@ -98,7 +98,7 @@ export class ApiMediaController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          this.logger.error({ status, message });
+          this.logger.error({ error });
           return res.status(status).send({ success: false, error: { status, message } });
         }
       }
