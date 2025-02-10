@@ -12,6 +12,7 @@ import { LIKES_MODULE_QUEUES } from './contracts/likes-interface/likes.constants
 import { USERS_MODULE_QUEUES } from './contracts/users-interface/users.constants';
 import { CHAT_MODULE_QUEUES } from './contracts/chats-interface/chats.constants';
 import cors from 'cors';
+import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface/notifications.constants';
 
 export {
 // @ts-ignore
@@ -32,7 +33,8 @@ export async function bootstrap() {
     ...MEDIA_MODULE_QUEUES,
     ...LIKES_MODULE_QUEUES,
     ...USERS_MODULE_QUEUES,
-    ...CHAT_MODULE_QUEUES
+    ...CHAT_MODULE_QUEUES,
+    ...NOTIFICATIONS_MODULE_QUEUES
   ], generalRmqOpts);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());

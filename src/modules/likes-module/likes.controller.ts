@@ -1,13 +1,16 @@
 import { Controller, Inject, Logger } from '@nestjs/common';
 import {
   ILikeAd,
-  ILikesController, IMatchAd,
+  ILikesController,
+  IMatchAd,
   IUnlikeAd,
   LIKES_MSG_PATTERNS,
 } from '../../contracts/likes-interface/likes.api-interface';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { LikesService } from './likes.service';
 import { LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.constants';
+import { WithNotify } from '../../utils/with-notify';
+import { NotificationTypesEnum } from '../../contracts/db/models/enums';
 
 @Controller('likes')
 export class LikesController implements ILikesController {
@@ -18,13 +21,19 @@ export class LikesController implements ILikesController {
   ) {}
 
   @MessagePattern(LIKES_MSG_PATTERNS.SEND_LIKE)
+  @WithNotify(NotificationTypesEnum.LIKE_RECEIVED)
   async sendLike(
     @Payload() payload: ILikeAd.Request,
   ): Promise<ILikeAd.Response> {
     try {
       const { userId, advertisementId } = payload;
       const { like, stats: user_stats } = await this.likesService.sendLike(userId, advertisementId);
-      return { success: true };
+      return {
+        success: true,
+        result: {
+          like, user_stats
+        }
+      };
     } catch (error) {
       return {
         success: false,

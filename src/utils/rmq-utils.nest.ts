@@ -1,11 +1,10 @@
-import { ClientProxy, ClientRMQ, RmqRecordBuilder, Transport } from '@nestjs/microservices';
+import { ClientProxy, RmqRecordBuilder, Transport } from '@nestjs/microservices';
 import { generalRmqOpts, RMQ_QUEUE_PREFIX } from '../config/config';
 import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
-import { Client } from '@nestjs/microservices/external/nats-client.interface';
-import { Observable } from 'rxjs';
 import { wait } from './wait';
+import amqplib, { Connection, Channel, Options } from 'amqplib';
 
-export const generateRmqOptions = (queues: string[] = [], serviceName?: string): {
+export const generateRmqOptions = (queues: string[] = [], serviceName?: string, extraOptions?: Record<string, unknown>): {
   name: string;
   transport: Transport.RMQ;
   options: {
@@ -22,7 +21,8 @@ export const generateRmqOptions = (queues: string[] = [], serviceName?: string):
       name: serviceName || 'no-name',
       options: {
         urls: generalRmqOpts.options?.urls,
-        queue: `${RMQ_QUEUE_PREFIX}${queue}`
+        queue: `${RMQ_QUEUE_PREFIX}${queue}`,
+        ...extraOptions
       }
     })
   );

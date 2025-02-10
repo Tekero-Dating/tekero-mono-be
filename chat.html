@@ -89,16 +89,24 @@
 <div id="preview" class="preview"></div>
 
 <script>
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNoZWxzZWFAdGVzdC5jb20iLCJzdWIiOjUsIm5hbWUiOiJFcmlrYSIsImlhdCI6MTczODU5MTQwNiwiZXhwIjoxNzM4NTkzMjA2fQ.J2DkomEeFJu7QhouEXyZGtASu6hbrFq4g0d6EaNPuT4';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcnZpbkB0ZXN0LmNvbSIsInN1YiI6NCwibmFtZSI6IkxhcmlzYSIsImlhdCI6MTczOTIxNTkxNCwiZXhwIjoxNzM5MjE3NzE0fQ.P5o863Q0HhZAOM8OukLHz6eZjSTzNLWFhUEZOpiVtmE';
 
-  const socket = io('http://localhost:3000/chat', {
-    query: {
-      token,
-      chatId: 1
-    }
+  // const socket = io('http://localhost:3000/chat', {
+  //   query: {
+  //     token,
+  //     chatId: 1
+  //   }
+  // });
+  const socket = io('http://localhost:3000/presence', {
+    query: { token }
   });
 
-  socket.emit('join', 1);
+  socket.emit('set-online');
+  socket.on('receiveNotification', (payload) => {
+    alert(payload);
+    console.log({ payload });
+  });
+  // socket.emit('join', 1);
 
   let id, name;
 

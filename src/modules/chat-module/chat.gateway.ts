@@ -7,20 +7,17 @@ import {
   MessageBody, ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { BadRequestException, Inject, Logger, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Inject, Logger, UnauthorizedException } from '@nestjs/common';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Chat } from '../../contracts/db/models/chat.entity';
 import { ChatUser } from '../../contracts/db/models/chat-user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { AuthJwtStrategy } from '../../utils/auth.jwt.strategy';
 import { JWT_SECRET } from '../../config/config';
-import { tsconfigPathsBeforeHookFactory } from '@nestjs/cli/lib/compiler/hooks/tsconfig-paths.hook';
 import { CHAT_MESSAGE_PATTERNS, CHAT_SERVICE_NAME } from '../../contracts/chats-interface/chats.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { ISendMessage } from '../../contracts/chats-interface/chats.api-interface';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import { TekeroError } from '../../utils/error-handling-utils';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from '../media-module/media.service';
 
 @WebSocketGateway({
