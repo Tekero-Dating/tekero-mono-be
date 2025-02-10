@@ -4,10 +4,7 @@ import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum'
 import { Notification } from '../../contracts/db/models/notification.entity';
 import { NotificationTypesEnum } from '../../contracts/db/models/enums';
 import { PresenceService } from '../presence-service/presence.service';
-import {
-  NOTIFICATIONS_DELIVERY_SERVICE_NAME, NOTIFICATIONS_MODULE_QUEUES,
-  NOTIFICATIONS_SERVICE_NAME,
-} from '../../contracts/notifications-interface/notifications.constants';
+import { NOTIFICATIONS_MODULE_QUEUES } from '../../contracts/notifications-interface/notifications.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { RmqService } from '../../utils/rmq-module/rmq.service';
 
