@@ -46,6 +46,10 @@ services:
         volumes:
             - grafana_data:/var/lib/grafana
 
+    redis:
+        image: redis:alpine
+        ports:
+            - "6379:6379"
     tekro_nest:
         build:
             context: .

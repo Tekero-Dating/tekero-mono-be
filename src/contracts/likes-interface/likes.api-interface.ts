@@ -16,6 +16,10 @@ export namespace ILikeAd {
   };
   export interface Response {
     success: boolean;
+    result?: {
+      like: Like;
+      user_stats: UserStats;
+    };
     error?: Record<string, any> | {
       status: number;
       message: string;

@@ -19,6 +19,8 @@ import { LikesModule } from './modules/likes-module/likes.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './modules/users-module/users.module';
 import { ChatModule } from './modules/chat-module/chat.module';
+import { NotificationsModule } from './modules/notifications-service/notifications.module';
+import { PresenceModule } from './modules/presence-service/presence.module';
 
 @Module({
   imports: [
@@ -35,7 +37,9 @@ import { ChatModule } from './modules/chat-module/chat.module';
     MediaModule,
     LikesModule,
     MetricsModule,
-    ChatModule
+    ChatModule,
+    NotificationsModule,
+    PresenceModule
   ],
   controllers: [
     AppController

@@ -14,7 +14,7 @@ export class Notification extends Model {
   @Column({
     type: DataType.JSON
   })
-  metadata: Record<string, unknown>;
+  payload: Record<string, unknown>;
 
   @Column({
     type: DataType.ENUM,

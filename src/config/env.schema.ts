@@ -19,6 +19,8 @@ export interface EnvSchema {
   JWT_SECRET: string;
   JWT_TOKEN_TTL: string;
   JWT_REFRESH_TOKEN_TTL: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
 };
 
 export const envSchema: JTDSchemaType<EnvSchema> = {
@@ -39,7 +41,9 @@ export const envSchema: JTDSchemaType<EnvSchema> = {
     SALT: { type: 'string' },
     JWT_SECRET: { type: 'string' },
     JWT_TOKEN_TTL: { type: 'string' },
-    JWT_REFRESH_TOKEN_TTL: { type: 'string' }
+    JWT_REFRESH_TOKEN_TTL: { type: 'string' },
+    REDIS_HOST: { type: 'string' },
+    REDIS_PORT: { type: 'string' }
   },
   optionalProperties: {
     APP_MODE: { enum: ['dev', 'stage', 'prod', 'test'] }

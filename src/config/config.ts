@@ -28,7 +28,9 @@ const {
   SALT,
   JWT_SECRET,
   JWT_TOKEN_TTL,
-  JWT_REFRESH_TOKEN_TTL
+  JWT_REFRESH_TOKEN_TTL,
+  REDIS_HOST,
+  REDIS_PORT
 } = process.env;
 
 const validate = ajv.compile<EnvSchema>(envSchema);
@@ -73,5 +75,7 @@ export {
   SALT,
   JWT_SECRET,
   JWT_TOKEN_TTL,
-  JWT_REFRESH_TOKEN_TTL
-}
+  JWT_REFRESH_TOKEN_TTL,
+  REDIS_HOST,
+  REDIS_PORT
+};
