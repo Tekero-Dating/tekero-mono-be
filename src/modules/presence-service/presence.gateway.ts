@@ -19,6 +19,7 @@ import {
 } from '../../contracts/notifications-interface/notifications.constants';
 import { RmqService } from '../../utils/rmq-module/rmq.service';
 import * as amqp from 'amqplib';
+import { RMQ_QUEUE_PREFIX } from '../../config/config';
 
 @WebSocketGateway({
   namespace: 'presence',
@@ -43,7 +44,7 @@ export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   private async startConsumer() {
     this.logger.log('startConsumer: starts consumer');
-    await this.rmqService.consume(NOTIFICATIONS_MODULE_QUEUES[1], async (msg: amqp.ConsumeMessage) => {
+    await this.rmqService.consume(`${RMQ_QUEUE_PREFIX}${NOTIFICATIONS_MODULE_QUEUES[1]}`, async (msg: amqp.ConsumeMessage) => {
       const content = JSON.parse(msg.content.toString());
       await this.sendInAppNotification(content);
     });

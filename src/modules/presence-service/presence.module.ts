@@ -20,9 +20,6 @@ import { RmqService } from '../../utils/rmq-module/rmq.service';
         expiresIn: JWT_TOKEN_TTL
       }
     }),
-    ClientsModule.register(
-      generateRmqOptions([NOTIFICATIONS_MODULE_QUEUES[1]], PRESENCE_SERVICE_NAME)
-    ),
     RmqModule
   ],
   providers: [PresenceGateway, PresenceService, RmqService],

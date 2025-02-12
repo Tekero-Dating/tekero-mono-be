@@ -7,6 +7,7 @@ import { PresenceService } from '../presence-service/presence.service';
 import { NOTIFICATIONS_MODULE_QUEUES } from '../../contracts/notifications-interface/notifications.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { RmqService } from '../../utils/rmq-module/rmq.service';
+import { RMQ_QUEUE_PREFIX } from '../../config/config';
 
 @Injectable()
 export class NotificationsService {
@@ -47,7 +48,7 @@ export class NotificationsService {
       const isOnline = await this.presenceService.isOnline(adOwnerId);
       if (isOnline) {
         this.logger.log('notifyAdOwnerAboutLike: user online. Sending to the queue.', { context });
-        await this.rmqService.publish(NOTIFICATIONS_MODULE_QUEUES[1], {
+        await this.rmqService.publish(`${RMQ_QUEUE_PREFIX}${NOTIFICATIONS_MODULE_QUEUES[1]}`, {
           userId: adOwnerId,
           notificationId: notification.id
         });

@@ -4,8 +4,21 @@ import * as amqp from 'amqplib';
 @Injectable()
 export class RmqService implements OnModuleDestroy {
   private channel: amqp.Channel;
+  constructor(@Inject('AMQP_CONNECTION') private readonly connection: amqp.Connection) {
+    this.connection.on('close', () => console.log('🔌 RabbitMQ Connection closed.'));
+    this.connection.on('error', (err) => console.error('⚠️ RabbitMQ Connection error:', err));
 
-  constructor(@Inject('AMQP_CONNECTION') private readonly connection: amqp.Connection) {}
+    process.on('SIGINT', async () => {
+      await this.onModuleDestroy();
+      process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
+      await this.onModuleDestroy();
+      process.exit(0);
+    });
+  }
+
 
   async initChannel() {
     if (!this.channel) {
@@ -38,11 +51,18 @@ export class RmqService implements OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    if (this.channel) {
-      await this.channel.close();
-    }
-    if (this.connection) {
-      await this.connection.close();
+    try {
+      if (this.channel && this.channel.close) {
+        console.log('Closing channel...');
+        await this.channel.close();
+      }
+      if (this.connection && this.connection.close) {
+        console.log('Closing connection...');
+        await this.connection.close();
+      }
+    } catch (error) {
+      console.error('Error closing RabbitMQ:', error.message);
     }
   }
+
 }
