@@ -17,7 +17,9 @@ import { rmqSend } from '../../utils/rmq-utils.nest';
 import { ADS_MSG_PATTERNS, ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
 import { JwtReq } from '../../utils/auth.jwt.strategy';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Advertisements')
 @Controller('api/ads')
 export class ApiAdsController {
   constructor (

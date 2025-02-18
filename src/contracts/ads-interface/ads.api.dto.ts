@@ -3,6 +3,7 @@ import { ConstitutionsEnum, GendersEnum, OpenersEnum } from '../db/models/enums'
 import { IAdvFields } from './ads.api-interface';
 import { AdTypesEnum } from '../db/models/enums/ad-types.enum';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * I fucked up with the default values for ads. The problem comes
@@ -13,6 +14,7 @@ import { Type } from 'class-transformer';
  */
 
 export class AdTargetFiltersDTO {
+  @ApiProperty()
   @IsOptional()
   @IsEnum(GendersEnum, {
     message: 'Gender does not match any of existing',
@@ -26,42 +28,52 @@ export class AdTargetFiltersDTO {
     GendersEnum.TRANS_MALE
   ];
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   genderExpressionFrom?: number = 0;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   genderExpressionTo?: number = 100;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   orientationFrom?: number = 0;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   orientationTo?: number = 100;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   distance?: number = 100;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   ageFrom?: number = 18;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   ageTo?: number = 118;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   heightFrom?: number = 100;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   heightTo?: number = 250;
 
+  @ApiProperty()
   @IsOptional()
   @IsEnum(ConstitutionsEnum, {
     message: 'Constitutions does not match any of existing',
@@ -76,44 +88,54 @@ export class AdTargetFiltersDTO {
 }
 
 export class CreateAdvDTO implements IAdvFields {
+  @ApiProperty()
   @IsOptional()
   @IsString({
     message: 'Text of ad should be a string'
   })
   text?: string = "";
 
+  @ApiProperty()
   @IsOptional()
   @IsArray()
   photos?: number[] = [];
 
+  @ApiProperty()
   @IsOptional()
   @IsEnum(AdTypesEnum)
   type: AdTypesEnum;
 
+  @ApiProperty()
   @IsOptional()
   @ValidateNested()
   @Type(() => AdTargetFiltersDTO)
   targetFilters: AdTargetFiltersDTO;
 
+  @ApiProperty()
   @IsObject()
   location: { type: 'Point'; coordinates: [ number, number ] };
 
+  @ApiProperty()
   @IsOptional()
   @IsEnum(OpenersEnum)
   opener?: OpenersEnum = OpenersEnum.QUESTION;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   song?: string = "";
 
+  @ApiProperty()
   @IsOptional()
   @IsObject()
   travelsTo?: { type: 'Point'; coordinates: [number, number] };
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   travelDateFrom?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   travelDateTo?: string;
@@ -122,6 +144,7 @@ export class CreateAdvDTO implements IAdvFields {
  * Here the duplicated part comes TODO
  */
 export class EditAdTargetFiltersDTO {
+  @ApiProperty()
   @IsOptional()
   @IsEnum(GendersEnum, {
     message: 'Gender does not match any of existing',
@@ -129,6 +152,7 @@ export class EditAdTargetFiltersDTO {
   })
   gender?: GendersEnum[];
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   genderExpressionFrom?: number;
@@ -137,34 +161,42 @@ export class EditAdTargetFiltersDTO {
   @IsNumber()
   genderExpressionTo?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   orientationFrom?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   orientationTo?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   distance?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   ageFrom?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   ageTo?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   heightFrom?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   heightTo?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsEnum(ConstitutionsEnum, {
     message: 'Constitutions does not match any of existing',
@@ -174,41 +206,50 @@ export class EditAdTargetFiltersDTO {
 }
 
 export class EditAdvDTO implements Partial<IAdvFields> {
+  @ApiProperty()
   @IsOptional()
   @IsString({
     message: 'Text of ad should be a string'
   })
   text?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsArray()
   photos?: number[];
 
+  @ApiProperty()
   @IsOptional()
   @ValidateNested()
   @Type(() => EditAdTargetFiltersDTO)
   targetFilters?: EditAdTargetFiltersDTO;
 
+  @ApiProperty()
   @IsOptional()
   @IsObject()
   location?: { type: 'Point'; coordinates: [number, number] };
 
+  @ApiProperty()
   @IsOptional()
   @IsEnum(OpenersEnum)
   opener?: OpenersEnum;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   song?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsObject()
   travelsTo?: { type: 'Point'; coordinates: [number, number] };
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   travelDateFrom?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   travelDateTo?: string;
