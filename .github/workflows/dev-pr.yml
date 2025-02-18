@@ -30,6 +30,8 @@ jobs:
                   sleep 20
 
             - name: Build and Test Application
+              env:
+                  NODE_OPTIONS: "--max-old-space-size=4096"
               run: |
                 npm ci
                 npm run build
