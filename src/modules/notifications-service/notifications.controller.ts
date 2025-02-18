@@ -6,13 +6,11 @@ import {
 } from '../../contracts/notifications-interface/notifications.constants';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service';
-import { RmqService } from '../../utils/rmq-module/rmq.service';
 
 @Controller('notifications')
 export class NotificationsController implements INotificationsController {
   constructor (
     @Inject(NOTIFICATIONS_SERVICE_NAME) private client: ClientProxy,
-    private readonly rmqService: RmqService,
     private readonly notificationsService: NotificationsService
   ) {}
 

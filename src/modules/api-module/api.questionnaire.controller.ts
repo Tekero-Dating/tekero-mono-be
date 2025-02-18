@@ -33,7 +33,7 @@ export class ApiQuestionnaireController {
   ) {
     const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
-    rmqSend<IGetQuestionnaire.Request, IGetQuestionnaire.Response>(
+    await rmqSend<IGetQuestionnaire.Request, IGetQuestionnaire.Response>(
       this.client,
       QUESTIONNAIRE_MSG_PATTERNS.GET_QUESTIONNAIRE,
       { userId },
@@ -58,7 +58,7 @@ export class ApiQuestionnaireController {
   ) {
     const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
-    rmqSend<ISubmitQuestionByShortcode.Request, ISubmitQuestionByShortcode.Response>(
+    await rmqSend<ISubmitQuestionByShortcode.Request, ISubmitQuestionByShortcode.Response>(
       this.client,
       QUESTIONNAIRE_MSG_PATTERNS.SUBMIT_QUESTIONNAIRE,
       { userId, response: body },

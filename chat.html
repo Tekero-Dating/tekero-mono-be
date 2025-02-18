@@ -89,7 +89,7 @@
 <div id="preview" class="preview"></div>
 
 <script>
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcnZpbkB0ZXN0LmNvbSIsInN1YiI6NCwibmFtZSI6IkxhcmlzYSIsImlhdCI6MTczOTIxNTkxNCwiZXhwIjoxNzM5MjE3NzE0fQ.P5o863Q0HhZAOM8OukLHz6eZjSTzNLWFhUEZOpiVtmE';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcnZpbkB0ZXN0LmNvbSIsInN1YiI6NCwibmFtZSI6IkxhcmlzYSIsImlhdCI6MTczOTY4NDAxOSwiZXhwIjoxNzM5Njg1ODE5fQ.e67_9j5L9Z8lFxBm3DCV5cmhyZKsqzFOvtrarVgTHrA';
 
   // const socket = io('http://localhost:3000/chat', {
   //   query: {
@@ -103,7 +103,6 @@
 
   socket.emit('set-online');
   socket.on('receiveNotification', (payload) => {
-    alert(payload);
     console.log({ payload });
   });
   // socket.emit('join', 1);

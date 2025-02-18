@@ -48,7 +48,7 @@ export class ApiAdsController {
       return res.status(status).send({ success: false, error: { status, message } });
     }
 
-    rmqSend<ICreateAdv.Request, ICreateAdv.Response>(
+    await rmqSend<ICreateAdv.Request, ICreateAdv.Response>(
       this.client,
       ADS_MSG_PATTERNS.CREATE,
       { fields: payload, userId },
@@ -80,7 +80,7 @@ export class ApiAdsController {
       return res.status(status).send({ success: false, error: { status, message } });
     }
 
-    rmqSend<IEditAdv.Request, IEditAdv.Response>(
+    await rmqSend<IEditAdv.Request, IEditAdv.Response>(
       this.client,
       ADS_MSG_PATTERNS.EDIT,
       { fields: payload, advId, userId },
@@ -106,7 +106,7 @@ export class ApiAdsController {
     @Res() res
   ) {
     const { userId } = req.user;
-    rmqSend(
+    await rmqSend(
       this.client,
       ADS_MSG_PATTERNS.ACTIVATE_ADV,
       { userId, advId },
@@ -134,7 +134,7 @@ export class ApiAdsController {
     @Res() res
   ) {
     const { userId } = req.user;
-    rmqSend(
+    await rmqSend(
       this.client,
       ADS_MSG_PATTERNS.ARCHIVE,
       { userId, advId },

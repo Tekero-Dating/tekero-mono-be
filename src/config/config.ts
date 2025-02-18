@@ -59,8 +59,11 @@ export const generalRmqOpts: IRmqOptions = {
   options: {
     queue: 'general_queue',
     urls: [RMQ_URL! as RmqUrl] as RmqUrl[],
-    noAck: false,
-    persistent: true
+    noAck: true,
+    persistent: true,
+    queueOptions: {
+      durable: true
+    }
   }
 };
 
