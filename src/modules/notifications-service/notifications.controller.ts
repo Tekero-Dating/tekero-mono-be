@@ -1,9 +1,6 @@
 import { INotificationsController } from '../../contracts/notifications-interface/notifications.api-interface';
 import { Controller, Inject } from '@nestjs/common';
-import {
-  NOTIFICATIONS_MSG_PATTERNS,
-  NOTIFICATIONS_SERVICE_NAME,
-} from '../../contracts/notifications-interface/notifications.constants';
+import { NOTIFICATIONS_MSG_PATTERNS, NOTIFICATIONS_SERVICE_NAME } from '../../contracts/notifications-interface/notifications.constants';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service';
 
