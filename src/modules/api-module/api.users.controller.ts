@@ -40,7 +40,7 @@ export class ApiUsersController {
     @Body() payload: CreateUserDTO,
     @Res() res
   ) {
-    rmqSend<ICreateUser.Request, ICreateUser.Response>(
+    await rmqSend<ICreateUser.Request, ICreateUser.Response>(
       this.client,
       USERS_MSG_PATTERNS.CREATE,
       payload,
@@ -63,7 +63,7 @@ export class ApiUsersController {
     @Res() res
   ) {
   const { userId } = req.user;
-    rmqSend<IDeleteUser.Request, IDeleteUser.Response>(
+    await rmqSend<IDeleteUser.Request, IDeleteUser.Response>(
       this.client,
       USERS_MSG_PATTERNS.DELETE,
       { ...payload, userId },
@@ -86,7 +86,7 @@ export class ApiUsersController {
     @Res() res
   ) {
     const { userId } = req.user;
-    rmqSend(
+    await rmqSend(
       this.client,
       USERS_MSG_PATTERNS.EDIT,
       { userId, fields: payload },

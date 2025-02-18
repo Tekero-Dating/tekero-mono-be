@@ -1,13 +1,17 @@
-import { Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Advertisement } from '../../contracts/db/models/advertisements.entity';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Notification } from '../../contracts/db/models/notification.entity';
 import { NotificationTypesEnum } from '../../contracts/db/models/enums';
 import { PresenceService } from '../presence-service/presence.service';
-import { NOTIFICATIONS_MODULE_QUEUES } from '../../contracts/notifications-interface/notifications.constants';
-import { ClientProxy } from '@nestjs/microservices';
-import { RmqService } from '../../utils/rmq-module/rmq.service';
-import { RMQ_QUEUE_PREFIX } from '../../config/config';
+import { PresenceGateway } from '../presence-service/presence.gateway';
 
 @Injectable()
 export class NotificationsService {
@@ -18,7 +22,7 @@ export class NotificationsService {
     @Inject(MODELS_REPOSITORIES_ENUM.NOTIFICATION)
     private notificationRepository: typeof Notification,
     private readonly presenceService: PresenceService,
-    private readonly rmqService: RmqService,
+    @Inject(forwardRef(() => PresenceGateway)) private readonly presenceGateway: PresenceGateway,
   ) {}
 
   async notifyAdOwnerAboutLike(userId: number, advertisementId: number, likeId: number): Promise<void> {
@@ -48,13 +52,13 @@ export class NotificationsService {
       const isOnline = await this.presenceService.isOnline(adOwnerId);
       if (isOnline) {
         this.logger.log('notifyAdOwnerAboutLike: user online. Sending to the queue.', { context });
-        await this.rmqService.publish(`${RMQ_QUEUE_PREFIX}${NOTIFICATIONS_MODULE_QUEUES[1]}`, {
+        await this.presenceGateway.sendInAppNotification({
           userId: adOwnerId,
           notificationId: notification.id
         });
       }
     } catch (error) {
-      this.logger.error('notifyAdOwnerAboutLike: uncaught error', { context });
+      this.logger.error('notifyAdOwnerAboutLike: uncaught error', { error, context });
       throw new InternalServerErrorException('Can not send notification');
     }
   }

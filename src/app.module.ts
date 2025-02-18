@@ -38,8 +38,8 @@ import { PresenceModule } from './modules/presence-service/presence.module';
     LikesModule,
     MetricsModule,
     ChatModule,
-    NotificationsModule,
-    PresenceModule
+    PresenceModule,
+    NotificationsModule
   ],
   controllers: [
     AppController

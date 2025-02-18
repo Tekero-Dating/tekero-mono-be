@@ -9,6 +9,18 @@ import { UserStats } from '../src/contracts/db/models/user-stats.entity';
 import { Chat } from '../src/contracts/db/models/chat.entity';
 import { ChatUser } from '../src/contracts/db/models/chat-user.entity';
 
+jest.mock('../src/utils/with-notify', () => ({
+  WithNotify: (eventName: any) => {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+      const originalMethod = descriptor.value;
+      descriptor.value = async function (...args: any[]) {
+        return originalMethod.apply(this, args);
+      };
+      return descriptor;
+    };
+  },
+}));
+
 describe('Likes testing suite', () => {
   let App: INestApplication;
   let likesController: LikesController;

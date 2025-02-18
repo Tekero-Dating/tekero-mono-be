@@ -5,12 +5,8 @@ import { PresenceService } from './presence.service';
 import { JWT_SECRET, JWT_TOKEN_TTL } from '../../config/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { generateRmqOptions } from '../../utils/rmq-utils.nest';
-import {
-  NOTIFICATIONS_MODULE_QUEUES,
-} from '../../contracts/notifications-interface/notifications.constants';
+import { NOTIFICATIONS_MODULE_QUEUES } from '../../contracts/notifications-interface/notifications.constants';
 import { PRESENCE_SERVICE_NAME } from '../../contracts/presence-interface/presence.constants';
-import { RmqModule } from '../../utils/rmq-module/rmq.module';
-import { RmqService } from '../../utils/rmq-module/rmq.service';
 
 @Module({
   imports: [
@@ -20,9 +16,11 @@ import { RmqService } from '../../utils/rmq-module/rmq.service';
         expiresIn: JWT_TOKEN_TTL
       }
     }),
-    RmqModule
+    ClientsModule.register(
+      generateRmqOptions([NOTIFICATIONS_MODULE_QUEUES[1]], PRESENCE_SERVICE_NAME)
+    )
   ],
-  providers: [PresenceGateway, PresenceService, RmqService],
+  providers: [PresenceGateway, PresenceService],
   exports: [PresenceGateway, PresenceService],
 })
 export class PresenceModule {}

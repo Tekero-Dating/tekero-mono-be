@@ -89,7 +89,7 @@ export class ApiMediaController {
     const { userId } = req.user;
     const { mediaId } = params;
     this.logger.log('getMediaById', { mediaId, userId });
-    rmqSend<IGetMedia.Request, IGetMedia.Response>(
+    await rmqSend<IGetMedia.Request, IGetMedia.Response>(
       this.client,
       MEDIA_MSG_PATTERNS.GET_MEDIA,
       { userId, mediaId },
@@ -118,7 +118,7 @@ export class ApiMediaController {
     const { userId } = req.user;
     const { mediaId } = params;
     this.logger.log('deleteMediaById', { mediaId, userId });
-    rmqSend<IGetMedia.Request, IGetMedia.Response>(
+    await rmqSend<IGetMedia.Request, IGetMedia.Response>(
       this.client,
       MEDIA_MSG_PATTERNS.DELETE_MEDIA,
       { userId, mediaId },
@@ -147,7 +147,7 @@ export class ApiMediaController {
     const { userId } = req.user;
     const { mediaId } = params;
     this.logger.log('updatePrivacy', { mediaId, userId });
-    rmqSend<ISetMediaPrivacy.Request, ISetMediaPrivacy.Response>(
+    await rmqSend<ISetMediaPrivacy.Request, ISetMediaPrivacy.Response>(
       this.client,
       MEDIA_MSG_PATTERNS.SET_MEDIA_PRIVACY,
       { userId, mediaId },
@@ -176,7 +176,7 @@ export class ApiMediaController {
     const { userId: ownerId } = req.user;
     const { accessorId, giver } = params;
     this.logger.log('updateMediaAccess', { ownerId, accessorId, giver });
-    rmqSend<IEditMediaAccess.Request, IEditMediaAccess.Response>(
+    await rmqSend<IEditMediaAccess.Request, IEditMediaAccess.Response>(
       this.client,
       MEDIA_MSG_PATTERNS.EDIT_MEDIA_ACCESS,
       { ownerId, accessorId, giver },

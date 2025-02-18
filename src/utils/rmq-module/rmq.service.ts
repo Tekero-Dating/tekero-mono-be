@@ -1,23 +1,13 @@
-import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
 import * as amqp from 'amqplib';
 
 @Injectable()
-export class RmqService implements OnModuleDestroy {
+export class RmqService implements OnApplicationShutdown {
+  private readonly logger = new Logger(RmqService.name);
   private channel: amqp.Channel;
-  constructor(@Inject('AMQP_CONNECTION') private readonly connection: amqp.Connection) {
-    this.connection.on('close', () => console.log('🔌 RabbitMQ Connection closed.'));
-    this.connection.on('error', (err) => console.error('⚠️ RabbitMQ Connection error:', err));
-
-    process.on('SIGINT', async () => {
-      await this.onModuleDestroy();
-      process.exit(0);
-    });
-
-    process.on('SIGTERM', async () => {
-      await this.onModuleDestroy();
-      process.exit(0);
-    });
-  }
+  constructor(
+    @Inject('AMQP_CONNECTION') private readonly connection: amqp.Connection
+  ) {}
 
 
   async initChannel() {
@@ -30,7 +20,7 @@ export class RmqService implements OnModuleDestroy {
     await this.initChannel();
     await this.channel.assertQueue(queue, { durable: true });
     this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), { persistent: true });
-    console.log(`📤 Message sent to ${queue}:`, message);
+    this.logger.log(`📤 Message sent to ${queue}:`, message);
   }
 
   async consume(queue: string, callback: (msg: amqp.ConsumeMessage) => void) {
@@ -50,7 +40,7 @@ export class RmqService implements OnModuleDestroy {
     });
   }
 
-  async onModuleDestroy() {
+  async onApplicationShutdown() {
     try {
       if (this.channel && this.channel.close) {
         console.log('Closing channel...');
@@ -64,5 +54,4 @@ export class RmqService implements OnModuleDestroy {
       console.error('Error closing RabbitMQ:', error.message);
     }
   }
-
 }

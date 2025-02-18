@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import RedisLib from 'ioredis';
 import { REDIS_HOST, REDIS_PORT } from '../../config/config';
 
 @Injectable()
 export class PresenceService {
+  private readonly logger = new Logger(PresenceService.name);
   private redisClient: Redis;
 
   constructor() {
@@ -16,33 +17,34 @@ export class PresenceService {
 
   async setOnline(userId: number, clientId: string, ttl = 300): Promise<void> {
     await this.redisClient.set(`online:user:${userId}`, clientId, 'EX', ttl);
-    console.log(`✅ User ${userId} is now online (Client: ${clientId})`);
+    this.logger.log(`✅ User ${userId} is now online (Client: ${clientId})`);
   }
 
   async removeOnline(userId: number): Promise<void> {
     const deleted = await this.redisClient.del(`online:user:${userId}`);
     if (deleted) {
-      console.log(`❌ User ${userId} is now offline`);
+      this.logger.log(`❌ User ${userId} is now offline`);
     } else {
-      console.log(`⚠️ User ${userId} was not online`);
+      this.logger.log(`⚠️ User ${userId} was not online`);
     }
   }
 
   async isOnline(userId: number): Promise<boolean> {
-    const list = await this.redisListOnlineUsers();
-    console.log({ list });
     const result = await this.redisClient.get(`online:user:${userId}`);
     const online = result !== null;
-    console.log(`📡 User ${userId} online status: ${online}`);
+    this.logger.log(`📡 User ${userId} online status: ${online}`);
     return online;
   }
 
   async redisListOnlineUsers(): Promise<number[]> {
-    const keys = await this.redisClient.keys('online:user:*'); // Get all presence keys
+    const keys = await this.redisClient.keys('online:user:*');
     const userIds = keys.map((key) => parseInt(key.split(':').pop() || '0', 10)).filter((id) => !isNaN(id));
-
-    console.log('👥 Online Users:', userIds);
+    this.logger.log('👥 Online Users:', userIds);
     return userIds;
   }
 
+  async onModuleDestroy(): Promise<void> {
+    await this.redisClient.quit();
+    this.logger.log('Redis connection closed gracefully.');
+  }
 }

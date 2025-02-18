@@ -2,25 +2,20 @@ import {
   WebSocketGateway,
   OnGatewayInit,
   OnGatewayConnection,
-  OnGatewayDisconnect, SubscribeMessage, ConnectedSocket, WebSocketServer,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  ConnectedSocket,
+  WebSocketServer
 } from '@nestjs/websockets';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Server, Socket } from 'socket.io';
 import { PresenceService } from './presence.service';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { NOTIFICATIONS_MSG_PATTERNS } from '../../contracts/notifications-interface/notifications.constants';
+import { ClientProxy, Ctx, MessagePattern } from '@nestjs/microservices';
 import { PRESENCE_SERVICE_NAME } from '../../contracts/presence-interface/presence.constants';
-import { rmqSend } from '../../utils/rmq-utils.nest';
-import { CHAT_MESSAGE_PATTERNS } from '../../contracts/chats-interface/chats.constants';
-import { TekeroError } from '../../utils/error-handling-utils';
-import {
-  NOTIFICATIONS_MODULE_QUEUES,
-  NOTIFICATIONS_MSG_PATTERNS,
-} from '../../contracts/notifications-interface/notifications.constants';
-import { RmqService } from '../../utils/rmq-module/rmq.service';
-import * as amqp from 'amqplib';
-import { RMQ_QUEUE_PREFIX } from '../../config/config';
 
+@Injectable()
 @WebSocketGateway({
   namespace: 'presence',
   cors: {
@@ -33,22 +28,11 @@ export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   server: Server;
 
   constructor(
-    private readonly rmqService: RmqService,
     private jwtService: JwtService,
-    private presenceService: PresenceService,
+    private readonly presenceService: PresenceService,
+    @Inject(PRESENCE_SERVICE_NAME)
+    private readonly client: ClientProxy
   ) {}
-
-  async onModuleInit() {
-    await this.startConsumer();
-  }
-
-  private async startConsumer() {
-    this.logger.log('startConsumer: starts consumer');
-    await this.rmqService.consume(`${RMQ_QUEUE_PREFIX}${NOTIFICATIONS_MODULE_QUEUES[1]}`, async (msg: amqp.ConsumeMessage) => {
-      const content = JSON.parse(msg.content.toString());
-      await this.sendInAppNotification(content);
-    });
-  }
 
   afterInit() {
     this.logger.log('WebSocket Presence Gateway Initialized');
@@ -89,14 +73,13 @@ export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     client.join(String(client.data.userId));
   }
 
+  @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.NOTIFY)
   sendInAppNotification(
       payload: { userId: number, notificationId: number }
-    ) {
-    console.log({ payload });
+  ): void {
     this.logger.log('sendInAppNotification', { payload });
     this.server.to(String(payload.userId)).emit('receiveNotification', {
       payload
     });
-    return { success: true };
   }
 }
