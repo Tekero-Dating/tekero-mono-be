@@ -45,6 +45,7 @@
     "@nestjs/platform-socket.io": "^10.3.2",
     "@nestjs/schedule": "^4.1.2",
     "@nestjs/sequelize": "^10.0.1",
+    "@nestjs/swagger": "^11.0.3",
     "@nestjs/websockets": "^10.3.2",
     "@willsoto/nestjs-prometheus": "^6.0.2",
     "ajv": "^8.13.0",
@@ -69,7 +70,8 @@
     "rimraf": "^5.0.1",
     "rxjs": "^7.8.1",
     "sequelize": "^6.37.1",
-    "sequelize-typescript": "^2.0.0"
+    "sequelize-typescript": "^2.0.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@nestjs/schematics": "^10.1.1",

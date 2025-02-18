@@ -13,6 +13,7 @@ import { USERS_MODULE_QUEUES } from './contracts/users-interface/users.constants
 import { CHAT_MODULE_QUEUES } from './contracts/chats-interface/chats.constants';
 import cors from 'cors';
 import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface/notifications.constants';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export {
 // @ts-ignore
@@ -36,9 +37,19 @@ export async function bootstrap() {
     ...CHAT_MODULE_QUEUES,
     ...NOTIFICATIONS_MODULE_QUEUES
   ], generalRmqOpts);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use(cookieParser());
   app.use(cors());
+  const config = new DocumentBuilder()
+    .setTitle('Tekero API')
+    .setDescription('API documentation for Tekero dating app')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
   await app.startAllMicroservices();
   console.log('bootstrap', new Date().toISOString(), process.pid, __filename);
   await app.listen(+APP_PORT!);
