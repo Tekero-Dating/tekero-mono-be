@@ -4,22 +4,6 @@ import { AmqplibQueueOptions, RmqUrl } from '@nestjs/microservices/external/rmq-
 import { wait } from './wait';
 import { Module, DynamicModule, Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 
-export const getRmqOptionsForQueue = (
-  queue: string,
-  queueOptions: AmqplibQueueOptions,
-  extraOptions: Record<string, unknown>
-): RmqOptions => {
-  const rmqConfig = {
-    transport: Transport.RMQ as Transport.RMQ, // idk why
-    options: {
-      ...extraOptions,
-      queue: `${RMQ_QUEUE_PREFIX}${queue}`,
-      queueOptions
-    }
-  };
-  return rmqConfig;
-};
-
 export const generateRmqOptions = (queues: string[] = [], serviceName?: string, extraOptions?: Record<string, unknown>): {
   name: string;
   transport: Transport.RMQ;
@@ -87,78 +71,3 @@ export const rmqSend = async <DataToSend, ResponseData>(
     .build();
   return await client.send<ResponseData>(messagePattern, rmqRecord).subscribe(handler);
 };
-
-
-@Injectable()
-export class RmqClientService implements OnModuleInit, OnModuleDestroy {
-  private client: ClientProxy;
-  constructor(@Inject('RMQ_OPTIONS') private readonly options) {}
-
-  onModuleInit() {
-    this.client = ClientProxyFactory.create({
-      ...this.options
-    });
-  }
-
-  async send<DataToSend, ResponseData>(messagePattern: string, data: DataToSend): Promise<ResponseData> {
-
-    console.log({ rmqSend: { messagePattern, data, options: this.options.options.urls }});
-    const rmqRecord = new RmqRecordBuilder<DataToSend>(data)
-      .setOptions({
-        headers: { ['x-version']: '1.0.0' },
-        expiration: 30000,
-      })
-      .build();
-
-    console.log({ rmqRecord, client: this.client });
-    return new Promise((resolve, reject) => {
-      this.client.send<ResponseData, typeof rmqRecord>(messagePattern, rmqRecord).subscribe({
-        next: resolve,
-        error: reject,
-      });
-    });
-  }
-
-  onModuleDestroy() {
-    this.client.close();
-  }
-};
-
-@Module({})
-export class RmqModule {
-  static register(queueName: string): DynamicModule {
-    return {
-      module: RmqModule,
-      imports: [
-        ClientsModule.register([
-          {
-            name: `RMQ_CLIENT_${queueName.toUpperCase()}`,
-            ...getRmqOptionsForQueue(
-              queueName,
-              generalRmqOpts!.options!.queueOptions!,
-              generalRmqOpts.options!
-            )
-          },
-        ]),
-      ],
-      providers: [
-        {
-          provide: `RMQ_OPTIONS_${queueName.toUpperCase()}`,
-          useValue: {
-            ...getRmqOptionsForQueue(
-              queueName,
-              generalRmqOpts!.options!.queueOptions!,
-              generalRmqOpts.options!
-            ).options
-          },
-        },
-        {
-          provide: `RMQ_CLIENT_${queueName.toUpperCase()}`,
-          useFactory: (options) => new RmqClientService(options),
-          inject: [`RMQ_OPTIONS_${queueName.toUpperCase()}`],
-        },
-      ],
-      exports: [`RMQ_CLIENT_${queueName.toUpperCase()}`, ClientsModule],
-    };
-  }
-}
