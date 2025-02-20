@@ -1,5 +1,3 @@
-export const QUESTIONNAIRE_MODULE_QUEUES = [
-  'questions'
-];
+export const QUESTIONNAIRE_MODULE_QUEUES = ['questions'];
 
 export const QUESTIONNAIRE_SERVICE_NAME = 'QUESTIONNAIRE_SERVICE';

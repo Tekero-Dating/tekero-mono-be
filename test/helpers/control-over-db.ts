@@ -1,21 +1,24 @@
 import { Sequelize } from 'sequelize-typescript';
 
-
 /**
  * It's just a wrapper to have shortened access to internal
  * sequlelize methods though simplified api
  */
 export class SuperSequelize {
   dbOpts;
-  sequelize
+  sequelize;
 
-  constructor (dbOpts: {
-    username: string;
-    password: string;
-    database: string;
-    host: string;
-    post: number;
-  } | any) {
+  constructor(
+    dbOpts:
+      | {
+          username: string;
+          password: string;
+          database: string;
+          host: string;
+          post: number;
+        }
+      | any,
+  ) {
     this.dbOpts = dbOpts;
     this.sequelize = new Sequelize(
       this.dbOpts.database,
@@ -25,8 +28,8 @@ export class SuperSequelize {
         host: this.dbOpts.host,
         port: this.dbOpts.port,
         dialect: 'postgres',
-        logging: false
-      }
+        logging: false,
+      },
     );
   }
 
@@ -46,7 +49,7 @@ export class SuperSequelize {
         CREATE EXTENSION IF NOT EXISTS postgis;
       `);
       console.log('Postgis extension applied SUCCESSFULLY');
-    } catch(e) {
+    } catch (e) {
       console.error('Can not apply postgis plugin', e);
     }
   }
@@ -62,7 +65,7 @@ export class SuperSequelize {
 
   async dropDbToWhichConnected(): Promise<boolean> {
     await this.close();
-    const AdminDB  = new Sequelize(
+    const AdminDB = new Sequelize(
       'postgres',
       this.dbOpts.username,
       this.dbOpts.password,
@@ -71,20 +74,19 @@ export class SuperSequelize {
         port: this.dbOpts.port,
         dialect: 'postgres',
         logging: false,
-      }
+      },
     );
 
     const { database } = this.dbOpts;
 
     try {
       await AdminDB.query(
-        `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${database}';`
+        `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${database}';`,
       );
-      await AdminDB
-        .query(`DROP DATABASE IF EXISTS "${database}";`);
+      await AdminDB.query(`DROP DATABASE IF EXISTS "${database}";`);
       console.log(`Database "${database}" dropped successfully.`);
       await AdminDB.close();
-      return true
+      return true;
     } catch (error) {
       console.error(`Error dropping database "${database}":`, error);
       await AdminDB.close();

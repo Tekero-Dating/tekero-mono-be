@@ -7,7 +7,9 @@ import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { MediaController } from '../src/modules/media-module/media.controller';
 import { MediaService } from '../src/modules/media-module/media.service';
 
-jest.spyOn(JwtAuthGuard.prototype, 'canActivate').mockImplementation(() => true);
+jest
+  .spyOn(JwtAuthGuard.prototype, 'canActivate')
+  .mockImplementation(() => true);
 
 const file = {
   fieldname: 'file',
@@ -38,30 +40,42 @@ describe('Media module testing suite', () => {
       mediaId = await mediaService.uploadMedia({
         userId: 1,
         expiration: 100,
-        file
+        file,
       });
       const mediaFromDB = await Media.findByPk(mediaId);
       expect(mediaFromDB).toBeTruthy();
     });
 
     it('Get media successfully', async () => {
-      const media = await mediaController.getMedia({
-        mediaId, userId: 1
-      }, null as any);
+      const media = await mediaController.getMedia(
+        {
+          mediaId,
+          userId: 1,
+        },
+        null as any,
+      );
 
       expect(mediaId).toBeTruthy();
-      expect(media!.result!.url).toBeTruthy()
+      expect(media!.result!.url).toBeTruthy();
     });
 
     it('Set media privacy successfully', async () => {
-      await mediaController.setMediaPrivacy({
-        mediaId, userId: 1
-      }, null as any);
+      await mediaController.setMediaPrivacy(
+        {
+          mediaId,
+          userId: 1,
+        },
+        null as any,
+      );
       const mediaPrivate = await Media.findByPk(mediaId);
 
-      await mediaController.setMediaPrivacy({
-        mediaId, userId: 1
-      }, null as any);
+      await mediaController.setMediaPrivacy(
+        {
+          mediaId,
+          userId: 1,
+        },
+        null as any,
+      );
       const mediaNotPrivate = await Media.findByPk(mediaId);
 
       expect(mediaPrivate!.private).toBe(true);
@@ -69,24 +83,34 @@ describe('Media module testing suite', () => {
     });
 
     it('Grant private media access', async () => {
-      await mediaController.editMediaAccess({
-        ownerId: 1, accessorId: 2, giver: true
-      }, null as any);
+      await mediaController.editMediaAccess(
+        {
+          ownerId: 1,
+          accessorId: 2,
+          giver: true,
+        },
+        null as any,
+      );
       const mediaAccess = await MediaAccess.findOne({
         where: {
           owner_id: 1,
-          accessor_id: 2
-        }
+          accessor_id: 2,
+        },
       });
 
-      await mediaController.editMediaAccess({
-        ownerId: 1, accessorId: 2, giver: false
-      }, null as any);
+      await mediaController.editMediaAccess(
+        {
+          ownerId: 1,
+          accessorId: 2,
+          giver: false,
+        },
+        null as any,
+      );
       const mediaAccessNotGranted = await MediaAccess.findOne({
         where: {
           owner_id: 1,
-          accessor_id: 2
-        }
+          accessor_id: 2,
+        },
       });
 
       expect(mediaAccess).toBeTruthy();
@@ -94,9 +118,13 @@ describe('Media module testing suite', () => {
     });
 
     it('Delete media successfully', async () => {
-      await mediaController.deleteMedia({
-        userId: 1, mediaId
-      }, null as any);
+      await mediaController.deleteMedia(
+        {
+          userId: 1,
+          mediaId,
+        },
+        null as any,
+      );
       const media = await Media.findByPk(mediaId);
       expect(media).toBeFalsy();
     });

@@ -2,8 +2,8 @@ export const TekeroError = (error: Record<string, any>) => {
   if (!error) {
     return {
       status: 500,
-      message: 'Uncaught error appeared'
-    }
+      message: 'Uncaught error appeared',
+    };
   }
   const getMessage = (err: typeof error) => {
     if (err.message) {
@@ -21,7 +21,7 @@ export const TekeroError = (error: Record<string, any>) => {
 
   const getStatus = (err: typeof error) => {
     if (err.status) {
-      return err.status
+      return err.status;
     }
     if (err.statusCode) {
       return err.statusCode;
@@ -31,14 +31,13 @@ export const TekeroError = (error: Record<string, any>) => {
         ? err.response.status
         : err.response?.statusCode === 'number'
           ? err.response.statusCode
-          : 500
+          : 500;
     }
-    return 500
-  }
-
+    return 500;
+  };
 
   return {
     status: getStatus(error),
-    message: getMessage(error)
-  }
-}
+    message: getMessage(error),
+  };
+};

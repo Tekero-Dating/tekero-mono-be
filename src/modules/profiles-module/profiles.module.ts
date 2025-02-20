@@ -13,16 +13,13 @@ import { UserRepository } from '../../contracts/db/models/user.entity';
 @Module({
   imports: [
     ClientsModule.register(
-      generateRmqOptions(USER_PROFILES_MODULE_QUEUES, USER_PROFILES_SERVICE_NAME)
-    )
+      generateRmqOptions(
+        USER_PROFILES_MODULE_QUEUES,
+        USER_PROFILES_SERVICE_NAME,
+      ),
+    ),
   ],
-  controllers: [
-    ProfilesController
-  ],
-  providers: [
-    ProfilesService,
-    UserProfileRepository,
-    UserRepository
-  ],
+  controllers: [ProfilesController],
+  providers: [ProfilesService, UserProfileRepository, UserRepository],
 })
 export class ProfilesModule {}

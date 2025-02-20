@@ -1,4 +1,12 @@
-import { AllowNull, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  AllowNull,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { Chat } from './chat.entity';
 import { User } from './user.entity';
 import { MessageTypesEnum } from './enums/message-types.enum';
@@ -27,7 +35,7 @@ export class Message extends Model {
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(MessageTypesEnum)
+    values: Object.keys(MessageTypesEnum),
   })
   type: MessageTypesEnum;
 
@@ -37,9 +45,9 @@ export class Message extends Model {
 
   @Column
   read: boolean;
-};
+}
 
 export const MessageRepository = {
   provide: 'MESSAGE_REPOSITORY',
-  useValue: Message
+  useValue: Message,
 };

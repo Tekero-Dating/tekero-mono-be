@@ -1,7 +1,16 @@
-import { Table, Model, ForeignKey, AllowNull, Column, BelongsTo, Max, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Model,
+  ForeignKey,
+  AllowNull,
+  Column,
+  BelongsTo,
+  Max,
+  DataType,
+} from 'sequelize-typescript';
 import { User } from './user.entity';
 
-@Table({ modelName: 'user-stats'})
+@Table({ modelName: 'user-stats' })
 export class UserStats extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -20,12 +29,12 @@ export class UserStats extends Model {
   available_likes: number;
 
   @Column({
-    type: DataType.DATE
+    type: DataType.DATE,
   })
   available_likes_refilled_date: Date;
-};
+}
 
 export const UserStatsRepository = {
   provide: 'USER_STATS_REPOSITORY',
-  useValue: UserStats
+  useValue: UserStats,
 };

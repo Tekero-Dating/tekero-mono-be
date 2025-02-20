@@ -1,4 +1,10 @@
-import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Chat } from './chat.entity';
 
@@ -15,9 +21,9 @@ export class ChatUser extends Model {
   chat_id!: number;
   @BelongsTo(() => Chat, 'chat_id')
   chat!: Chat;
-};
+}
 
 export const ChatUserRepository = {
   provide: 'CHAT_USER_REPOSITORY',
-  useValue: ChatUser
+  useValue: ChatUser,
 };

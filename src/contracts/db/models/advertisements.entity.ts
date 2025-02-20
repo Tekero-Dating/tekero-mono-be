@@ -27,13 +27,13 @@ export class Advertisement extends Model {
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(AdTypesEnum)
+    values: Object.keys(AdTypesEnum),
   })
   type: AdTypesEnum;
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(AdStatusesEnum)
+    values: Object.keys(AdStatusesEnum),
   })
   status: AdStatusesEnum;
 
@@ -43,10 +43,12 @@ export class Advertisement extends Model {
       async validateJSON(value: any) {
         const valid = validateAdvFilter(value);
         if (!valid) {
-          throw new Error(`Invalid response format: ${JSON.stringify(validateAdvFilter.errors)}`);
+          throw new Error(
+            `Invalid response format: ${JSON.stringify(validateAdvFilter.errors)}`,
+          );
         }
-      }
-    }
+      },
+    },
   })
   filter: {
     gender: GendersEnum[];
@@ -60,38 +62,37 @@ export class Advertisement extends Model {
     heightFrom: number;
     heightTo: number;
     constitution: ConstitutionsEnum[];
-  }
+  };
 
   @Column
   text: string;
 
   @Column({
-    type: DataType.GEOGRAPHY('POINT', 4326)
+    type: DataType.GEOGRAPHY('POINT', 4326),
   })
   location: { type: 'Point'; coordinates: [number, number] };
 
   @AllowNull(true)
   @Column({
-    type: DataType.GEOGRAPHY('POINT', 4326)
+    type: DataType.GEOGRAPHY('POINT', 4326),
   })
   travels_to?: { type: 'Point'; coordinates: [number, number] };
 
   @AllowNull(true)
   @Column({
-    type: DataType.DATE
+    type: DataType.DATE,
   })
   travel_date_from: Date;
 
   @AllowNull(true)
   @Column({
-    type: DataType.DATE
+    type: DataType.DATE,
   })
   travel_date_to: Date;
 
-
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(OpenersEnum)
+    values: Object.keys(OpenersEnum),
   })
   opener: OpenersEnum;
 
@@ -116,5 +117,5 @@ export class Advertisement extends Model {
 export const AdvertisementsRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'ADVERTISEMENTS_REPOSITORY',
-  useValue: Advertisement
+  useValue: Advertisement,
 };

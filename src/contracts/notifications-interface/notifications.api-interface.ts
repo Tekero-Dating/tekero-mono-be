@@ -5,16 +5,17 @@ export namespace INReceiveLike {
     userId: number;
     advertisementId: number;
     like: Like;
-  };
+  }
   export interface Response {
     success: boolean;
-    error?: Record<string, any> | {
-      status: number;
-      message: string;
-    };
-  };
-};
-
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
 
 export interface INotificationsController {
   receiveLike(payload: INReceiveLike.Request): Promise<INReceiveLike.Response>;

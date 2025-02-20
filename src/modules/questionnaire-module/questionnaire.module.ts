@@ -15,17 +15,15 @@ import { QuestionnaireStepsRepository } from '../../contracts/db/models/question
     ClientsModule.register(
       generateRmqOptions(
         QUESTIONNAIRE_MODULE_QUEUES,
-        QUESTIONNAIRE_SERVICE_NAME
-      )
-    )
+        QUESTIONNAIRE_SERVICE_NAME,
+      ),
+    ),
   ],
-  controllers: [
-    QuestionnaireController
-  ],
+  controllers: [QuestionnaireController],
   providers: [
     QuestionnaireService,
     QuestionnaireRepository,
-    QuestionnaireStepsRepository
+    QuestionnaireStepsRepository,
   ],
 })
 export class QuestionnaireModule {}

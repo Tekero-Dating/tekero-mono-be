@@ -23,4 +23,4 @@ export class CreateUserDTO {
   @Transform(({ value }) => new Date(value))
   @IsDate()
   dob: Date;
-};
+}

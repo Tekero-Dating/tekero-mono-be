@@ -19,6 +19,6 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "seeders", "migrations"],
+  "include": ["src/**/*.ts", "seeders", "migrations", "test"],
   "exclude": ["node_modules", "dist", "src/tsconfig.json"]
 }

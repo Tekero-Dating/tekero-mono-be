@@ -9,16 +9,18 @@ import {
 import { rmqUrl } from '../src/config/config';
 import { Controller, INestApplication, Inject, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { createRmqMicroservices, generateRmqOptions, rmqSend } from '../src/utils/rmq-utils.nest';
+import {
+  createRmqMicroservices,
+  generateRmqOptions,
+  rmqSend,
+} from '../src/utils/rmq-utils.nest';
 import { wait } from '../src/utils/wait';
 
 @Controller()
 class PublisherController<T> {
-  constructor (
-    @Inject('test-service') private client: ClientProxy
-  ) {}
+  constructor(@Inject('test-service') private client: ClientProxy) {}
 
-  successCount: number = 0;
+  successCount = 0;
 
   async onApplicationBootstrap() {
     await this.client.connect();
@@ -29,14 +31,9 @@ class PublisherController<T> {
   }
 
   async sendTestMessage() {
-    await rmqSend(
-      this.client,
-      'test-message',
-      'test message 1',
-      (response) => {
-        response.success && this.successCount++;
-      }
-    );
+    await rmqSend(this.client, 'test-message', 'test message 1', (response) => {
+      response.success && this.successCount++;
+    });
   }
 
   async sendWrongMessage() {
@@ -46,18 +43,16 @@ class PublisherController<T> {
       'wrong message 1',
       (response) => {
         response.success && this.successCount++;
-      }
+      },
     );
   }
-};
+}
 
 @Controller()
 class ConsumerController<T> {
-  constructor (
-    @Inject('test-service') private client: ClientProxy
-  ) {}
+  constructor(@Inject('test-service') private client: ClientProxy) {}
 
-  messagesCount: number = 0;
+  messagesCount = 0;
 
   async onApplicationBootstrap() {
     await this.client.connect();
@@ -77,34 +72,32 @@ class ConsumerController<T> {
   async handleWrongMessage(@Payload() data) {
     return Promise.resolve({ success: false });
   }
-};
+}
 
 @Module({
   imports: [
-    ClientsModule.register(
-      generateRmqOptions(['test'], 'test-service')
-    )
+    ClientsModule.register(generateRmqOptions(['test'], 'test-service')),
   ],
-  controllers: [ ConsumerController, PublisherController ]
+  controllers: [ConsumerController, PublisherController],
 })
 class TestModule {}
 
 const clientRmqConfig: RmqOptions = {
   transport: Transport.RMQ,
   options: {
-    "queue": 'test',
-    "urls": [rmqUrl!],
-    "queueOptions": {
-      "durable": true,
-      "noAck": true,
-      "persistent": false
-    }
-  }
+    queue: 'test',
+    urls: [rmqUrl!],
+    queueOptions: {
+      durable: true,
+      noAck: true,
+      persistent: false,
+    },
+  },
 };
 
 let app: INestApplication,
-  consumerController: ConsumerController<{"index": number}>,
-  publisherController: PublisherController<any>
+  consumerController: ConsumerController<{ index: number }>,
+  publisherController: PublisherController<any>;
 
 describe('RMQ', () => {
   beforeAll(async () => {
@@ -119,12 +112,12 @@ describe('RMQ', () => {
     await wait(200);
     await app.close();
     await wait(200);
-  })
+  });
 
   afterEach(() => {
     consumerController.messagesCount = 0;
     publisherController.successCount = 0;
-  })
+  });
 
   it('Consumer and publisher connected to the queue and exchanging messages', async () => {
     publisherController.sendTestMessage();
@@ -141,5 +134,3 @@ describe('RMQ', () => {
     expect(publisherController.successCount).toEqual(0);
   });
 });
-
-

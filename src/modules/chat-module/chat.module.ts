@@ -6,7 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { ChatController } from './chat.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { generateRmqOptions } from '../../utils/rmq-utils.nest';
-import { CHAT_MODULE_QUEUES, CHAT_SERVICE_NAME } from '../../contracts/chats-interface/chats.constants';
+import {
+  CHAT_MODULE_QUEUES,
+  CHAT_SERVICE_NAME,
+} from '../../contracts/chats-interface/chats.constants';
 import { ChatService } from './chat.service';
 import { MessageRepository } from '../../contracts/db/models/message.entity';
 import { MediaService } from '../media-module/media.service';
@@ -19,11 +22,11 @@ import { S3Service } from '../media-module/s3.service';
 @Module({
   imports: [
     ClientsModule.register(
-      generateRmqOptions(CHAT_MODULE_QUEUES, CHAT_SERVICE_NAME)
+      generateRmqOptions(CHAT_MODULE_QUEUES, CHAT_SERVICE_NAME),
     ),
-    MediaModule
+    MediaModule,
   ],
-  controllers: [ ChatController ],
+  controllers: [ChatController],
   providers: [
     ChatGateway,
     ChatUserRepository,
@@ -35,7 +38,7 @@ import { S3Service } from '../media-module/s3.service';
     JwtService,
     ChatService,
     MediaService,
-    S3Service
-  ]
+    S3Service,
+  ],
 })
 export class ChatModule {}

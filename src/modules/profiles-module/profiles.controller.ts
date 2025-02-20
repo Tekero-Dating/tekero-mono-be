@@ -4,7 +4,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ClientProxy, Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 import { ProfilesService } from './profiles.service';
 import {
   IUserProfileController,
@@ -13,10 +19,10 @@ import {
 import { USER_PROFILES_SERVICE_NAME } from '../../contracts/uesr-profiles-interface/user-profiles.constants';
 
 @Controller('profiles')
-export class ProfilesController implements IUserProfileController{
+export class ProfilesController implements IUserProfileController {
   constructor(
     private readonly userProfilesService: ProfilesService,
-    @Inject(USER_PROFILES_SERVICE_NAME) private client: ClientProxy
+    @Inject(USER_PROFILES_SERVICE_NAME) private client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -34,16 +40,19 @@ export class ProfilesController implements IUserProfileController{
       if (!profile) {
         return {
           success: false,
-          error: new NotFoundException('Profile not found') }
+          error: new NotFoundException('Profile not found'),
+        };
       }
       return {
         success: true,
-        result: profile
+        result: profile,
       };
     } catch (error) {
       return {
         success: false,
-        error: new InternalServerErrorException('Error during profile fetching')
+        error: new InternalServerErrorException(
+          'Error during profile fetching',
+        ),
       };
     }
   }
@@ -51,21 +60,24 @@ export class ProfilesController implements IUserProfileController{
   @MessagePattern(USER_PROFILES_MSG_PATTERNS.UPDATE)
   async updateUserProfile(@Payload() data, @Ctx() context: RmqContext) {
     try {
-      const profile = await this.userProfilesService.updateUserProfile(data.userId, data);
+      const profile = await this.userProfilesService.updateUserProfile(
+        data.userId,
+        data,
+      );
       if (!profile) {
         return {
           success: false,
-          error: new NotFoundException('User profile not found')
-        }
+          error: new NotFoundException('User profile not found'),
+        };
       }
-     return {
+      return {
         success: true,
-        result: { updated: true, profile }
+        result: { updated: true, profile },
       };
     } catch (error) {
       return {
         success: false,
-        error: new InternalServerErrorException(error)
+        error: new InternalServerErrorException(error),
       };
     }
   }

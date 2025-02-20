@@ -16,27 +16,30 @@ import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export {
-// @ts-ignore
-  bootstrap
+  // @ts-ignore
+  bootstrap,
 };
 
 /* istanbul ignore next Use forktTs */
-if (require.main === module)
-  bootstrap()
+if (require.main === module) bootstrap();
 
 // @ts-ignore
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await createRmqMicroservices(app, [
-    ...ADS_MODULE_QUEUES,
-    ...USER_PROFILES_MODULE_QUEUES,
-    ...QUESTIONNAIRE_MODULE_QUEUES,
-    ...MEDIA_MODULE_QUEUES,
-    ...LIKES_MODULE_QUEUES,
-    ...USERS_MODULE_QUEUES,
-    ...CHAT_MODULE_QUEUES,
-    ...NOTIFICATIONS_MODULE_QUEUES
-  ], generalRmqOpts);
+  await createRmqMicroservices(
+    app,
+    [
+      ...ADS_MODULE_QUEUES,
+      ...USER_PROFILES_MODULE_QUEUES,
+      ...QUESTIONNAIRE_MODULE_QUEUES,
+      ...MEDIA_MODULE_QUEUES,
+      ...LIKES_MODULE_QUEUES,
+      ...USERS_MODULE_QUEUES,
+      ...CHAT_MODULE_QUEUES,
+      ...NOTIFICATIONS_MODULE_QUEUES,
+    ],
+    generalRmqOpts,
+  );
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use(cookieParser());
   app.use(cors());

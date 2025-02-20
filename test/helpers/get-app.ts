@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 
 let App: INestApplication;
-export const getApp =  async () => {
+export const getApp = async () => {
   console.log('GETAPP started');
   if (!App) {
     console.log('GETAPP: app is not initialised, init and return new instance');
