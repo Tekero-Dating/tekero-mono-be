@@ -12,10 +12,10 @@ export class AdvertisementMedia extends Model {
   @ForeignKey(() => Media)
   @Column
   mediaId!: number;
-};
+}
 
 export const AdvertisementMediaRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'ADV_MEDIA_REPOSITORY') when using  MODELS_REPOSITORIES_ENUM['ADVERTISEMENTS_MEDIA']
   provide: 'ADV_MEDIA_REPOSITORY',
-  useValue: AdvertisementMedia
-}
+  useValue: AdvertisementMedia,
+};

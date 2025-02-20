@@ -1,14 +1,20 @@
 import {
-  Controller, Delete,
+  Controller,
+  Delete,
   Get,
   Inject,
   Logger,
-  Param, Patch,
+  Param,
+  Patch,
   Post,
-  Query, Request,
+  Query,
+  Request,
   Res,
-  UploadedFile, UseGuards,
-  UseInterceptors, UsePipes, ValidationPipe,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { TekeroError } from '../../utils/error-handling-utils';
@@ -21,7 +27,10 @@ import {
   IUploadMedia,
 } from '../../contracts/media-interface/media.api-interface';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MEDIA_MSG_PATTERNS, MEDIA_SERVICE_NAME } from '../../contracts/media-interface/media.constants';
+import {
+  MEDIA_MSG_PATTERNS,
+  MEDIA_SERVICE_NAME,
+} from '../../contracts/media-interface/media.constants';
 import {
   DeleteMediaDto,
   EditMediaAccessDto,
@@ -36,7 +45,7 @@ export class ApiMediaController {
   private readonly logger = new Logger(ApiMediaController.name);
   constructor(
     @Inject(MEDIA_SERVICE_NAME) private client: ClientProxy,
-    private readonly mediaService: MediaService
+    private readonly mediaService: MediaService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -53,34 +62,40 @@ export class ApiMediaController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req: JwtReq,
     @Res() res,
-    @Query('expiration') expiration?: number
+    @Query('expiration') expiration?: number,
   ): Promise<IUploadMedia.Response> {
     const { userId } = req.user;
     this.logger.log(`API request uploadImage`);
     try {
       const result = await this.mediaService.uploadMedia({
-        userId, expiration, file
+        userId,
+        expiration,
+        file,
       });
 
       this.logger.log(`uploadImage: successfully uploaded image`);
       return res.status(201).send({
         success: true,
         result: {
-          mediaId: result
-        }
+          mediaId: result,
+        },
       });
     } catch (error) {
       const { status, message } = TekeroError(error);
       this.logger.error({ status, message });
-      return res.status(status).send({ success: false, error: { status, message } });
+      return res
+        .status(status)
+        .send({ success: false, error: { status, message } });
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('get-media/:mediaId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async getMediaById(
     @Param() params: GetMediaDto,
     @Request() req: JwtReq,
@@ -99,17 +114,21 @@ export class ApiMediaController {
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ error });
-          return res.status(status).send({ success: false, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success: false, error: { status, message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('delete-media/:mediaId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async deleteMediaById(
     @Param() params: DeleteMediaDto,
     @Request() req: JwtReq,
@@ -130,15 +149,17 @@ export class ApiMediaController {
           this.logger.error({ status, message });
           res.status(status).send({ success: false, error: { message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('update-privacy/:mediaId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async updatePrivacy(
     @Param() params: SetMediaPrivacyDto,
     @Request() req: JwtReq,
@@ -159,15 +180,17 @@ export class ApiMediaController {
           this.logger.error({ status, message });
           res.status(status).send({ success, error: { message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('update-media-access/:accessorId/:giver')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async updateMediaAccess(
     @Param() params: EditMediaAccessDto,
     @Request() req: JwtReq,
@@ -188,7 +211,7 @@ export class ApiMediaController {
           this.logger.error({ status, message });
           res.status(status).send({ success, error: { message } });
         }
-      }
+      },
     );
   }
 }

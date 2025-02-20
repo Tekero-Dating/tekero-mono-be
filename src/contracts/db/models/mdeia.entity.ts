@@ -5,7 +5,9 @@ import {
   BelongsTo,
   ForeignKey,
   AllowNull,
-  IsUrl, BelongsToMany, DataType,
+  IsUrl,
+  BelongsToMany,
+  DataType,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Advertisement } from './advertisements.entity';
@@ -19,7 +21,7 @@ export class Media extends Model {
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(MediaTypesEnum)
+    values: Object.keys(MediaTypesEnum),
   })
   media_type: MediaTypesEnum;
 
@@ -43,14 +45,12 @@ export class Media extends Model {
   @BelongsTo(() => User, { foreignKeyConstraint: true })
   user?: User;
 
-  @BelongsToMany(
-    () => Advertisement, () => AdvertisementMedia
-  )
+  @BelongsToMany(() => Advertisement, () => AdvertisementMedia)
   advertisements?: Advertisement[];
 }
 
 export const MediaRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'MEDIA_REPOSITORY',
-  useValue: Media
+  useValue: Media,
 };

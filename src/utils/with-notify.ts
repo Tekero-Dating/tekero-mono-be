@@ -29,26 +29,26 @@ export class NotifySingleton {
   }
 }
 
-export function WithNotify (
-  eventName: NotificationTypesEnum
-): MethodDecorator {
+export function WithNotify(eventName: NotificationTypesEnum): MethodDecorator {
   return (
-    target: Object,
+    target: object,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
   ) => {
     const client = NotifySingleton.getClient();
     const originalMethod = descriptor.value;
-    descriptor.value = async function(...args: any[]) {
+    descriptor.value = async function (...args: any[]) {
       const result = await originalMethod.apply(this, args);
       if (!result.success) {
         return result;
       }
       await rmqSend(
-        client, eventName, { ...args, ...result.result },
-        ({success, error}) => {}
+        client,
+        eventName,
+        { ...args, ...result.result },
+        ({ success, error }) => {},
       );
       return result;
     };
   };
-};
+}

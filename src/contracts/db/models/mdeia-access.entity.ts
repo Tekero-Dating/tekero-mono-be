@@ -27,5 +27,5 @@ export class MediaAccess extends Model {
 export const MediaAccessRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'MEDIA_ACCESS_REPOSITORY',
-  useValue: MediaAccess
+  useValue: MediaAccess,
 };

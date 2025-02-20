@@ -39,18 +39,16 @@ import { PresenceModule } from './modules/presence-service/presence.module';
     MetricsModule,
     ChatModule,
     PresenceModule,
-    NotificationsModule
+    NotificationsModule,
   ],
-  controllers: [
-    AppController
-  ],
+  controllers: [AppController],
   providers: [
     AppService,
     UserRepository,
     {
       provide: APP_INTERCEPTOR,
-      useClass: MetricsInterceptor
-    }
+      useClass: MetricsInterceptor,
+    },
   ],
 })
 export class AppModule {}

@@ -4,5 +4,5 @@ export enum OpenersEnum {
   CALL = 'CALL',
   VIDEO = 'VIDEO',
   QUESTION = 'QUESTION',
-  MEDIA = 'MEDIA'
-};
+  MEDIA = 'MEDIA',
+}

@@ -4,7 +4,7 @@ import {
   Model,
   BelongsTo,
   ForeignKey,
-  AllowNull
+  AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 
@@ -22,5 +22,5 @@ export class UserSettings extends Model {
 export const UserSettingsRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'USER_SETTINGS_REPOSITORY',
-  useValue: UserSettings
+  useValue: UserSettings,
 };
