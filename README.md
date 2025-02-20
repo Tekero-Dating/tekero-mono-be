@@ -32,6 +32,7 @@ docker run -p 3000:3000 -v $(pwd):/app grinder_nest
 
 #### 4. Docker-compose (*recommended*)
 ```
+make up # or
 NODE_ENV=development docker compose --env-file .env.development up --build
 ```
 

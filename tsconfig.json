@@ -20,5 +20,5 @@
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "seeders", "migrations"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "src/tsconfig.json"]
 }

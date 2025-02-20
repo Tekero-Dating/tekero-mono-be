@@ -1,10 +1,22 @@
-import { Body, Controller, Get, Inject, Logger, Param, Post, Res, Request,UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Logger,
+  Param,
+  Post,
+  Res,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { QUESTIONNAIRE_SERVICE_NAME } from '../../contracts/questionnaire-interface/questionnaire.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
 import {
-  IGetQuestionnaire, ISubmitQuestionByShortcode,
+  IGetQuestionnaire,
+  ISubmitQuestionByShortcode,
   QUESTIONNAIRE_MSG_PATTERNS,
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
@@ -13,9 +25,9 @@ import { JwtReq } from '../../utils/auth.jwt.strategy';
 @Controller('api/questionnaire')
 export class ApiQuestionnaireController {
   private readonly logger = new Logger(ApiQuestionnaireController.name);
-  constructor (
+  constructor(
     @Inject(QUESTIONNAIRE_SERVICE_NAME)
-    private readonly client: ClientProxy
+    private readonly client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -27,10 +39,7 @@ export class ApiQuestionnaireController {
 
   @UseGuards(JwtAuthGuard)
   @Get('get-questionnaire')
-  async getQuestionnaire(
-    @Request() req: JwtReq,
-    @Res() res
-  ) {
+  async getQuestionnaire(@Request() req: JwtReq, @Res() res) {
     const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
     await rmqSend<IGetQuestionnaire.Request, IGetQuestionnaire.Response>(
@@ -43,9 +52,11 @@ export class ApiQuestionnaireController {
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          return res.status(status).send({ success: false, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success: false, error: { status, message } });
         }
-      }
+      },
     );
   }
 
@@ -54,11 +65,14 @@ export class ApiQuestionnaireController {
   async submitQuestion(
     @Request() req: JwtReq,
     @Body() body: ISubmitQuestionByShortcode.Request['response'],
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     this.logger.log(`API request getQuestionnaire`);
-    await rmqSend<ISubmitQuestionByShortcode.Request, ISubmitQuestionByShortcode.Response>(
+    await rmqSend<
+      ISubmitQuestionByShortcode.Request,
+      ISubmitQuestionByShortcode.Response
+    >(
       this.client,
       QUESTIONNAIRE_MSG_PATTERNS.SUBMIT_QUESTIONNAIRE,
       { userId, response: body },
@@ -68,9 +82,11 @@ export class ApiQuestionnaireController {
         } else {
           const { status, message } = TekeroError(error);
           this.logger.error({ status, message });
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 }
