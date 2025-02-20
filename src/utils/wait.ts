@@ -1,5 +1,5 @@
 function wait(timeout: number) {
-  return new Promise<void>(res => setTimeout(res, timeout))
+  return new Promise<void>((res) => setTimeout(res, timeout));
 }
 
-export { wait }
+export { wait };

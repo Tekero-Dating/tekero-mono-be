@@ -8,14 +8,11 @@ export interface IDbModuleParams {
   username: string;
   password: string;
   database: string;
-  models: ModelCtor[]
-};
+  models: ModelCtor[];
+}
 
-export const getDbProviders = (
-  dbConfigs: IDbModuleParams[],
-  sync: boolean = false
-) => {
-  return dbConfigs.map(config => ({
+export const getDbProviders = (dbConfigs: IDbModuleParams[], sync = false) => {
+  return dbConfigs.map((config) => ({
     provide: 'SEQUELIZE',
     useFactory: async () => {
       const sequelize = new Sequelize({
@@ -23,23 +20,28 @@ export const getDbProviders = (
         ...config,
       });
       sequelize.addModels(config.models);
-      sync && await sequelize.sync(
-        // Uncomment if you need to clean up and initialize all DB models from scratch
-        // { force: true }
-      );
+      sync &&
+        (await sequelize
+          .sync
+          // Uncomment if you need to clean up and initialize all DB models from scratch
+          // { force: true }
+          ());
 
       return sequelize;
-    }
+    },
   }));
 };
 
-export const getDbModule = (dbModuleParams: IDbModuleParams[], sync: boolean = false) => {
+export const getDbModule = (
+  dbModuleParams: IDbModuleParams[],
+  sync = false,
+) => {
   const providers = getDbProviders(dbModuleParams, sync);
   @Module({
     providers: providers,
-    exports: providers
+    exports: providers,
   })
-  class DatabaseModule {};
+  class DatabaseModule {}
 
   return DatabaseModule;
 };

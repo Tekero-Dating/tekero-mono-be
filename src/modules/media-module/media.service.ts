@@ -3,12 +3,21 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
-import { AWS_ACCESS_KEY, AWS_REGION, AWS_S3_BUCKET, AWS_SECRET_KEY } from '../../config/config';
-import { IEditMediaAccess, IMediaService, ISetMediaPrivacy } from '../../contracts/media-interface/media.api-interface';
+import {
+  AWS_ACCESS_KEY,
+  AWS_REGION,
+  AWS_S3_BUCKET,
+  AWS_SECRET_KEY,
+} from '../../config/config';
+import {
+  IEditMediaAccess,
+  IMediaService,
+  ISetMediaPrivacy,
+} from '../../contracts/media-interface/media.api-interface';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Media } from '../../contracts/db/models/mdeia.entity';
 import { User } from '../../contracts/db/models/user.entity';
@@ -23,7 +32,7 @@ export class MediaService implements IMediaService {
     secretAccessKey: AWS_SECRET_KEY,
   });
 
-  constructor (
+  constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.MEDIA)
     private readonly mediaRepository: typeof Media,
     @Inject(MODELS_REPOSITORIES_ENUM.MEDIA_ACCESS)
@@ -31,15 +40,14 @@ export class MediaService implements IMediaService {
     @Inject(MODELS_REPOSITORIES_ENUM.USER)
     private readonly userRepository: typeof User,
     @Inject(S3Service)
-    private readonly  s3Service: S3Service
+    private readonly s3Service: S3Service,
   ) {}
 
   async uploadMedia(payload) {
     const { userId, expiration, file } = payload;
     const { originalname: name } = file;
 
-    const user = await this.userRepository
-      .findOne({ where: { id: userId } });
+    const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -57,10 +65,12 @@ export class MediaService implements IMediaService {
           user_id: userId,
           private: false,
           url: uploadedFileUrl,
-          ...(expiration ? {
-            expiration,
-            opened: false
-          } : {})
+          ...(expiration
+            ? {
+                expiration,
+                opened: false,
+              }
+            : {}),
         });
         return newMedia.id;
       } else {
@@ -72,7 +82,9 @@ export class MediaService implements IMediaService {
   }
 
   async getMedia(userId: number, mediaId: number): Promise<{ url: string }> {
-    const media = await this.mediaRepository.findOne({ where: { id: mediaId } });
+    const media = await this.mediaRepository.findOne({
+      where: { id: mediaId },
+    });
     if (!media) {
       throw new NotFoundException('Media not found');
     }
@@ -92,8 +104,8 @@ export class MediaService implements IMediaService {
     const media = await this.mediaRepository.findOne({
       where: {
         user_id: userId,
-        id: mediaId
-      }
+        id: mediaId,
+      },
     });
     if (!media) {
       throw new NotFoundException('Media to delete does not exist');
@@ -101,31 +113,32 @@ export class MediaService implements IMediaService {
     const key = media.url.split('.com/')[1];
     const deleted = await this.s3_delete(key);
     if (deleted) {
-      deleted && await this.mediaRepository.destroy({
-        where: {
-          id: mediaId
-        }
-      });
+      deleted &&
+        (await this.mediaRepository.destroy({
+          where: {
+            id: mediaId,
+          },
+        }));
       return;
-    }
-    else {
+    } else {
       throw new InternalServerErrorException("Can't delete media");
     }
   }
 
-  async setMediaPrivacy(userId: number, mediaId: number): Promise<
-      ISetMediaPrivacy.Response["result"]
-    > {
+  async setMediaPrivacy(
+    userId: number,
+    mediaId: number,
+  ): Promise<ISetMediaPrivacy.Response['result']> {
     const media = await this.mediaRepository.findOne({
-      where: { user_id: userId, id: mediaId }
+      where: { user_id: userId, id: mediaId },
     });
     if (!media) {
-      throw new NotFoundException('Media does not exist')
+      throw new NotFoundException('Media does not exist');
     }
 
     const updated = await this.mediaRepository.update(
       { private: !media.private },
-      { where: { id: media.id } }
+      { where: { id: media.id } },
     );
 
     if (updated[0]) {
@@ -135,18 +148,24 @@ export class MediaService implements IMediaService {
     }
   }
 
-  async editMediaAccess(ownerId, accessorId, giver): Promise<IEditMediaAccess.Response["result"]> {
+  async editMediaAccess(
+    ownerId,
+    accessorId,
+    giver,
+  ): Promise<IEditMediaAccess.Response['result']> {
     if (giver) {
-      const result = await this.mediaAccessRepository.findOrCreate<MediaAccess>({
-        where: {
-          owner_id: ownerId,
-          accessor_id: accessorId
-        }
-      });
+      const result = await this.mediaAccessRepository.findOrCreate<MediaAccess>(
+        {
+          where: {
+            owner_id: ownerId,
+            accessor_id: accessorId,
+          },
+        },
+      );
       if (result) {
         return {
-          allowed: true
-        }
+          allowed: true,
+        };
       } else {
         throw new InternalServerErrorException('Something went wrong');
       }
@@ -154,13 +173,13 @@ export class MediaService implements IMediaService {
       const result = await this.mediaAccessRepository.destroy<MediaAccess>({
         where: {
           owner_id: ownerId,
-          accessor_id: accessorId
-        }
+          accessor_id: accessorId,
+        },
       });
       if (result) {
         return {
-          allowed: false
-        }
+          allowed: false,
+        };
       } else {
         throw new InternalServerErrorException('Something went wrong');
       }
@@ -170,7 +189,7 @@ export class MediaService implements IMediaService {
   private async s3_delete(key) {
     const params = {
       Bucket: AWS_S3_BUCKET!,
-      Key: key
+      Key: key,
     };
 
     try {

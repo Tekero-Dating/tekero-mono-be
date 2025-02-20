@@ -3,7 +3,8 @@ import {
   Column,
   Model,
   BelongsTo,
-  ForeignKey, DataType,
+  ForeignKey,
+  DataType,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Advertisement } from './advertisements.entity';
@@ -16,7 +17,7 @@ import { Advertisement } from './advertisements.entity';
       fields: ['user_id', 'advertisement_id'],
       name: 'unique_user_advertisement',
     },
-  ]
+  ],
 })
 export class Like extends Model {
   @ForeignKey(() => Advertisement)
@@ -34,7 +35,7 @@ export class Like extends Model {
   userId!: User;
 
   @Column({
-    type: DataType.DATE
+    type: DataType.DATE,
   })
   expiration_date: Date;
 
@@ -45,5 +46,5 @@ export class Like extends Model {
 export const LikeRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'LIKE_REPOSITORY',
-  useValue: Like
+  useValue: Like,
 };

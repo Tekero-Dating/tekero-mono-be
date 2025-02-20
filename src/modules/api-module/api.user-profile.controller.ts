@@ -6,7 +6,9 @@ import {
   Inject,
   Param,
   Post,
-  Res, Request as Req, UseGuards,
+  Res,
+  Request as Req,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -23,7 +25,7 @@ import { JwtReq } from '../../utils/auth.jwt.strategy';
 export class ApiUserProfileController {
   constructor(
     @Inject(USER_PROFILES_SERVICE_NAME)
-    private readonly client: ClientProxy
+    private readonly client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -35,13 +37,12 @@ export class ApiUserProfileController {
 
   @UseGuards(JwtAuthGuard)
   @Get('get/:userId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
-  async getUserProfile(
-    @Param('userId') userId: number,
-    @Res() res
-  ) {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
+  async getUserProfile(@Param('userId') userId: number, @Res() res) {
     await rmqSend(
       this.client,
       USER_PROFILES_MSG_PATTERNS.GET,
@@ -51,26 +52,34 @@ export class ApiUserProfileController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('update')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async updateUserProfile(
     @Body() payload: UpdateProfileDTO,
     @Req() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     if (!Object.keys(payload).length) {
-      const { status, message } = TekeroError(new BadRequestException('There are nothing to update'));
-      return res.status(status).send({ success: false, error: { status, message } });
+      const { status, message } = TekeroError(
+        new BadRequestException('There are nothing to update'),
+      );
+      return res
+        .status(status)
+        .send({ success: false, error: { status, message } });
     }
 
     await rmqSend(
@@ -82,9 +91,11 @@ export class ApiUserProfileController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 }

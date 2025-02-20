@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Questionnaire } from '../../contracts/db/models/questionnaire.entity';
 import { QuestionnaireSteps } from '../../contracts/db/models/questionnaire-steps.entity';
@@ -10,22 +16,20 @@ import {
 @Injectable()
 export class QuestionnaireService {
   private readonly logger = new Logger(QuestionnaireService.name);
-  constructor (
+  constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.QUESTIONNAIRE)
     private readonly questionnaireRepository: typeof Questionnaire,
     @Inject(MODELS_REPOSITORIES_ENUM.QUESTIONNAIRE_STEPS)
-    private readonly questionnaireStepsRepository: typeof  QuestionnaireSteps
+    private readonly questionnaireStepsRepository: typeof QuestionnaireSteps,
   ) {}
 
   async getQuestionnaire(userId: number) {
     this.logger.log(`Lookup for questionnaire for user ${userId}`);
     const [questionnaireStatus, questions] = await Promise.all([
-      await this.questionnaireRepository
-        .findOne<Questionnaire>({
-          where: { user_id: userId }
+      await this.questionnaireRepository.findOne<Questionnaire>({
+        where: { user_id: userId },
       }),
-      await this.questionnaireStepsRepository
-       .findAll()
+      await this.questionnaireStepsRepository.findAll(),
     ]);
 
     if (!questionnaireStatus) {
@@ -36,25 +40,28 @@ export class QuestionnaireService {
     const result: IGetQuestionnaire.Response['result'] = {
       started: false,
       completed: false,
-      questions: []
+      questions: [],
     };
 
     if (questionnaireStatus.questionnaire_started === false) {
       this.logger.log('Questionnalire not started.', { userId });
-      result.questions = questions.map(question => {
+      result.questions = questions.map((question) => {
         return {
           answered: false,
-          question: question.question
-        }
+          question: question.question,
+        };
       });
       return result;
     }
 
-    this.logger.log('Questionnaire started, dividing answered and not answered', { userId });
+    this.logger.log(
+      'Questionnaire started, dividing answered and not answered',
+      { userId },
+    );
 
     result.started = true;
     const notAnsweredQuestions: QuestionnaireSteps['question'][] = [];
-    const answeredQuestions: QuestionnaireSteps['question'][] = []
+    const answeredQuestions: QuestionnaireSteps['question'][] = [];
     questions.forEach(({ question }) => {
       const { shortcode } = question;
       if (!questionnaireStatus.responses[shortcode]) {
@@ -68,17 +75,17 @@ export class QuestionnaireService {
       ...answeredQuestions.map((question) => ({
         answered: true,
         response: questionnaireStatus.responses[question.shortcode],
-        question
+        question,
       })),
-      ...notAnsweredQuestions.map((question ) => ({
+      ...notAnsweredQuestions.map((question) => ({
         answered: false,
-        question
-      }))
+        question,
+      })),
     ];
 
     if (
-      result.questions
-        .filter(q => q.answered === true).length === result.questions.length
+      result.questions.filter((q) => q.answered === true).length ===
+      result.questions.length
     ) {
       result.completed = true;
     }
@@ -88,13 +95,12 @@ export class QuestionnaireService {
 
   async submitQuestionByShortcode(
     userId: number,
-    response: ISubmitQuestionByShortcode.Request['response']
+    response: ISubmitQuestionByShortcode.Request['response'],
   ) {
-    const { shortcode, response: answer  } = response;
-    const questionnaireStep = await this.questionnaireStepsRepository
-      .findOne({
-        where: { 'question.shortcode': shortcode }
-      });
+    const { shortcode, response: answer } = response;
+    const questionnaireStep = await this.questionnaireStepsRepository.findOne({
+      where: { 'question.shortcode': shortcode },
+    });
 
     if (!questionnaireStep) {
       throw new NotFoundException('Question with given shortcode not found');
@@ -102,17 +108,19 @@ export class QuestionnaireService {
 
     const { active, question } = questionnaireStep;
     if (!active) {
-      throw new BadRequestException('Trying to submit response to inactive question');
+      throw new BadRequestException(
+        'Trying to submit response to inactive question',
+      );
     } else if (question.type !== typeof answer) {
       throw new BadRequestException('Response provided in wrong format');
     }
 
     let usersQuestionnaire: Questionnaire;
     try {
-      usersQuestionnaire = await this.questionnaireRepository
-        .findOne<Questionnaire>({
+      usersQuestionnaire =
+        await this.questionnaireRepository.findOne<Questionnaire>({
           where: { user_id: userId },
-          rejectOnEmpty: true
+          rejectOnEmpty: true,
         });
     } catch (_e) {
       throw new NotFoundException('Can not find the users questionnaire');
@@ -123,26 +131,35 @@ export class QuestionnaireService {
           ...usersQuestionnaire.responses,
           ...{ [shortcode]: answer },
         },
-        ...(!Object.keys(usersQuestionnaire.responses).length ? { questionnaire_started: true } : {})
+        ...(!Object.keys(usersQuestionnaire.responses).length
+          ? { questionnaire_started: true }
+          : {}),
       },
       {
         where: { id: usersQuestionnaire.id },
-        returning: true
-      }
+        returning: true,
+      },
     );
 
-    const totalActiveQuestions = await this.questionnaireStepsRepository
-      .findAll({ where: { active: true } });
+    const totalActiveQuestions =
+      await this.questionnaireStepsRepository.findAll({
+        where: { active: true },
+      });
 
     if (
-      updated[0] && Object.keys(usersQuestionnaire.responses).length + 1 === totalActiveQuestions.length
+      updated[0] &&
+      Object.keys(usersQuestionnaire.responses).length + 1 ===
+        totalActiveQuestions.length
     ) {
-      updated = await this.questionnaireRepository.update({
-        is_completed: true
-      } as Questionnaire, {
-        where: { id: usersQuestionnaire.id },
-        returning: true
-      });
+      updated = await this.questionnaireRepository.update(
+        {
+          is_completed: true,
+        } as Questionnaire,
+        {
+          where: { id: usersQuestionnaire.id },
+          returning: true,
+        },
+      );
     }
     return updated[1][0];
   }

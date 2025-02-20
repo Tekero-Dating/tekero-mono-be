@@ -38,7 +38,9 @@ export class PresenceService {
 
   async redisListOnlineUsers(): Promise<number[]> {
     const keys = await this.redisClient.keys('online:user:*');
-    const userIds = keys.map((key) => parseInt(key.split(':').pop() || '0', 10)).filter((id) => !isNaN(id));
+    const userIds = keys
+      .map((key) => parseInt(key.split(':').pop() || '0', 10))
+      .filter((id) => !isNaN(id));
     this.logger.log('👥 Online Users:', userIds);
     return userIds;
   }

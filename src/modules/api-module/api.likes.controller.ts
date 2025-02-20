@@ -19,9 +19,9 @@ import { LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.consta
 
 @Controller('api/like')
 export class ApiLikesController {
-  constructor (
+  constructor(
     @Inject(LIKES_SERVICE_NAME)
-    private readonly client: ClientProxy
+    private readonly client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -33,79 +33,87 @@ export class ApiLikesController {
 
   @UseGuards(JwtAuthGuard)
   @Post('send-like/:advId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async sendLike(
     @Param('advId') advertisementId: number,
     @Req() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     await rmqSend(
       this.client,
       LIKES_MSG_PATTERNS.SEND_LIKE,
       { userId, advertisementId },
-      ({ success, result, error}) => {
+      ({ success, result, error }) => {
         if (success) {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('dismiss-like/:advId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async dismissLike(
     @Param('advId') advertisementId: number,
     @Req() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     await rmqSend(
       this.client,
       LIKES_MSG_PATTERNS.DISMISS_LIKE,
       { userId, advertisementId },
-      ({ success, result, error}) => {
+      ({ success, result, error }) => {
         if (success) {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('match/:likeId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
-  async match(
-    @Param('likeId') likeId: number,
-    @Req() req: JwtReq,
-    @Res() res
-  ) {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
+  async match(@Param('likeId') likeId: number, @Req() req: JwtReq, @Res() res) {
     const { userId } = req.user;
     await rmqSend(
       this.client,
       LIKES_MSG_PATTERNS.MATCH,
       { userId, likeId },
-      ({ success, result, error}) => {
+      ({ success, result, error }) => {
         if (success) {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 }

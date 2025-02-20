@@ -15,9 +15,9 @@ import { NotificationTypesEnum } from '../../contracts/db/models/enums';
 @Controller('likes')
 export class LikesController implements ILikesController {
   private readonly logger = new Logger(LikesController.name);
-  constructor (
+  constructor(
     private readonly likesService: LikesService,
-    @Inject(LIKES_SERVICE_NAME) private client: ClientProxy
+    @Inject(LIKES_SERVICE_NAME) private client: ClientProxy,
   ) {}
 
   @MessagePattern(LIKES_MSG_PATTERNS.SEND_LIKE)
@@ -27,55 +27,62 @@ export class LikesController implements ILikesController {
   ): Promise<ILikeAd.Response> {
     try {
       const { userId, advertisementId } = payload;
-      const { like, stats: user_stats } = await this.likesService.sendLike(userId, advertisementId);
+      const { like, stats: user_stats } = await this.likesService.sendLike(
+        userId,
+        advertisementId,
+      );
       return {
         success: true,
         result: {
-          like, user_stats
-        }
+          like,
+          user_stats,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error
-      }
+        error,
+      };
     }
   }
 
-  @MessagePattern((LIKES_MSG_PATTERNS.DISMISS_LIKE))
+  @MessagePattern(LIKES_MSG_PATTERNS.DISMISS_LIKE)
   async dismissLike(
-    @Payload() payload: IUnlikeAd.Request
+    @Payload() payload: IUnlikeAd.Request,
   ): Promise<IUnlikeAd.Response> {
     try {
       const { userId, advertisementId } = payload;
       await this.likesService.dismissLike(userId, advertisementId);
       return {
-        success: true
+        success: true,
       };
     } catch (error) {
       return {
         success: false,
-        error
-      }
+        error,
+      };
     }
-  };
+  }
 
   @MessagePattern(LIKES_MSG_PATTERNS.MATCH)
   async makeMatch(
-    @Payload() payload: IMatchAd.Request
+    @Payload() payload: IMatchAd.Request,
   ): Promise<IMatchAd.Response> {
     try {
       const { userId, likeId } = payload;
-      const { chat, author_stats, liker_stats } = await this.likesService.match(userId, likeId);
+      const { chat, author_stats, liker_stats } = await this.likesService.match(
+        userId,
+        likeId,
+      );
       return {
         success: true,
-        result: { chat, author_stats, liker_stats }
+        result: { chat, author_stats, liker_stats },
       };
     } catch (error) {
       return {
         success: false,
-        error
-      }
+        error,
+      };
     }
   }
 }

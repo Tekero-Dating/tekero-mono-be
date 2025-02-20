@@ -1,4 +1,11 @@
-import { AllowNull, BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  AllowNull,
+  BelongsTo,
+  Column,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { User } from './user.entity';
 import { ActionsList } from './actions-list.entity';
 
@@ -38,5 +45,5 @@ export class Operation extends Model {
 
 export const OperationsRepository = {
   provide: 'OPERATIONS_REPOSITORY',
-  useValue: Operation
+  useValue: Operation,
 };

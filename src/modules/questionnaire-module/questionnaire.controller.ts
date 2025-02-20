@@ -5,14 +5,20 @@ import {
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 import { QuestionnaireService } from './questionnaire.service';
 import { QUESTIONNAIRE_SERVICE_NAME } from '../../contracts/questionnaire-interface/questionnaire.constants';
-import { ClientProxy, Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 
 @Controller('questionnaire')
 export class QuestionnaireController implements IQuestionnaireController {
   private readonly logger = new Logger(QuestionnaireController.name);
-  constructor (
+  constructor(
     private readonly questionnaireService: QuestionnaireService,
-    @Inject(QUESTIONNAIRE_SERVICE_NAME) private client: ClientProxy
+    @Inject(QUESTIONNAIRE_SERVICE_NAME) private client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -28,16 +34,18 @@ export class QuestionnaireController implements IQuestionnaireController {
     const { userId } = data;
     try {
       const result = await this.questionnaireService.getQuestionnaire(userId);
-      this.logger.log(`getQuestionnaire Request processes successfully`, { userId });
+      this.logger.log(`getQuestionnaire Request processes successfully`, {
+        userId,
+      });
       return {
         success: true,
-        result
+        result,
       };
     } catch (e) {
       this.logger.error(e, { userId });
       return {
         success: false,
-        error: e
+        error: e,
       };
     }
   }
@@ -47,20 +55,27 @@ export class QuestionnaireController implements IQuestionnaireController {
     const { userId, response } = data;
     this.logger.log('submitQuestionByShortcode Received request', { userId });
     try {
-      const questionnaireStatus = await this.questionnaireService.submitQuestionByShortcode(userId, response);
-      this.logger.log(`submitQuestionByShortcode Request processes successfully`, { userId });
+      const questionnaireStatus =
+        await this.questionnaireService.submitQuestionByShortcode(
+          userId,
+          response,
+        );
+      this.logger.log(
+        `submitQuestionByShortcode Request processes successfully`,
+        { userId },
+      );
       return {
         success: true,
         result: {
-          questionnaireStatus
-        }
+          questionnaireStatus,
+        },
       };
     } catch (e) {
       this.logger.error('submitQuestionByShortcode', { e, userId, response });
       return {
         success: false,
-        error: e
-      }
+        error: e,
+      };
     }
   }
 }

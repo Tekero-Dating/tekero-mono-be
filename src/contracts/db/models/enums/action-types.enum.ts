@@ -4,5 +4,5 @@ export enum ActionTypesEnum {
   PUBLISH_AD = 'PUBLISH_AD',
   TRAVEL_AD = 'TRAVEL_AD',
   TOP_UP = 'TOP_UP',
-  GIFT = 'GIFT'
+  GIFT = 'GIFT',
 }

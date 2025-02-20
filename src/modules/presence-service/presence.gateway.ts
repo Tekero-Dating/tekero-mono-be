@@ -5,7 +5,7 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
   ConnectedSocket,
-  WebSocketServer
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -19,10 +19,12 @@ import { PRESENCE_SERVICE_NAME } from '../../contracts/presence-interface/presen
 @WebSocketGateway({
   namespace: 'presence',
   cors: {
-    origin: '*'
-  }
+    origin: '*',
+  },
 })
-export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class PresenceGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   private readonly logger = new Logger(PresenceGateway.name);
   @WebSocketServer()
   server: Server;
@@ -31,7 +33,7 @@ export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private jwtService: JwtService,
     private readonly presenceService: PresenceService,
     @Inject(PRESENCE_SERVICE_NAME)
-    private readonly client: ClientProxy
+    private readonly client: ClientProxy,
   ) {}
 
   afterInit() {
@@ -65,21 +67,20 @@ export class PresenceGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @SubscribeMessage('set-online')
-  handleJoin (
-    @ConnectedSocket() client: Socket
-  ): void {
+  handleJoin(@ConnectedSocket() client: Socket): void {
     const context = client.data;
     this.logger.log('Join request:', { ...context });
     client.join(String(client.data.userId));
   }
 
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.NOTIFY)
-  sendInAppNotification(
-      payload: { userId: number, notificationId: number }
-  ): void {
+  sendInAppNotification(payload: {
+    userId: number;
+    notificationId: number;
+  }): void {
     this.logger.log('sendInAppNotification', { payload });
     this.server.to(String(payload.userId)).emit('receiveNotification', {
-      payload
+      payload,
     });
   }
 }

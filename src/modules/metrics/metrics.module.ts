@@ -15,7 +15,7 @@ const metrics = [
     name: 'http_requests_total',
     help: 'Total number of HTTP requests',
     labelNames: ['method', 'endpoint', 'status'],
-  })
+  }),
 ];
 
 @Global()

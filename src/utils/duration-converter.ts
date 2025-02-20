@@ -22,7 +22,6 @@ export const durationToMilliseconds = (durationStr: string) => {
   let totalMilliseconds = 0;
   let match;
 
-
   while ((match = regex.exec(durationStr)) !== null) {
     const value = parseInt(match[1], 10);
     const unit = match[2];
@@ -38,4 +37,4 @@ export const durationToMilliseconds = (durationStr: string) => {
   }
 
   return totalMilliseconds;
-}
+};

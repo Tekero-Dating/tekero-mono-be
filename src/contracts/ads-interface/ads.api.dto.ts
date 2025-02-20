@@ -1,5 +1,17 @@
-import { IsArray, IsEnum, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ConstitutionsEnum, GendersEnum, OpenersEnum } from '../db/models/enums';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import {
+  ConstitutionsEnum,
+  GendersEnum,
+  OpenersEnum,
+} from '../db/models/enums';
 import { IAdvFields } from './ads.api-interface';
 import { AdTypesEnum } from '../db/models/enums/ad-types.enum';
 import { Type } from 'class-transformer';
@@ -18,14 +30,14 @@ export class AdTargetFiltersDTO {
   @IsOptional()
   @IsEnum(GendersEnum, {
     message: 'Gender does not match any of existing',
-    each: true
+    each: true,
   })
   gender?: GendersEnum[] = [
     GendersEnum.FEMALE,
     GendersEnum.MALE,
     GendersEnum.NON_BINARY,
     GendersEnum.TRANS_FEMALE,
-    GendersEnum.TRANS_MALE
+    GendersEnum.TRANS_MALE,
   ];
 
   @ApiProperty()
@@ -77,13 +89,13 @@ export class AdTargetFiltersDTO {
   @IsOptional()
   @IsEnum(ConstitutionsEnum, {
     message: 'Constitutions does not match any of existing',
-    each: true
+    each: true,
   })
   constitution?: ConstitutionsEnum[] = [
     ConstitutionsEnum.SKINNY,
     ConstitutionsEnum.AVERAGE,
     ConstitutionsEnum.SPORTY,
-    ConstitutionsEnum.CURVY
+    ConstitutionsEnum.CURVY,
   ];
 }
 
@@ -91,9 +103,9 @@ export class CreateAdvDTO implements IAdvFields {
   @ApiProperty()
   @IsOptional()
   @IsString({
-    message: 'Text of ad should be a string'
+    message: 'Text of ad should be a string',
   })
-  text?: string = "";
+  text?: string = '';
 
   @ApiProperty()
   @IsOptional()
@@ -113,7 +125,7 @@ export class CreateAdvDTO implements IAdvFields {
 
   @ApiProperty()
   @IsObject()
-  location: { type: 'Point'; coordinates: [ number, number ] };
+  location: { type: 'Point'; coordinates: [number, number] };
 
   @ApiProperty()
   @IsOptional()
@@ -123,7 +135,7 @@ export class CreateAdvDTO implements IAdvFields {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  song?: string = "";
+  song?: string = '';
 
   @ApiProperty()
   @IsOptional()
@@ -139,7 +151,7 @@ export class CreateAdvDTO implements IAdvFields {
   @IsOptional()
   @IsString()
   travelDateTo?: string;
-};
+}
 /**
  * Here the duplicated part comes TODO
  */
@@ -148,7 +160,7 @@ export class EditAdTargetFiltersDTO {
   @IsOptional()
   @IsEnum(GendersEnum, {
     message: 'Gender does not match any of existing',
-    each: true
+    each: true,
   })
   gender?: GendersEnum[];
 
@@ -200,7 +212,7 @@ export class EditAdTargetFiltersDTO {
   @IsOptional()
   @IsEnum(ConstitutionsEnum, {
     message: 'Constitutions does not match any of existing',
-    each: true
+    each: true,
   })
   constitution?: ConstitutionsEnum[];
 }
@@ -209,7 +221,7 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @ApiProperty()
   @IsOptional()
   @IsString({
-    message: 'Text of ad should be a string'
+    message: 'Text of ad should be a string',
   })
   text?: string;
 
@@ -253,4 +265,4 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @IsOptional()
   @IsString()
   travelDateTo?: string;
-};
+}

@@ -7,9 +7,9 @@ import { DB_MODELS } from '../contracts/db/models/models.enum';
 import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
 
 dotenv.config({
-  path: `.env.${process.env.NODE_ENV}`
-})
-const ajv = new Ajv()
+  path: `.env.${process.env.NODE_ENV}`,
+});
+const ajv = new Ajv();
 
 const {
   DB_DRIVER,
@@ -30,7 +30,7 @@ const {
   JWT_TOKEN_TTL,
   JWT_REFRESH_TOKEN_TTL,
   REDIS_HOST,
-  REDIS_PORT
+  REDIS_PORT,
 } = process.env;
 
 const validate = ajv.compile<EnvSchema>(envSchema);
@@ -48,7 +48,7 @@ export const dbOpts = {
   username: DB_USERNAME!,
   password: DB_PASSWORD!,
   database: DB_NAME!,
-  models: DB_MODELS
+  models: DB_MODELS,
 };
 
 interface IRmqOptions extends RmqOptions {
@@ -62,9 +62,9 @@ export const generalRmqOpts: IRmqOptions = {
     noAck: true,
     persistent: true,
     queueOptions: {
-      durable: true
-    }
-  }
+      durable: true,
+    },
+  },
 };
 
 export const rmqUrl = RMQ_URL;
@@ -80,5 +80,5 @@ export {
   JWT_TOKEN_TTL,
   JWT_REFRESH_TOKEN_TTL,
   REDIS_HOST,
-  REDIS_PORT
+  REDIS_PORT,
 };

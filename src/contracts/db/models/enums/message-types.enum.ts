@@ -3,5 +3,5 @@ export enum MessageTypesEnum {
   MEDIA = 'MEDIA',
   QUESTION = 'QUESTION',
   CONTRACT = 'CONTRACT',
-  CALL = 'CALL'
-};
+  CALL = 'CALL',
+}

@@ -13,12 +13,15 @@ import { PRESENCE_SERVICE_NAME } from '../../contracts/presence-interface/presen
     JwtModule.register({
       secret: JWT_SECRET,
       signOptions: {
-        expiresIn: JWT_TOKEN_TTL
-      }
+        expiresIn: JWT_TOKEN_TTL,
+      },
     }),
     ClientsModule.register(
-      generateRmqOptions([NOTIFICATIONS_MODULE_QUEUES[1]], PRESENCE_SERVICE_NAME)
-    )
+      generateRmqOptions(
+        [NOTIFICATIONS_MODULE_QUEUES[1]],
+        PRESENCE_SERVICE_NAME,
+      ),
+    ),
   ],
   providers: [PresenceGateway, PresenceService],
   exports: [PresenceGateway, PresenceService],

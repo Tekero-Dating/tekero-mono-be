@@ -1,4 +1,11 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { Advertisement } from './advertisements.entity';
 import { ChatTypesEnum } from './enums/chat-types.enum';
 
@@ -12,12 +19,12 @@ export class Chat extends Model {
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(ChatTypesEnum)
+    values: Object.keys(ChatTypesEnum),
   })
   chat_type: ChatTypesEnum;
-};
+}
 
 export const ChatRepository = {
   provide: 'CHAT_REPOSITORY',
-  useValue: Chat
+  useValue: Chat,
 };

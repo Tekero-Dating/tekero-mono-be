@@ -1,4 +1,13 @@
-import { Controller, Post, UseGuards, Request, Res, Get, Body, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Res,
+  Get,
+  Body,
+  Logger,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './local.auth-guard';
 import { AuthService } from './auth.service';
 import { Request as Req, Response } from 'express';
@@ -11,9 +20,7 @@ import { User } from '../../contracts/db/models/user.entity';
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
-  constructor (
-    private authService: AuthService
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -30,7 +37,7 @@ export class AuthController {
       await this.authService.openUserSession({
         ...tokens,
         req,
-        user: req.user
+        user: req.user,
       });
       res.cookie('access_token', tokens.access_token, {
         httpOnly: true,
@@ -47,14 +54,14 @@ export class AuthController {
       return res.send({
         success: true,
         result: {
-          message: 'User logged in successfully'
-        }
+          message: 'User logged in successfully',
+        },
       });
     } catch (error) {
       const { status, message } = TekeroError(error);
       res.status(status).send({
         success: false,
-        error: { status, message }
+        error: { status, message },
       });
     }
   }
@@ -75,13 +82,13 @@ export class AuthController {
         maxAge: durationToMilliseconds(JWT_TOKEN_TTL!),
       });
       res.send({
-        success: true
+        success: true,
       });
     } catch (error) {
       const { status, message } = TekeroError(error);
       res.status(status).send({
         success: false,
-        error: { status, message }
+        error: { status, message },
       });
     }
   }
