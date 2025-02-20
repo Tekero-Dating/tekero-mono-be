@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from '../../contracts/db/models/user.entity';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { hashPassword } from '../../utils/hash-password';
@@ -12,18 +17,20 @@ import { Op } from 'sequelize';
 
 @Injectable()
 export class AuthService {
-  constructor (
+  constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.USER)
     private userRepository: typeof User,
     @Inject(MODELS_REPOSITORIES_ENUM.SESSIONS)
     private sessionsRepository: typeof Session,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
-  async validateUserCredentials(email: string, password: string):
-    Promise<Omit<User, 'password'> | null> {
+  async validateUserCredentials(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.userRepository.findOne<User>({
-      where: { email }
+      where: { email },
     });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -37,31 +44,32 @@ export class AuthService {
   }
 
   login(user: Omit<User, 'password'>): {
-    access_token: string,
-    refresh_token: string
+    access_token: string;
+    refresh_token: string;
   } {
     const payload = {
       email: user.email,
       sub: user.id,
-      name: user.firstName
+      name: user.firstName,
     };
 
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, {
-        expiresIn: JWT_REFRESH_TOKEN_TTL
-      })
-    }
+        expiresIn: JWT_REFRESH_TOKEN_TTL,
+      }),
+    };
   }
 
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
       const access_token = this.jwtService.sign({
-        email: payload.email, sub: payload.id
+        email: payload.email,
+        sub: payload.id,
       });
 
-      const updated =  await this.sessionsRepository.update<Session>(
+      const updated = await this.sessionsRepository.update<Session>(
         { access_token },
         {
           where: {
@@ -69,11 +77,11 @@ export class AuthService {
             session_state: SessionStatesEnum.ACTIVE,
             refresh_token: refreshToken,
             rt_expiration_date: {
-              [Op.gt]: new Date()
-            }
+              [Op.gt]: new Date(),
+            },
           },
-          returning: true
-        }
+          returning: true,
+        },
       );
 
       if (updated[0] < 1) {
@@ -85,20 +93,34 @@ export class AuthService {
     }
   }
 
-  async openUserSession(
-    { access_token, refresh_token, req, user }:
-      { access_token: string; refresh_token: string; req: Request, user: Omit<User, 'password'> }
-  ) {
+  async openUserSession({
+    access_token,
+    refresh_token,
+    req,
+    user,
+  }: {
+    access_token: string;
+    refresh_token: string;
+    req: Request;
+    user: Omit<User, 'password'>;
+  }) {
     const userData = this.jwtService.decode(access_token);
-    const refreshExpire = new Date(+`${this.jwtService.decode(refresh_token).exp}000`);
-    const accessExpire = new Date(+`${this.jwtService.decode(access_token).exp}000`);
+    const refreshExpire = new Date(
+      +`${this.jwtService.decode(refresh_token).exp}000`,
+    );
+    const accessExpire = new Date(
+      +`${this.jwtService.decode(access_token).exp}000`,
+    );
     const fingerPrint = extractUserFingerprint(req);
 
     await this.sessionsRepository.update<Session>(
       { session_state: SessionStatesEnum.OUTDATED },
       {
-        where: { user_id: userData.sub, session_state: SessionStatesEnum.ACTIVE }
-      }
+        where: {
+          user_id: userData.sub,
+          session_state: SessionStatesEnum.ACTIVE,
+        },
+      },
     );
     await this.sessionsRepository.create<Session>({
       access_token,
@@ -107,7 +129,7 @@ export class AuthService {
       at_expiration_date: accessExpire,
       fingerprint: fingerPrint,
       session_state: SessionStatesEnum.ACTIVE,
-      user_id: user.id
+      user_id: user.id,
     });
   }
 }

@@ -15,20 +15,18 @@ import { SessionsRepository } from '../../contracts/db/models/sessions.entity';
     JwtModule.register({
       secret: JWT_SECRET,
       signOptions: {
-        expiresIn: JWT_TOKEN_TTL
-      }
-    })
+        expiresIn: JWT_TOKEN_TTL,
+      },
+    }),
   ],
-  controllers: [
-    AuthController
-  ],
+  controllers: [AuthController],
   providers: [
     AuthService,
     UserRepository,
     AuthLocalStrategy,
     AuthJwtStrategy,
-    SessionsRepository
+    SessionsRepository,
   ],
-  exports: [JwtModule]
+  exports: [JwtModule],
 })
 export class AuthModule {}

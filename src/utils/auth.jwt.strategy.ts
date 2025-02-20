@@ -10,20 +10,20 @@ import { Request } from 'express';
 import { extractUserFingerprint } from './extract-metadata-from-request';
 import { Op } from 'sequelize';
 
-export type JwtReq = Request & { user: { userId: number; email: string; } };
+export type JwtReq = Request & { user: { userId: number; email: string } };
 
 @Injectable()
 export class AuthJwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.SESSIONS)
-    private sessionsRepository: typeof Session
+    private sessionsRepository: typeof Session,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: JWT_SECRET,
       usernameField: 'email',
-      passReqToCallback: true
+      passReqToCallback: true,
     });
   }
 
@@ -34,14 +34,17 @@ export class AuthJwtStrategy extends PassportStrategy(Strategy) {
         user_id: payload.sub,
         session_state: SessionStatesEnum.ACTIVE,
         at_expiration_date: {
-          [Op.gt]: new Date()
-        }
-      }
+          [Op.gt]: new Date(),
+        },
+      },
     });
     if (userSession) {
       const newFingerprint = extractUserFingerprint(req);
-      const matchOfFingerprints = areFingerprintsMatch(userSession!.fingerprint, newFingerprint);
-      console.log({ matchOfFingerprints })
+      const matchOfFingerprints = areFingerprintsMatch(
+        userSession!.fingerprint,
+        newFingerprint,
+      );
+      console.log({ matchOfFingerprints });
       // if (!matchOfFingerprints) return null;
       return { userId: payload.sub, email: payload.email };
     }

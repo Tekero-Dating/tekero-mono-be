@@ -6,50 +6,54 @@ import { Chat } from '../db/models/chat.entity';
 export const LIKES_MSG_PATTERNS = {
   SEND_LIKE: 'SEND_LIKE',
   DISMISS_LIKE: 'DISMISS_LIKE',
-  MATCH: 'MATCH'
+  MATCH: 'MATCH',
 };
 
 export namespace ILikeAd {
   export interface Request {
     userId: number;
     advertisementId: number;
-  };
+  }
   export interface Response {
     success: boolean;
     result?: {
       like: Like;
       user_stats: UserStats;
     };
-    error?: Record<string, any> | {
-      status: number;
-      message: string;
-    };
-  };
-};
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
 
 export namespace IUnlikeAd {
   export interface Request {
     userId: number;
     advertisementId: number;
-  };
+  }
   export interface Response {
     success: boolean;
     result?: {
       like: Like;
       user_stats: UserStats;
     };
-    error?: Record<string, any> | {
-      status: number;
-      message: string;
-    };
-  };
-};
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
 
 export namespace IMatchAd {
   export interface Request {
     userId: number;
     likeId: number;
-  };
+  }
   export interface Response {
     success: boolean;
     result?: {
@@ -57,28 +61,39 @@ export namespace IMatchAd {
       author_stats: UserStats;
       liker_stats: UserStats;
     };
-    error?: Record<string, any> | {
-      status: number;
-      message: string;
-    };
-  };
-};
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
 
 export interface ILikesController {
   /**
    * Send like
    */
-  sendLike: (payload: ILikeAd.Request, context: RmqContext) => Promise<ILikeAd.Response>;
+  sendLike: (
+    payload: ILikeAd.Request,
+    context: RmqContext,
+  ) => Promise<ILikeAd.Response>;
 
   /**
    * Remove like
    */
-  dismissLike: (payload: IUnlikeAd.Request, context: RmqContext) => Promise<IUnlikeAd.Response>;
+  dismissLike: (
+    payload: IUnlikeAd.Request,
+    context: RmqContext,
+  ) => Promise<IUnlikeAd.Response>;
 
   /**
    * Make a match with the user who liked.
    * Match opens a chat with all users who
    * related to liked adv
    */
-  makeMatch: (payload: IMatchAd.Request, context: RmqContext) => Promise<IMatchAd.Response>;
+  makeMatch: (
+    payload: IMatchAd.Request,
+    context: RmqContext,
+  ) => Promise<IMatchAd.Response>;
 }

@@ -1,20 +1,32 @@
 import {
   BadRequestException,
   Body,
-  Controller, Delete, Get,
+  Controller,
+  Delete,
+  Get,
   Inject,
   Param,
-  Post, Put, Request,
-  Res, UseGuards,
+  Post,
+  Put,
+  Request,
+  Res,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ADS_SERVICE_NAME } from '../../contracts/ads-interface/ads.constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateAdvDTO, EditAdvDTO } from '../../contracts/ads-interface/ads.api.dto';
+import {
+  CreateAdvDTO,
+  EditAdvDTO,
+} from '../../contracts/ads-interface/ads.api.dto';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
-import { ADS_MSG_PATTERNS, ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
+import {
+  ADS_MSG_PATTERNS,
+  ICreateAdv,
+  IEditAdv,
+} from '../../contracts/ads-interface/ads.api-interface';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
 import { JwtReq } from '../../utils/auth.jwt.strategy';
 import { ApiTags } from '@nestjs/swagger';
@@ -22,9 +34,9 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Advertisements')
 @Controller('api/ads')
 export class ApiAdsController {
-  constructor (
+  constructor(
     @Inject(ADS_SERVICE_NAME)
-    private readonly client: ClientProxy
+    private readonly client: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -36,18 +48,24 @@ export class ApiAdsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('create')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async createAd(
     @Body() payload: CreateAdvDTO,
     @Request() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     if (!Object.keys(payload).length) {
-      const { status, message } = TekeroError(new BadRequestException('There are nothing to update'));
-      return res.status(status).send({ success: false, error: { status, message } });
+      const { status, message } = TekeroError(
+        new BadRequestException('There are nothing to update'),
+      );
+      return res
+        .status(status)
+        .send({ success: false, error: { status, message } });
     }
 
     await rmqSend<ICreateAdv.Request, ICreateAdv.Response>(
@@ -59,27 +77,35 @@ export class ApiAdsController {
           return res.status(201).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
+      },
     );
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('edit/:advId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async editAd(
     @Param('advId') advId: number,
     @Body() payload: EditAdvDTO,
     @Request() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     if (!Object.keys(payload).length) {
-      const { status, message } = TekeroError(new BadRequestException('There are nothing to update'));
-      return res.status(status).send({ success: false, error: { status, message } });
+      const { status, message } = TekeroError(
+        new BadRequestException('There are nothing to update'),
+      );
+      return res
+        .status(status)
+        .send({ success: false, error: { status, message } });
     }
 
     await rmqSend<IEditAdv.Request, IEditAdv.Response>(
@@ -91,21 +117,25 @@ export class ApiAdsController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
-      }
-    )
+      },
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('publish/:advId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async publishAdvertisement(
     @Param('advId') advId: number,
     @Request() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     await rmqSend(
@@ -127,13 +157,15 @@ export class ApiAdsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('archive/:advId')
-  @UsePipes(new ValidationPipe({
-    transform: true
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   async archiveAdvertisement(
     @Param('advId') advId: number,
     @Request() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {
     const { userId } = req.user;
     await rmqSend(
@@ -145,7 +177,9 @@ export class ApiAdsController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
-          return res.status(status).send({ success, error: { status, message } });
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
         }
       },
     );
@@ -156,6 +190,6 @@ export class ApiAdsController {
   async getSuitableAdvertisements(
     @Body() payload,
     @Request() req: JwtReq,
-    @Res() res
+    @Res() res,
   ) {}
 }

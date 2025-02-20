@@ -6,14 +6,17 @@ import { UserRepository } from '../../contracts/db/models/user.entity';
 import { S3Service } from './s3.service';
 import { ClientsModule } from '@nestjs/microservices';
 import { generateRmqOptions } from '../../utils/rmq-utils.nest';
-import { MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME } from '../../contracts/media-interface/media.constants';
+import {
+  MEDIA_MODULE_QUEUES,
+  MEDIA_SERVICE_NAME,
+} from '../../contracts/media-interface/media.constants';
 import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.entity';
 
 @Module({
   imports: [
     ClientsModule.register(
-      generateRmqOptions(MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME)
-    )
+      generateRmqOptions(MEDIA_MODULE_QUEUES, MEDIA_SERVICE_NAME),
+    ),
   ],
   controllers: [MediaController],
   providers: [
@@ -21,7 +24,7 @@ import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.en
     S3Service,
     MediaRepository,
     UserRepository,
-    MediaAccessRepository
-  ]
+    MediaAccessRepository,
+  ],
 })
 export class MediaModule {}

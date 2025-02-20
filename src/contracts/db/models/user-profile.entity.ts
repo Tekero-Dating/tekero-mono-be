@@ -7,7 +7,8 @@ import {
   Min,
   Max,
   IsUrl,
-  ForeignKey, AllowNull,
+  ForeignKey,
+  AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { ConstitutionsEnum, GendersEnum } from './enums';
@@ -28,11 +29,11 @@ export class UserProfile extends Model {
   @Min(1)
   @Max(100)
   @Column
-  orientation?: number
+  orientation?: number;
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(GendersEnum)
+    values: Object.keys(GendersEnum),
   })
   sex?: GendersEnum;
 
@@ -61,7 +62,7 @@ export class UserProfile extends Model {
   @AllowNull(true)
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(ConstitutionsEnum)
+    values: Object.keys(ConstitutionsEnum),
   })
   constitution?: ConstitutionsEnum;
 }
@@ -69,5 +70,5 @@ export class UserProfile extends Model {
 export const UserProfileRepository = {
   //  TypeError: Cannot read properties of undefined (reading 'GRINDER') when using  MODELS_REPOSITORIES_ENUM['GRINDER']
   provide: 'USER_PROFILE_REPOSITORY',
-  useValue: UserProfile
+  useValue: UserProfile,
 };

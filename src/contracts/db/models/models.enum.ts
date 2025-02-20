@@ -36,7 +36,7 @@ export const DB_MODELS: ModelCtor[] = [
   Notification,
   ChatUser,
   Chat,
-  Message
+  Message,
 ];
 
 export const MODELS_REPOSITORIES_ENUM = {
@@ -58,5 +58,5 @@ export const MODELS_REPOSITORIES_ENUM = {
   NOTIFICATION: 'NOTIFICATION_REPOSITORY',
   CHAT_USER: 'CHAT_USER_REPOSITORY',
   CHAT: 'CHAT_REPOSITORY',
-  MESSAGE: 'MESSAGE_REPOSITORY'
+  MESSAGE: 'MESSAGE_REPOSITORY',
 };

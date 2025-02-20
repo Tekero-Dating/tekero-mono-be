@@ -3,5 +3,5 @@ export enum UserRolesEnum {
   MODERATOR = 'MODERATOR',
   USER = 'USER',
   GUEST = 'GUEST',
-  INVITEE = 'INVITEE'
+  INVITEE = 'INVITEE',
 }

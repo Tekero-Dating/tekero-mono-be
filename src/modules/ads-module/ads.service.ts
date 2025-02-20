@@ -8,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Advertisement } from '../../contracts/db/models/advertisements.entity';
-import { ICreateAdv, IEditAdv } from '../../contracts/ads-interface/ads.api-interface';
+import {
+  ICreateAdv,
+  IEditAdv,
+} from '../../contracts/ads-interface/ads.api-interface';
 import { AdStatusesEnum } from '../../contracts/db/models/enums/ad-statuses.enum';
 import { AdTypesEnum } from '../../contracts/db/models/enums/ad-types.enum';
 import { AdvertisementMedia } from '../../contracts/db/models/junctions/advertisement-media.entity';
@@ -27,7 +30,7 @@ export class AdsService {
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS_MEDIA)
     private advMediaRepository: typeof AdvertisementMedia,
     @Inject('SEQUELIZE')
-    private readonly sequelizeInstance: Sequelize
+    private readonly sequelizeInstance: Sequelize,
   ) {}
 
   /**
@@ -44,11 +47,11 @@ export class AdsService {
         where: {
           id: { [Op.in]: mediaIds },
           user_id: userId,
-          private: false
-        }
+          private: false,
+        },
       });
-      medias.forEach(media => {
-        mediaToAttach.push(media.id)
+      medias.forEach((media) => {
+        mediaToAttach.push(media.id);
       });
     }
     return mediaToAttach;
@@ -56,18 +59,21 @@ export class AdsService {
 
   async createAd(
     userId: number,
-    payload: ICreateAdv.Request['fields']
+    payload: ICreateAdv.Request['fields'],
   ): Promise<Advertisement> {
     this.logger.log('createAd', { userId });
     const preConfiguredFields: Partial<Advertisement> = {
       status: AdStatusesEnum.DRAFT,
       type: payload.type,
       active: false,
-      duration: (1000 * 3600) * 168
+      duration: 1000 * 3600 * 168,
     };
 
     let adv;
-    const mediaToAttach: number[] = await this.prepareMediaToAttach(payload.photos, userId);
+    const mediaToAttach: number[] = await this.prepareMediaToAttach(
+      payload.photos,
+      userId,
+    );
     const transaction = await this.sequelizeInstance.transaction();
     const filter = payload.targetFilters;
     const travelFields: {
@@ -89,18 +95,18 @@ export class AdsService {
           ...preConfiguredFields,
           ...payload,
           filter,
-          ...travelFields
+          ...travelFields,
         },
-        { transaction }
+        { transaction },
       );
       this.logger.log('createAd created advertisement');
 
       await this.advMediaRepository.bulkCreate<AdvertisementMedia>(
-        mediaToAttach.map(mediaId => ({
+        mediaToAttach.map((mediaId) => ({
           advertisementId: adv.id,
-          mediaId
+          mediaId,
         })),
-        { transaction }
+        { transaction },
       );
       this.logger.log('createAd attached media');
       await transaction.commit();
@@ -110,7 +116,7 @@ export class AdsService {
       await transaction.rollback();
       throw {
         message: 'Error during ad creation',
-        status: 400
+        status: 400,
       };
     }
   }
@@ -118,17 +124,19 @@ export class AdsService {
   async editAd(
     userId: number,
     advId: number,
-    payload: IEditAdv.Request['fields']
+    payload: IEditAdv.Request['fields'],
   ): Promise<Advertisement> {
     this.logger.log('editAd', { userId, advId });
     const originalAdv = await this.advRepository.findOne<Advertisement>({
       where: {
         id: advId,
-        user_id: userId
-      }
+        user_id: userId,
+      },
     });
     if (!originalAdv) {
-      throw new NotFoundException('There is no advertisement with the given ID for the current user.')
+      throw new NotFoundException(
+        'There is no advertisement with the given ID for the current user.',
+      );
     }
 
     const travelFields: {
@@ -143,31 +151,35 @@ export class AdsService {
       travelFields.travel_date_to = new Date(payload.travelDateTo!);
     }
 
-    let newAdvertisement = {
+    const newAdvertisement = {
       ...originalAdv,
       ...payload,
       filter: {
         ...originalAdv.filter,
-        ...payload.targetFilters
+        ...payload.targetFilters,
       },
-      ...travelFields
-    }
+      ...travelFields,
+    };
 
     try {
-      const [numberOfAffectedRows, [updatedRecord]] = await this.advRepository.update(newAdvertisement, {
-        where: { id: advId },
-        returning: true
-      });
+      const [numberOfAffectedRows, [updatedRecord]] =
+        await this.advRepository.update(newAdvertisement, {
+          where: { id: advId },
+          returning: true,
+        });
       this.logger.log('editAd adv edited');
 
       if (numberOfAffectedRows) {
         return updatedRecord;
       } else {
-        this.logger.error('editAd did not find any records to update', { userId, advId })
+        this.logger.error('editAd did not find any records to update', {
+          userId,
+          advId,
+        });
         throw new NotFoundException('Record not found or update failed');
       }
     } catch (e) {
-      this.logger.error('editAd', { e, userId, advId, payload })
+      this.logger.error('editAd', { e, userId, advId, payload });
       throw new BadRequestException('Update failed');
     }
   }
@@ -175,7 +187,7 @@ export class AdsService {
   async publishAdv(userId: number, advId: number) {
     this.logger.log('publishAdv', { userId, advId });
     const advBelongedToUser = await this.advRepository.findOne({
-      where: { id: advId, user_id: userId }
+      where: { id: advId, user_id: userId },
     });
 
     if (!advBelongedToUser) {
@@ -184,13 +196,16 @@ export class AdsService {
     }
 
     try {
-      await this.advRepository.update({
-        status: AdStatusesEnum.ACTIVE,
-        active: true,
-        activated: Date.now()
-      }, {
-        where: { id: advId }
-      });
+      await this.advRepository.update(
+        {
+          status: AdStatusesEnum.ACTIVE,
+          active: true,
+          activated: Date.now(),
+        },
+        {
+          where: { id: advId },
+        },
+      );
       return;
     } catch (error) {
       this.logger.error('publishAdv', error);
@@ -201,7 +216,7 @@ export class AdsService {
   async archiveAdv(userId: number, advId: number) {
     this.logger.log('archiveAdv', { userId, advId });
     const advBelongedToUser = await this.advRepository.findOne({
-      where: { id: advId, user_id: userId }
+      where: { id: advId, user_id: userId },
     });
 
     if (!advBelongedToUser) {
@@ -210,12 +225,15 @@ export class AdsService {
     }
 
     try {
-      await this.advRepository.update({
-        status: AdStatusesEnum.ARCHIVED,
-        active: false
-      }, {
-        where: { id: advId }
-      });
+      await this.advRepository.update(
+        {
+          status: AdStatusesEnum.ARCHIVED,
+          active: false,
+        },
+        {
+          where: { id: advId },
+        },
+      );
       return;
     } catch (error) {
       this.logger.error('archiveAdv', { error, userId, advId });

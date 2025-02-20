@@ -13,4 +13,4 @@ export const areFingerprintsMatch = (
     oldFingerprint.acceptLanguage === newFingerprint.acceptLanguage &&
     oldFingerprint.acceptEncoding === newFingerprint.acceptEncoding
   );
-}
+};

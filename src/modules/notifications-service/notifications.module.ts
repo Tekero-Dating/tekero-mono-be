@@ -17,18 +17,19 @@ import { PresenceModule } from '../presence-service/presence.module';
   imports: [
     PresenceModule,
     ClientsModule.register(
-      generateRmqOptions([NOTIFICATIONS_MODULE_QUEUES[0]], NOTIFICATIONS_SERVICE_NAME)
-    )
+      generateRmqOptions(
+        [NOTIFICATIONS_MODULE_QUEUES[0]],
+        NOTIFICATIONS_SERVICE_NAME,
+      ),
+    ),
   ],
-  controllers: [
-    NotificationsController
-  ],
+  controllers: [NotificationsController],
   providers: [
     NotificationsService,
     PresenceService,
     NotificationRepository,
     AdvertisementsRepository,
-    MessageRepository
-  ]
+    MessageRepository,
+  ],
 })
 export class NotificationsModule {}

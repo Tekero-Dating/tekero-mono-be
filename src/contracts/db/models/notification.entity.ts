@@ -1,4 +1,11 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { User } from './user.entity';
 import { NotificationTypesEnum } from './enums/notification-types.enum';
 
@@ -12,22 +19,22 @@ export class Notification extends Model {
   userId!: User;
 
   @Column({
-    type: DataType.JSON
+    type: DataType.JSON,
   })
   payload: Record<string, unknown>;
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(NotificationTypesEnum)
+    values: Object.keys(NotificationTypesEnum),
   })
   type: NotificationTypesEnum;
 
   @Column
   acknowledged: boolean;
-};
+}
 
 export const NotificationRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'NOTIFICATION') when using  MODELS_REPOSITORIES_ENUM['NOTIFICATION']
   provide: 'NOTIFICATION_REPOSITORY',
-  useValue: Notification
+  useValue: Notification,
 };

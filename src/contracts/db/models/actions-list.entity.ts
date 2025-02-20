@@ -14,10 +14,10 @@ export class ActionsList extends Model {
   @AllowNull(true)
   @Column
   description: string;
-};
+}
 
 export const ActionsListRepository = {
   // TODO: TypeError: Cannot read properties of undefined (reading 'ACTIONS_LIST_REPOSITORY') when using  MODELS_REPOSITORIES_ENUM['ACTIONS_LIST_REPOSITORY']
   provide: 'ACTIONS_LIST_REPOSITORY',
-  useValue: ActionsList
-}
+  useValue: ActionsList,
+};
