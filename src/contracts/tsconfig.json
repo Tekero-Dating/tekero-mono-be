@@ -102,13 +102,13 @@
     // Due to `amqp-connection-manager`
     "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
 
-    "importsNotUsedAsValues": "error"
+    "verbatimModuleSyntax": false 
   },
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.d.ts",
-    "./src/**/*.js",
-    "./src/**/*.json"
+    "./**/*.ts",
+    "./**/*.d.ts",
+    "./**/*.js",
+    "./**/*.json"
   ],
   "exclude": [
     "**/node_modules",
