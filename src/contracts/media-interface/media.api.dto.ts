@@ -7,7 +7,10 @@ import {
 } from './media.api-interface';
 import { IsBoolean, IsNumber, IsOptional, Validate } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+// @ts-ignore because Multer can't be used as a type since it's not exported from the express namespace
+import { Multer } from 'multer';
 import { ApiProperty } from '@nestjs/swagger';
+
 
 class IsMulterFile {
   validate(file: Express.Multer.File | undefined): boolean {
@@ -71,7 +74,7 @@ export class EditMediaAccessDto implements Partial<IEditMediaAccess.Request> {
   accessorId: number;
 
   @ApiProperty()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: any }) => {
     if (value === 'true') return true;
     if (value === 'false') return false;
     return value;

@@ -25,6 +25,16 @@ import { ApiProperty } from '@nestjs/swagger';
  * we have tons of duplicated code. TODO
  */
 
+export class CoordinatesDTO {
+  @ApiProperty({ enum: ['Point'], example: 'Point' })
+  @IsString()
+  type: 'Point';
+
+  @ApiProperty({ type: [Number], example: [40.7128, -74.006] })
+  @IsArray()
+  coordinates: [number, number];
+}
+
 export class AdTargetFiltersDTO {
   @ApiProperty()
   @IsOptional()
@@ -123,9 +133,10 @@ export class CreateAdvDTO implements IAdvFields {
   @Type(() => AdTargetFiltersDTO)
   targetFilters: AdTargetFiltersDTO;
 
-  @ApiProperty()
-  @IsObject()
-  location: { type: 'Point'; coordinates: [number, number] };
+  @ValidateNested()
+  @Type(() => CoordinatesDTO)
+  @ApiProperty({ type: CoordinatesDTO })
+  location: CoordinatesDTO;
 
   @ApiProperty()
   @IsOptional()
@@ -137,10 +148,10 @@ export class CreateAdvDTO implements IAdvFields {
   @IsString()
   song?: string = '';
 
-  @ApiProperty()
-  @IsOptional()
-  @IsObject()
-  travelsTo?: { type: 'Point'; coordinates: [number, number] };
+  @ValidateNested()
+  @Type(() => CoordinatesDTO)
+  @ApiProperty({ type: CoordinatesDTO })
+  travelsTo?: CoordinatesDTO;
 
   @ApiProperty()
   @IsOptional()
@@ -236,10 +247,10 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @Type(() => EditAdTargetFiltersDTO)
   targetFilters?: EditAdTargetFiltersDTO;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsObject()
-  location?: { type: 'Point'; coordinates: [number, number] };
+  @ValidateNested()
+  @Type(() => CoordinatesDTO)
+  @ApiProperty({ type: CoordinatesDTO })
+  location: CoordinatesDTO;
 
   @ApiProperty()
   @IsOptional()
@@ -251,10 +262,10 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @IsString()
   song?: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsObject()
-  travelsTo?: { type: 'Point'; coordinates: [number, number] };
+  @ValidateNested()
+  @Type(() => CoordinatesDTO)
+  @ApiProperty({ type: CoordinatesDTO })
+  travelsTo?: CoordinatesDTO;
 
   @ApiProperty()
   @IsOptional()

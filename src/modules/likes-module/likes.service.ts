@@ -85,21 +85,16 @@ export class LikesService {
 
     const transaction = await this.sequelizeInstance.transaction();
     try {
-      // TODO: wrap in transaction?
-      const stats = (
-        await this.userStatsRepository.update(
-          {
-            available_likes: userStats!.available_likes - 1,
-          },
-          {
-            where: {
-              user_id,
-            },
-            returning: true,
-            transaction,
-          },
-        )
-      )[1][0];
+      const updatedStats: [number, UserStats[]?] = await this.userStatsRepository.update<UserStats>({
+        available_likes: userStats!.available_likes - 1,
+      }, {
+        where: {
+          user_id,
+        },
+        returning: true,
+        transaction,
+      });
+      const stats = updatedStats[1]?.[0];
       const like = await this.likeRepository.create(
         {
           user_id,
@@ -159,6 +154,7 @@ export class LikesService {
           },
           {
             where: { user_id },
+            returning: true
           },
         );
       }
@@ -173,7 +169,7 @@ export class LikesService {
     this.logger.log('Match', { userId, likeId });
     const transaction = await this.sequelizeInstance.transaction();
     try {
-      const like = await this.likeRepository.update(
+      const like: [number, Like[]?]  = await this.likeRepository.update(
         {
           match: true,
         },
@@ -187,7 +183,7 @@ export class LikesService {
 
       const chat = await this.chatRepository.create(
         {
-          advertisement_id: like[1][0].advertisement_id,
+          advertisement_id: like[1]?.[0].advertisement_id,
           chat_type: ChatTypesEnum.ACTIVE,
         },
         {
@@ -206,7 +202,7 @@ export class LikesService {
       );
       await this.chatUserRepository.create(
         {
-          user_id: like[1][0].user_id, // like sender
+          user_id: like[1]?.[0].user_id, // like sender
           chat_id: chat.id,
         },
         { transaction },
@@ -217,7 +213,7 @@ export class LikesService {
         where: { user_id: userId },
       });
       const likeSenderUserStats = await this.userStatsRepository.findOne({
-        where: { user_id: like[1][0].user_id },
+        where: { user_id: like[1]?.[0].user_id },
       });
 
       if (!authorUserStats || !likeSenderUserStats) {
@@ -229,7 +225,7 @@ export class LikesService {
         throw new NotFoundException('User stats for matched users not found');
       }
 
-      const newAuthorStats = await this.userStatsRepository.update(
+      const newAuthorStats: [number, UserStats[]?] = await this.userStatsRepository.update(
         {
           active_chats: authorUserStats!.active_chats + 1,
         },
@@ -239,7 +235,7 @@ export class LikesService {
           transaction,
         },
       );
-      const newLikerStats = await this.userStatsRepository.update(
+      const newLikerStats: [number, UserStats[]?] = await this.userStatsRepository.update(
         {
           active_chats: likeSenderUserStats!.active_chats + 1,
         },
@@ -253,8 +249,8 @@ export class LikesService {
       await transaction.commit();
       return {
         chat,
-        author_stats: newAuthorStats[1][0],
-        liker_stats: newLikerStats[1][0],
+        author_stats: newAuthorStats[1]?.[0],
+        liker_stats: newLikerStats[1]?.[0],
       };
     } catch (error) {
       this.logger.error('Match', { userId, likeId, error });
@@ -294,7 +290,10 @@ export class LikesService {
         available_likes: likes,
         available_likes_refilled_date: Date.now(),
       },
-      { where: { id: userId } },
+      {
+        where: { id: userId },
+        returning:  true
+      },
     );
   }
 }

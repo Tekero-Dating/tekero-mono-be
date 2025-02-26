@@ -12,6 +12,7 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('questionnaire')
 export class QuestionnaireController implements IQuestionnaireController {
@@ -45,7 +46,7 @@ export class QuestionnaireController implements IQuestionnaireController {
       this.logger.error(e, { userId });
       return {
         success: false,
-        error: e,
+        error: TekeroError(e),
       };
     }
   }
@@ -74,7 +75,7 @@ export class QuestionnaireController implements IQuestionnaireController {
       this.logger.error('submitQuestionByShortcode', { e, userId, response });
       return {
         success: false,
-        error: e,
+        error: TekeroError(e)
       };
     }
   }

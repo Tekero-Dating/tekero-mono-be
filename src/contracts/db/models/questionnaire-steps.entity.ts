@@ -5,8 +5,9 @@ export interface IQuestion {
   shortcode: string;
   question: string;
   languages: Record<string, string>;
-  affected_property: string;
+  affected_property?: string | null;
   type: string;
+  variations_of_answer?: any[] | null;
 }
 
 @Table({ modelName: 'questionnaire-steps' })

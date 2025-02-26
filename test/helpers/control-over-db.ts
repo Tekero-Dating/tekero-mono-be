@@ -36,6 +36,7 @@ export class SuperSequelize {
       await this.sequelize.query(`CREATE DATABASE "${name}" ${addTemplate}`);
       console.log(`Database ${name} created successfully.`);
     } catch (error) {
+      // @ts-ignore
       console.error(`Error creating database: ${error.message}`);
     }
   }
@@ -56,6 +57,7 @@ export class SuperSequelize {
       await this.sequelize.query(`DROP DATABASE IF EXISTS "${name}"`);
       console.log(`Database ${name} dropped successfully.`);
     } catch (error) {
+      // @ts-ignore
       console.error(`Error dropping database: ${error.message}`);
     }
   }

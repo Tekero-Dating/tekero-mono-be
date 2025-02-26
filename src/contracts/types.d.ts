@@ -1,4 +1,4 @@
-type ApiError =
+export type ApiError =
   | Record<string, any>
   | {
       status: number;

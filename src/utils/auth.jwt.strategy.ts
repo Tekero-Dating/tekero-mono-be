@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
 import { JWT_SECRET } from '../config/config';
 import { areFingerprintsMatch } from './compare-fingerprints';
 import { MODELS_REPOSITORIES_ENUM } from '../contracts/db/models/models.enum';
@@ -24,7 +24,7 @@ export class AuthJwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: JWT_SECRET,
       usernameField: 'email',
       passReqToCallback: true,
-    });
+    } as StrategyOptionsWithRequest);
   }
 
   async validate(req: Request, payload) {

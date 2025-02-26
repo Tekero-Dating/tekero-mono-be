@@ -18,6 +18,7 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('media')
 export class MediaController implements IMediaController {
@@ -51,12 +52,9 @@ export class MediaController implements IMediaController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
-    return {
-      success: true,
-    };
   }
 
   @MessagePattern(MEDIA_MSG_PATTERNS.DELETE_MEDIA)
@@ -74,7 +72,7 @@ export class MediaController implements IMediaController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -95,7 +93,7 @@ export class MediaController implements IMediaController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -121,7 +119,7 @@ export class MediaController implements IMediaController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }

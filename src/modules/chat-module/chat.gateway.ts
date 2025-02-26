@@ -86,8 +86,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client connected: ${client.id}, User: ${payload.sub}`);
     } catch (error) {
       this.logger.error('Connection rejected:', { error, ...context });
+      const tekeroError = TekeroError(error);
       client.emit('error', {
-        message: error.message || 'Unauthorized connection',
+        success: false,
+        message: tekeroError.message || 'Unauthorized connection',
       });
       client.disconnect();
     }
@@ -234,13 +236,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
               result,
             });
           } else {
-            console.log('ERROR', error);
+            this.logger.log('ERROR', error);
           }
         },
       );
     } catch (error) {
-      console.error('Upload failed:', error);
-      client.emit('upload-failure', { success: false, error: error.message });
+      this.logger.error('Upload failed:', error);
+      client.emit('upload-failure', { success: false, error: TekeroError(error).message });
     }
   }
 }
