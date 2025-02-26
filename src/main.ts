@@ -14,7 +14,9 @@ import { CHAT_MODULE_QUEUES } from './contracts/chats-interface/chats.constants'
 import cors from 'cors';
 import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface/notifications.constants';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as crypto from 'crypto';
 
+global.crypto = crypto; // TODO nest/schedule of version 5 sucks very hard
 export {
   // @ts-ignore
   bootstrap,
