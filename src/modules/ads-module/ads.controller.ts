@@ -16,6 +16,7 @@ import {
   IPublishAdv,
 } from '../../contracts/ads-interface/ads.api-interface';
 import { ADS_SERVICE_NAME } from '../../contracts/ads-interface/ads.constants';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('ads')
 export class AdsController implements IAdsController {
@@ -54,7 +55,7 @@ export class AdsController implements IAdsController {
       this.logger.error('createAdv', { error, payload });
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -82,7 +83,7 @@ export class AdsController implements IAdsController {
       this.logger.error('editAdv', { error, payload });
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -101,7 +102,7 @@ export class AdsController implements IAdsController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -120,7 +121,7 @@ export class AdsController implements IAdsController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }

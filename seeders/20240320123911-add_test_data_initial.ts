@@ -199,22 +199,20 @@ module.exports = {
       },  {
         user_id: 3,
         questionnaire_started: true,
-        is_completed: true,
+        is_completed: false,
         responses: {
-          display_name: "Danya",
           sex: 'MALE',
-          gender_expresion: 99
+          gender_expression: 50
         },
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')
       },  {
         user_id: 4,
         questionnaire_started: true,
-        is_completed: true,
+        is_completed: false,
         responses: {
-          display_name: 'Lara K.',
           sex: 'FEMALE',
-          gender_expresion: 50
+          gender_expression: 50
         },
         createdAt: new Date('2024-03-15'),
         updatedAt: new Date('2024-03-15')

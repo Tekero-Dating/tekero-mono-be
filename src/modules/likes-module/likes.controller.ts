@@ -1,4 +1,4 @@
-import { Controller, Inject, Logger } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 import {
   ILikeAd,
   ILikesController,
@@ -11,10 +11,10 @@ import { LikesService } from './likes.service';
 import { LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.constants';
 import { WithNotify } from '../../utils/with-notify';
 import { NotificationTypesEnum } from '../../contracts/db/models/enums';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('likes')
 export class LikesController implements ILikesController {
-  private readonly logger = new Logger(LikesController.name);
   constructor(
     private readonly likesService: LikesService,
     @Inject(LIKES_SERVICE_NAME) private client: ClientProxy,
@@ -35,13 +35,13 @@ export class LikesController implements ILikesController {
         success: true,
         result: {
           like,
-          user_stats,
+          user_stats: user_stats!,
         },
       };
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -59,7 +59,7 @@ export class LikesController implements ILikesController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -76,12 +76,16 @@ export class LikesController implements ILikesController {
       );
       return {
         success: true,
-        result: { chat, author_stats, liker_stats },
+        result: {
+          chat,
+          author_stats: author_stats!,
+          liker_stats: liker_stats!
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }

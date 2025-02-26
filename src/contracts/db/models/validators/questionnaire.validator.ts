@@ -15,10 +15,18 @@ const questionSchema: JSONSchemaType<IQuestion> = {
       additionalProperties: { type: 'string' },
       required: [],
     },
-    affected_property: { type: 'string' },
+    affected_property: {
+      type: 'string',
+      nullable: true,
+    },
     type: { type: 'string' },
+    variations_of_answer: {
+      type: 'array',
+      items: { type: 'object' },
+      nullable: true,
+    },
   },
-  required: ['shortcode', 'question', 'languages', 'affected_property', 'type'],
+  required: ['shortcode', 'question', 'languages', 'type'],
   additionalProperties: false,
 };
 

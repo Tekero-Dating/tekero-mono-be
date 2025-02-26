@@ -17,6 +17,7 @@ import {
   RmqContext,
 } from '@nestjs/microservices';
 import { UsersService } from './users.service';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('users')
 export class UsersController implements IUsersController {
@@ -42,7 +43,7 @@ export class UsersController implements IUsersController {
       const result = await this.usersService.createUser(payload);
       return { success: true, result };
     } catch (error) {
-      return { success: false, error };
+      return { success: false, error: TekeroError(error) };
     }
   }
 
@@ -56,7 +57,7 @@ export class UsersController implements IUsersController {
       await this.usersService.deleteUser(payload);
       return { success: true };
     } catch (error) {
-      return { success: false, error };
+      return { success: false, error: TekeroError(error) };
     }
   }
 
@@ -73,7 +74,7 @@ export class UsersController implements IUsersController {
       );
       return { success: true, result: { user: updatedUser } };
     } catch (error) {
-      return { success: false, error };
+      return { success: false, error: TekeroError(error) };
     }
   }
 }

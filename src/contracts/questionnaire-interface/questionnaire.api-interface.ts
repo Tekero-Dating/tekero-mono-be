@@ -1,29 +1,33 @@
 import { RmqContext } from '@nestjs/microservices';
 import { QuestionnaireSteps } from '../db/models/questionnaire-steps.entity';
 import { Questionnaire } from '../db/models/questionnaire.entity';
-import { BaseResponse } from '../types';
 
 export const QUESTIONNAIRE_MSG_PATTERNS = {
   GET_QUESTIONNAIRE: 'get_questionnaire',
   SUBMIT_QUESTIONNAIRE: 'susbmit_questionnaire',
 };
 
-interface Question {
-  answered: boolean;
-  response?: string | number | boolean;
-  question: QuestionnaireSteps['question'];
-}
-
 export namespace IGetQuestionnaire {
   export interface Request {
     userId: number;
   }
-  export interface Response extends BaseResponse {
+  export interface Response {
+    success: boolean;
     result?: {
       started: boolean;
       completed: boolean;
-      questions?: Question[];
+      questions?: {
+        answered: boolean;
+        response?: string | number | boolean;
+        question: QuestionnaireSteps['question'];
+      }[];
     };
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
   }
 }
 
@@ -35,12 +39,19 @@ export namespace ISubmitQuestionByShortcode {
       response: string | number | boolean;
     };
   }
-  export interface Response extends BaseResponse {
+  export interface Response {
+    success: boolean;
     result?:
       | {
           questionnaireStatus: Questionnaire;
         }
       | IGetQuestionnaire.Response['result'];
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
   }
 }
 

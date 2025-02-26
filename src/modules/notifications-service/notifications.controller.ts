@@ -6,6 +6,7 @@ import {
 } from '../../contracts/notifications-interface/notifications.constants';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('notifications')
 export class NotificationsController implements INotificationsController {
@@ -26,7 +27,10 @@ export class NotificationsController implements INotificationsController {
         success: true,
       };
     } catch (e) {
-      return { success: false, error: e };
+      return {
+        success: false,
+        error: TekeroError(e)
+      };
     }
   }
 }

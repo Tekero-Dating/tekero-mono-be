@@ -1,11 +1,11 @@
-export const TekeroError = (error: Record<string, any>) => {
+export const TekeroError = (error: unknown) => {
   if (!error) {
     return {
       status: 500,
       message: 'Uncaught error appeared',
     };
   }
-  const getMessage = (err: typeof error) => {
+  const getMessage = (err: any) => {
     if (err.message) {
       return err.message;
     }
@@ -19,7 +19,7 @@ export const TekeroError = (error: Record<string, any>) => {
     return 'Uncaught error appeared';
   };
 
-  const getStatus = (err: typeof error) => {
+  const getStatus = (err: any) => {
     if (err.status) {
       return err.status;
     }

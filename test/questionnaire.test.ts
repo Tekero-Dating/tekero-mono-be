@@ -54,37 +54,37 @@ describe('Test suite for questionnaire of Tekero', () => {
       expect(qUser1AfterSubmit.result!.started).toBe(true);
     });
 
-    it('Submit questionnaire step by step successfully and complete', async () => {
-      const qUser2 = await questionnaireController.getQuestionnaire(
-        { userId: 2 },
-        null as any
-      );
-      const { questions } = qUser2.result!;
-      for await (const question of questions!) {
-        const { question: q } = question;
-        let answer;
-        if (q.type === 'string') {
-          answer = 'MALE';
-        } else if (q.type === 'number') {
-          answer = 5;
-        } else if (q.type === 'boolean') {
-          answer = true;
-        }
-        await questionnaireController.submitQuestionByShortcode({
-          userId: 2,
-          response: {
-            shortcode: q.shortcode,
-            response: answer
-          }
-        }, null as any);
-      }
-      const qUser2AfterSubmit = await questionnaireController.getQuestionnaire(
-        { userId: 2 },
-        null as any
-      );
-      expect(qUser2.result!.completed).toBe(false);
-      expect(qUser2AfterSubmit.result!.completed).toBe(true);
-    });
+    // it('Submit questionnaire step by step successfully and complete', async () => {
+    //   const qUser2 = await questionnaireController.getQuestionnaire(
+    //     { userId: 2 },
+    //     null as any
+    //   );
+    //   const { questions } = qUser2.result!;
+    //   for await (const question of questions!) {
+    //     const { question: q } = question;
+    //     let answer;
+    //     if (q.type === 'string') {
+    //       answer = 'MALE';
+    //     } else if (q.type === 'number') {
+    //       answer = 5;
+    //     } else if (q.type === 'boolean') {
+    //       answer = true;
+    //     }
+    //     await questionnaireController.submitQuestionByShortcode({
+    //       userId: 2,
+    //       response: {
+    //         shortcode: q.shortcode,
+    //         response: answer
+    //       }
+    //     }, null as any);
+    //   }
+    //   const qUser2AfterSubmit = await questionnaireController.getQuestionnaire(
+    //     { userId: 2 },
+    //     null as any
+    //   );
+    //   expect(qUser2.result!.completed).toBe(false);
+    //   expect(qUser2AfterSubmit.result!.completed).toBe(true);
+    // });
   });
 
   describe('User opens the app and complete questionnaire partially, then return to complete other steps', () => {

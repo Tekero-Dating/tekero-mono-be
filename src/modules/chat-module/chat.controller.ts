@@ -12,6 +12,7 @@ import {
   CHAT_SERVICE_NAME,
 } from '../../contracts/chats-interface/chats.constants';
 import { ChatService } from './chat.service';
+import { TekeroError } from '../../utils/error-handling-utils';
 
 @Controller('chat')
 export class ChatController implements IChatController {
@@ -34,7 +35,7 @@ export class ChatController implements IChatController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -54,7 +55,7 @@ export class ChatController implements IChatController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }
@@ -74,7 +75,7 @@ export class ChatController implements IChatController {
     } catch (error) {
       return {
         success: false,
-        error,
+        error: TekeroError(error),
       };
     }
   }

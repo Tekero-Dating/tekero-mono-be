@@ -59,7 +59,7 @@ export class AuthController {
       });
     } catch (error) {
       const { status, message } = TekeroError(error);
-      res.status(status).send({
+      return res.status(status).send({
         success: false,
         error: { status, message },
       });
