@@ -33,4 +33,18 @@ export class NotificationsController implements INotificationsController {
       };
     }
   }
+
+  @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.MATCH)
+  async match(@Payload() payload) {
+    try {
+      await this.notificationsService.notifyLikeSenderAboutMatch(payload['0'].userId, payload['0'].likeId);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: TekeroError(error)
+      };
+    }
+  }
 }

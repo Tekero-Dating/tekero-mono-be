@@ -165,9 +165,17 @@ export class LikesService {
     }
   }
 
-  async match(userId, likeId) {
-    this.logger.log('Match', { userId, likeId });
+  async match(userId: number, likeId: number) {
+    const context = { userId, likeId };
+    this.logger.log('Match', context);
     const transaction = await this.sequelizeInstance.transaction();
+
+    const initialLike = await this.likeRepository.findByPk(likeId);
+    if (initialLike?.match) {
+      this.logger.error('Match: user trying to match a few times.', context);
+      throw new BadRequestException('Not possible to match twice');
+    }
+
     try {
       const like: [number, Like[]?]  = await this.likeRepository.update(
         {
@@ -179,7 +187,7 @@ export class LikesService {
           transaction,
         },
       );
-      this.logger.log('Match: Like updated', { userId, likeId });
+      this.logger.log('Match: Like updated', context);
 
       const chat = await this.chatRepository.create(
         {

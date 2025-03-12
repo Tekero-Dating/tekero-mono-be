@@ -24,8 +24,7 @@ export class Notification extends Model {
   payload: Record<string, unknown>;
 
   @Column({
-    type: DataType.ENUM,
-    values: Object.keys(NotificationTypesEnum),
+    type: DataType.ENUM(...Object.values(NotificationTypesEnum))
   })
   type: NotificationTypesEnum;
 

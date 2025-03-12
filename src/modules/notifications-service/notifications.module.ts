@@ -12,6 +12,7 @@ import { AdvertisementsRepository } from '../../contracts/db/models/advertisemen
 import { MessageRepository } from '../../contracts/db/models/message.entity';
 import { PresenceService } from '../presence-service/presence.service';
 import { PresenceModule } from '../presence-service/presence.module';
+import { LikeRepository } from '../../contracts/db/models/like.entity';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PresenceModule } from '../presence-service/presence.module';
     NotificationRepository,
     AdvertisementsRepository,
     MessageRepository,
+    LikeRepository
   ],
 })
 export class NotificationsModule {}
