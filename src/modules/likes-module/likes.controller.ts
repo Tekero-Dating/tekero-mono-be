@@ -65,6 +65,7 @@ export class LikesController implements ILikesController {
   }
 
   @MessagePattern(LIKES_MSG_PATTERNS.MATCH)
+  @WithNotify(NotificationTypesEnum.MATCH)
   async makeMatch(
     @Payload() payload: IMatchAd.Request,
   ): Promise<IMatchAd.Response> {

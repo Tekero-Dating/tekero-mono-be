@@ -20,6 +20,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
+import { firstValueFrom, timeout } from 'rxjs';
 
 export const generateRmqOptions = (
   queues: string[] = [],
@@ -103,7 +104,14 @@ export const rmqSend = async <DataToSend, ResponseData>(
       expiration: 30000,
     })
     .build();
-  return await client
-    .send<ResponseData>(messagePattern, rmqRecord)
-    .subscribe(handler);
+
+  try {
+    const response = await firstValueFrom(
+      client.send<ResponseData>(messagePattern, rmqRecord).pipe(timeout(5000)),
+    );
+    handler(response);
+  } catch (err) {
+    console.error('rmqSend error:', err);
+    handler({ success: false, error: err });
+  }
 };

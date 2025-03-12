@@ -12,6 +12,7 @@ import { Notification } from '../../contracts/db/models/notification.entity';
 import { NotificationTypesEnum } from '../../contracts/db/models/enums';
 import { PresenceService } from '../presence-service/presence.service';
 import { PresenceGateway } from '../presence-service/presence.gateway';
+import { Like } from '../../contracts/db/models/like.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -19,6 +20,8 @@ export class NotificationsService {
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS)
     private advertisementRepository: typeof Advertisement,
+    @Inject(MODELS_REPOSITORIES_ENUM.LIKE)
+    private likeRepository: typeof Like,
     @Inject(MODELS_REPOSITORIES_ENUM.NOTIFICATION)
     private notificationRepository: typeof Notification,
     private readonly presenceService: PresenceService,
@@ -75,6 +78,46 @@ export class NotificationsService {
         error,
         context,
       });
+      throw new InternalServerErrorException('Can not send notification');
+    }
+  }
+
+  async notifyLikeSenderAboutMatch(adOwnerId: number, likeId: number) {
+    const context = { adOwnerId, likeId };
+    this.logger.log('notifyLikeSenderAboutMatch: started', { context });
+
+    const like = await this.likeRepository.findOne({
+      where: { id: likeId },
+      attributes: ['user_id', 'advertisement_id']
+    });
+
+    if (!like) {
+      this.logger.error('notifyLikeSenderAboutMatch like not found', context)
+      throw new NotFoundException('Like not found');
+    }
+
+    try {
+      const notification = await this.notificationRepository.create({
+        userId: like?.user_id,
+        payload: {
+          likeId,
+          advertisementId: like?.advertisement_id
+        },
+        type: NotificationTypesEnum.MATCH,
+        acknowledged: false,
+      });
+      this.logger.log('notifyLikeSenderAboutMatch: completed notification', context);
+
+      const isOnline = await this.presenceService.isOnline(like?.user_id);
+      if (isOnline) {
+        this.logger.log('notifyLikeSenderAboutMatch user online. Sending to presence gateway', context)
+        await this.presenceGateway.sendInAppNotification({
+          userId: like?.user_id,
+          notificationId: notification.id,
+        });
+      }
+    } catch (error) {
+      this.logger.error('notifyLikeSenderAboutMatch: uncaught error', error);
       throw new InternalServerErrorException('Can not send notification');
     }
   }
