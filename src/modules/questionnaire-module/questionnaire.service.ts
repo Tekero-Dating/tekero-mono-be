@@ -111,7 +111,13 @@ export class QuestionnaireService {
       throw new BadRequestException(
         'Trying to submit response to inactive question',
       );
-    } else if (question.type !== typeof answer) {
+    } else if (
+      (
+        question.type === 'string' ||
+        question.type === 'number' ||
+        question.type === 'boolean'
+      ) && question.type !== typeof answer
+    ) {
       throw new BadRequestException('Response provided in wrong format');
     }
 

@@ -67,17 +67,17 @@ export class PresenceGateway
   }
 
   @SubscribeMessage('set-online')
-  handleJoin(@ConnectedSocket() client: Socket): void {
+  async handleJoin(@ConnectedSocket() client: Socket): Promise<void> {
     const context = client.data;
     this.logger.log('Join request:', { ...context });
     client.join(String(client.data.userId));
   }
 
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.NOTIFY)
-  sendInAppNotification(payload: {
+  async sendInAppNotification(payload: {
     userId: number;
     notificationId: number;
-  }): void {
+  }): Promise<void> {
     this.logger.log('sendInAppNotification', { payload });
     this.server.to(String(payload.userId)).emit('receiveNotification', {
       payload,

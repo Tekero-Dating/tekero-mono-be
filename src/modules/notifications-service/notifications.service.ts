@@ -98,7 +98,7 @@ export class NotificationsService {
 
     try {
       const notification = await this.notificationRepository.create({
-        userId: like?.user_id,
+        user_id: like?.user_id,
         payload: {
           likeId,
           advertisementId: like?.advertisement_id

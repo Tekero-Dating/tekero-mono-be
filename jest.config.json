@@ -10,32 +10,21 @@
     "!**/cypress/**",
     "!**/*.d.ts"
   ],
-  "coverageThreshold": {
-  },
+  "coverageThreshold": {},
   "testPathIgnorePatterns": [
     "/node_modules/",
     "/dist/",
-    "/mongo/"
+    "/mongo/",
+    "\\.js$"
   ],
-  "testEnvironment": "node",
-  "verbose": true,
-  "bail": false,"preset": "ts-jest",
-  "watchPathIgnorePatterns": [".*\\.json"],
-  "collectCoverage": true,
-  "collectCoverageFrom": [
-    "src/*.{ts,tsx,js,jsx}",
-    "!**/*.migrations.ts",
-    "!**/node_modules/**",
-    "!**/coverage/**",
-    "!**/cypress/**",
-    "!**/*.d.ts"
+  "testMatch": [
+    "**/?(*.)+(spec|test).[tj]s?(x)"
   ],
-  "coverageThreshold": {
-  },
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "/dist/",
-    "/mongo/"
+  "reporters": [
+    "default",
+    ["jest-summary-reporter", {
+      "failuresOnly": false
+    }]
   ],
   "testEnvironment": "node",
   "verbose": true,

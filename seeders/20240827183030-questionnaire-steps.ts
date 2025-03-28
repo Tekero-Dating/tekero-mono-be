@@ -38,10 +38,11 @@ module.exports = {
             "ru": "Укажите ваш пол?",
           },
           "affected_property": "sex",
-          "type": "string",
+          "type": "string"
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -55,7 +56,8 @@ module.exports = {
           "type": "string",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -69,7 +71,8 @@ module.exports = {
           "type": "number",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -83,7 +86,8 @@ module.exports = {
           "type": "location",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -97,7 +101,8 @@ module.exports = {
           "type": "location",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": true
       }, {
         "active": true,
         "question": {
@@ -111,7 +116,8 @@ module.exports = {
           "type": "number",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": true
       }, {
         "active": true,
         "question": {
@@ -125,7 +131,8 @@ module.exports = {
           "type": "number",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": true
       }, {
         "active": true,
         "question": {
@@ -139,7 +146,8 @@ module.exports = {
           "type": "number",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": true
       }, {
         "active": true,
         "question": {
@@ -176,7 +184,8 @@ module.exports = {
           ]
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -221,7 +230,8 @@ module.exports = {
           ]
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -270,7 +280,8 @@ module.exports = {
           ],
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -319,7 +330,8 @@ module.exports = {
           ]
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       }, {
         "active": true,
         "question": {
@@ -333,7 +345,8 @@ module.exports = {
           "type": "array",
         },
         createdAt: new Date('2024-03-15'),
-        updatedAt: new Date('2024-03-15')
+        updatedAt: new Date('2024-03-15'),
+        "optional": false
       },
     ];
 
