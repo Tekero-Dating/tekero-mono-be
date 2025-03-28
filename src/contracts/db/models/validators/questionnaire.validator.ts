@@ -31,14 +31,41 @@ const questionSchema: JSONSchemaType<IQuestion> = {
 };
 
 const responseSchema: JSONSchemaType<
-  Record<string, string | number | boolean>
+  Record<
+    string,
+    string | number | boolean | { type: 'Point'; coordinates: [number, number] } | string[]
+  >
 > = {
   type: 'object',
   additionalProperties: {
-    oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }],
+    oneOf: [
+      { type: 'string' },
+      { type: 'number' },
+      { type: 'boolean' },
+      { type: 'array', items: { type: 'string' } },
+      {
+        type: 'object',
+        properties: {
+          type: { type: 'string', const: 'Point' },
+          coordinates: {
+            type: 'array',
+            items: { type: 'number' },
+            minItems: 2,
+            maxItems: 2,
+          },
+        },
+        required: ['type', 'coordinates'],
+        additionalProperties: false,
+      },
+    ],
   },
   required: [],
-};
+} as unknown as JSONSchemaType<
+  Record<
+    string,
+    string | number | boolean | { type: 'Point'; coordinates: [number, number] } | string[]
+  >
+>; // TODO: just because ajv is shit. Try to fix it if you can
 
 export const validateQuestion = ajv.compile(questionSchema);
 export const validateResponse = ajv.compile(responseSchema);

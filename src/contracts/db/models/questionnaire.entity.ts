@@ -39,7 +39,11 @@ export class Questionnaire extends Model {
       },
     },
   })
-  responses!: Record<string, string | number | boolean>;
+  responses!: Record<
+    string,
+    string | number | boolean | string[] |
+    Record<string, string | { type: string; coordinates: number[]}>
+  >;
 }
 
 export const QuestionnaireRepository = {

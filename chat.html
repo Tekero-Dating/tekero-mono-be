@@ -89,23 +89,23 @@
 <div id="preview" class="preview"></div>
 
 <script>
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcnZpbkB0ZXN0LmNvbSIsInN1YiI6NCwibmFtZSI6IkxhcmlzYSIsImlhdCI6MTczOTY4NDAxOSwiZXhwIjoxNzM5Njg1ODE5fQ.e67_9j5L9Z8lFxBm3DCV5cmhyZKsqzFOvtrarVgTHrA';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcnZpbkB0ZXN0LmNvbSIsInN1YiI6NCwibmFtZSI6IkxhcmlzYSIsImlhdCI6MTc0MjUxMzIwMSwiZXhwIjoxNzQyNTE1MDAxfQ.VF4k164AIvMUh1gnuU1cXUMUMxX4HWaZQTm-T_qcknA';
 
-  // const socket = io('http://localhost:3000/chat', {
-  //   query: {
-  //     token,
-  //     chatId: 1
-  //   }
+  const socket = io('http://localhost:3000/chat', {
+    query: {
+      token,
+      chatId: 1
+    }
+  });
+  // const socket = io('http://localhost:3000/presence', {
+  //   query: { token }
   // });
-  const socket = io('http://localhost:3000/presence', {
-    query: { token }
-  });
 
-  socket.emit('set-online');
-  socket.on('receiveNotification', (payload) => {
-    console.log({ payload });
-  });
-  // socket.emit('join', 1);
+  // socket.emit('set-online');
+  // socket.on('receiveNotification', (payload) => {
+  //   console.log({ payload });
+  // });
+  socket.emit('join', 1);
 
   let id, name;
 
@@ -162,6 +162,7 @@
 
   // Listen for incoming messages
   socket.on('receiveMessage', async (data) => {
+    console.log('received', data);
     const chat = document.getElementById('chat');
     const sender = data.result.user_id === id
       ? `<p><b>${data.sender}:</b></p>`

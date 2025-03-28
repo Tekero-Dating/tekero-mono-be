@@ -1,4 +1,8 @@
-import { INotificationsController } from '../../contracts/notifications-interface/notifications.api-interface';
+import {
+  INMatch,
+  INotificationsController,
+  INReceiveLike,
+} from '../../contracts/notifications-interface/notifications.api-interface';
 import { Controller, Inject } from '@nestjs/common';
 import {
   NOTIFICATIONS_MSG_PATTERNS,
@@ -7,6 +11,7 @@ import {
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service';
 import { TekeroError } from '../../utils/error-handling-utils';
+import { ILikeAd } from '../../contracts/likes-interface/likes.api-interface';
 
 @Controller('notifications')
 export class NotificationsController implements INotificationsController {
@@ -16,7 +21,7 @@ export class NotificationsController implements INotificationsController {
   ) {}
 
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.LIKE_RECEIVED)
-  async receiveLike(@Payload() payload) {
+  async receiveLike(@Payload() payload: INReceiveLike.Request) {
     try {
       await this.notificationsService.notifyAdOwnerAboutLike(
         payload['0'].userId,
@@ -35,7 +40,7 @@ export class NotificationsController implements INotificationsController {
   }
 
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.MATCH)
-  async match(@Payload() payload) {
+  async match(@Payload() payload: INMatch.Request): Promise<INMatch.Response> {
     try {
       await this.notificationsService.notifyLikeSenderAboutMatch(payload['0'].userId, payload['0'].likeId);
 

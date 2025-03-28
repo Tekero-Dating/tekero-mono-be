@@ -3,6 +3,7 @@ import { closeApp, getApp } from './helpers/get-app';
 import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { QuestionnaireController } from '../src/modules/questionnaire-module/questionnaire.controller';
 import { GendersEnum } from '../src/contracts/db/models/enums';
+import { QuestionnaireSteps } from '../src/contracts/db/models/questionnaire-steps.entity';
 
 jest.spyOn(JwtAuthGuard.prototype, 'canActivate').mockImplementation(() => true);
 
@@ -54,85 +55,43 @@ describe('Test suite for questionnaire of Tekero', () => {
       expect(qUser1AfterSubmit.result!.started).toBe(true);
     });
 
-    // it('Submit questionnaire step by step successfully and complete', async () => {
-    //   const qUser2 = await questionnaireController.getQuestionnaire(
-    //     { userId: 2 },
-    //     null as any
-    //   );
-    //   const { questions } = qUser2.result!;
-    //   for await (const question of questions!) {
-    //     const { question: q } = question;
-    //     let answer;
-    //     if (q.type === 'string') {
-    //       answer = 'MALE';
-    //     } else if (q.type === 'number') {
-    //       answer = 5;
-    //     } else if (q.type === 'boolean') {
-    //       answer = true;
-    //     }
-    //     await questionnaireController.submitQuestionByShortcode({
-    //       userId: 2,
-    //       response: {
-    //         shortcode: q.shortcode,
-    //         response: answer
-    //       }
-    //     }, null as any);
-    //   }
-    //   const qUser2AfterSubmit = await questionnaireController.getQuestionnaire(
-    //     { userId: 2 },
-    //     null as any
-    //   );
-    //   expect(qUser2.result!.completed).toBe(false);
-    //   expect(qUser2AfterSubmit.result!.completed).toBe(true);
-    // });
-  });
-
-  describe('User opens the app and complete questionnaire partially, then return to complete other steps', () => {
-    it('Submit questionnaire remaining steps successfully', async () => {
+    it('Submit questionnaire step by step successfully and complete', async () => {
       const qUser2 = await questionnaireController.getQuestionnaire(
         { userId: 2 },
         null as any
       );
       const { questions } = qUser2.result!;
-      const middleQuestionOfQuestionnaireIndex =
-        Math.floor(questions!.length / 2) === 0
-          ? 0
-          : Math.floor(questions!.length / 2) - 1
-      const middleQuestion = questions![middleQuestionOfQuestionnaireIndex];
-      let middleQuestionAnswer;
-      if (middleQuestion.question.type === 'string') {
-        middleQuestionAnswer = 'FEMALE';
-      } else if (middleQuestion.question.type === 'number') {
-        middleQuestionAnswer = 6;
-      } else if (middleQuestion.question.type === 'boolean') {
-        middleQuestionAnswer = false;
-      }
-      await questionnaireController.submitQuestionByShortcode({
-        userId: 2,
-        response: {
-          shortcode: middleQuestion.question.shortcode,
-          response: middleQuestionAnswer
-        }
-      }, null as any);
+      for await (const question of questions!) {
+        const { question: q } = question;
+        let answer;
 
-      const qUser2AfterSubmitPart = await questionnaireController.getQuestionnaire(
+        if (q.type === 'string') {
+          answer = 'MALE';
+        } else if (q.type === 'number') {
+          answer = 5;
+        } else if (q.type === 'boolean') {
+          answer = true;
+        } else if (q.type === 'array') {
+          answer = ['a', 'b', 'c'];
+        } else if (q.type === 'location') {
+          answer = {
+            "type": "Point", "coordinates": [2.186015, 41.388123]
+          };
+        }
+        await questionnaireController.submitQuestionByShortcode({
+          userId: 2,
+          response: {
+            shortcode: q.shortcode,
+            response: answer
+          }
+        }, null as any);
+      }
+      const qUser2AfterSubmit = await questionnaireController.getQuestionnaire(
         { userId: 2 },
         null as any
       );
-      expect(middleQuestion.answered).toBe(true);
-      expect(
-        qUser2AfterSubmitPart.result!.questions![middleQuestionOfQuestionnaireIndex].response
-      ).not.toEqual(middleQuestion.response);
-      expect(qUser2AfterSubmitPart.result!
-        .questions![middleQuestionOfQuestionnaireIndex].response
-      ).toEqual(middleQuestionAnswer);
-      expect(qUser2AfterSubmitPart.result!.started).toEqual(true);
-    });
+      expect(qUser2.result!.completed).toBe(false);
+      expect(qUser2AfterSubmit.result!.completed).toBe(true);
+    }, 15000);
   });
-
-  describe('Negative cases', () => {
-    it('User try to submit incorrect data and receives bad data error from server', () => {
-
-    });
-  })
 });

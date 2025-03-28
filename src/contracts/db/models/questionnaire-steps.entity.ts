@@ -30,6 +30,11 @@ export class QuestionnaireSteps extends Model {
 
   @Column
   active: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN
+  })
+  optional: boolean;
 }
 
 export const QuestionnaireStepsRepository = {

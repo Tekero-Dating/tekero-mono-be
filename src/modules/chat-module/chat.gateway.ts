@@ -110,10 +110,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    * Join a chat room
    */
   @SubscribeMessage('join')
-  handleJoinChat(@ConnectedSocket() client: Socket): void {
+  async handleJoinChat(@ConnectedSocket() client: Socket): Promise<void> {
     const context = client.data;
     this.logger.log('Join request:', { ...context });
-    rmqSend<any, any>(
+    await rmqSend<any, any>(
       this.client,
       CHAT_MESSAGE_PATTERNS.GET_CHAT_HISTORY,
       {
@@ -151,14 +151,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    * Send a message to a chat room
    */
   @SubscribeMessage('send')
-  handleSendMessage(
+  async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { message: string },
-  ): void {
+  ): Promise<void> {
     const context = client.data;
     this.logger.log('Send message:', { ...context });
     const { message } = payload;
-    rmqSend<ISendMessage.Request, ISendMessage.Response>(
+    await rmqSend<ISendMessage.Request, ISendMessage.Response>(
       this.client,
       CHAT_MESSAGE_PATTERNS.SEND_MESSAGE,
       {
