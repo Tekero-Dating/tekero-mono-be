@@ -3,6 +3,7 @@ import {
   ILikeAd,
   ILikesController,
   IMatchAd,
+  IRejectLike,
   IUnlikeAd,
   LIKES_MSG_PATTERNS,
 } from '../../contracts/likes-interface/likes.api-interface';
@@ -64,6 +65,25 @@ export class LikesController implements ILikesController {
     }
   }
 
+  @MessagePattern(LIKES_MSG_PATTERNS.REJECT_LIKE)
+  @WithNotify(NotificationTypesEnum.LIKE_REJECTED)
+  async rejectLike(
+    @Payload() payload: IRejectLike.Request,
+  ): Promise<IRejectLike.Response> {
+    try {
+      const { userId, likeId } = payload;
+      await this.likesService.rejectLike(userId, likeId);
+      return {
+        success: true,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: TekeroError(error),
+      };
+    }
+  }
+
   @MessagePattern(LIKES_MSG_PATTERNS.MATCH)
   @WithNotify(NotificationTypesEnum.MATCH)
   async makeMatch(
@@ -80,7 +100,7 @@ export class LikesController implements ILikesController {
         result: {
           chat,
           author_stats: author_stats!,
-          liker_stats: liker_stats!
+          liker_stats: liker_stats!,
         },
       };
     } catch (error) {

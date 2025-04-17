@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 
-@Table({ modelName: 'user-stats' })
+@Table({ modelName: 'user-stats', indexes: [{ fields: ['user_id'] }] })
 export class UserStats extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)

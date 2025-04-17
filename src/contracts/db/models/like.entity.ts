@@ -24,20 +24,25 @@ export class Like extends Model {
   @Column
   advertisement_id!: number;
 
+  @BelongsTo(() => Advertisement, 'advertisement_id')
+  advertisement!: Advertisement;
+
   @ForeignKey(() => User)
   @Column
   user_id!: number;
 
-  @BelongsTo(() => Advertisement, 'advertisement_id')
-  adv_id!: User;
-
   @BelongsTo(() => User, 'user_id')
-  userId!: User;
+  user!: User;
 
   @Column({
     type: DataType.DATE,
   })
   expiration_date: Date;
+
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  rejected: boolean;
 
   @Column
   match: boolean;

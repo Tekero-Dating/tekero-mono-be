@@ -8,12 +8,16 @@ import {
   UsePipes,
   ValidationPipe,
   Inject,
+  Patch,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
 import { JwtReq } from '../../utils/auth.jwt.strategy';
 import { rmqSend } from '../../utils/rmq-utils.nest';
-import { LIKES_MSG_PATTERNS } from '../../contracts/likes-interface/likes.api-interface';
+import {
+  IRejectLike,
+  LIKES_MSG_PATTERNS,
+} from '../../contracts/likes-interface/likes.api-interface';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { LIKES_SERVICE_NAME } from '../../contracts/likes-interface/likes.constants';
 
@@ -83,6 +87,36 @@ export class ApiLikesController {
           return res.status(200).send({ success, result });
         } else {
           const { status, message } = TekeroError(error);
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
+        }
+      },
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('reject-like/:likeId')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
+  async rejectLike(
+    @Param('likeId') likeId: number,
+    @Req() req: JwtReq,
+    @Res() res,
+  ) {
+    const { userId } = req.user;
+    await rmqSend<IRejectLike.Request, IRejectLike.Response>(
+      this.client,
+      LIKES_MSG_PATTERNS.REJECT_LIKE,
+      { userId, likeId },
+      ({ success, error }) => {
+        if (success) {
+          return res.status(200).send({ success });
+        } else {
+          const { status, message } = error;
           return res
             .status(status)
             .send({ success, error: { status, message } });

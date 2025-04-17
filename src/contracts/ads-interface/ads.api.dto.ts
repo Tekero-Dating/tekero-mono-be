@@ -25,6 +25,15 @@ import { ApiProperty } from '@nestjs/swagger';
  * we have tons of duplicated code. TODO
  */
 
+/**
+ * TODO: another shit - class-validator sucks and eat shit!
+ * it doesn't validate nested objects
+ * (https://github.com/typestack/class-validator/issues/1375) -
+ * contributors just saying that it's not hight ptiority
+ * and they won't fix it.
+ *
+ * Why did I used these fucking DTOs then????
+ */
 export class CoordinatesDTO {
   @ApiProperty({ enum: ['Point'], example: 'Point' })
   @IsString()
@@ -32,6 +41,7 @@ export class CoordinatesDTO {
 
   @ApiProperty({ type: [Number], example: [40.7128, -74.006] })
   @IsArray()
+  @IsNumber({}, { each: true })
   coordinates: [number, number];
 }
 
@@ -133,9 +143,9 @@ export class CreateAdvDTO implements IAdvFields {
   @Type(() => AdTargetFiltersDTO)
   targetFilters: AdTargetFiltersDTO;
 
+  @ApiProperty({ type: () => CoordinatesDTO })
   @ValidateNested()
   @Type(() => CoordinatesDTO)
-  @ApiProperty({ type: CoordinatesDTO })
   location: CoordinatesDTO;
 
   @ApiProperty()
@@ -276,4 +286,16 @@ export class EditAdvDTO implements Partial<IAdvFields> {
   @IsOptional()
   @IsString()
   travelDateTo?: string;
+}
+
+export class SuitableAdvDTO {
+  @ApiProperty()
+  @ValidateNested()
+  @Type(() => AdTargetFiltersDTO)
+  filters: AdTargetFiltersDTO;
+
+  @ApiProperty({ type: () => CoordinatesDTO })
+  @Type(() => CoordinatesDTO)
+  @ValidateNested()
+  location: CoordinatesDTO;
 }

@@ -34,7 +34,7 @@ export class NotificationsController implements INotificationsController {
     } catch (e) {
       return {
         success: false,
-        error: TekeroError(e)
+        error: TekeroError(e),
       };
     }
   }
@@ -42,13 +42,16 @@ export class NotificationsController implements INotificationsController {
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.MATCH)
   async match(@Payload() payload: INMatch.Request): Promise<INMatch.Response> {
     try {
-      await this.notificationsService.notifyLikeSenderAboutMatch(payload['0'].userId, payload['0'].likeId);
+      await this.notificationsService.notifyLikeSenderAboutMatch(
+        payload['0'].userId,
+        payload['0'].likeId,
+      );
 
       return { success: true };
     } catch (error) {
       return {
         success: false,
-        error: TekeroError(error)
+        error: TekeroError(error),
       };
     }
   }

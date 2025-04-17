@@ -42,7 +42,7 @@ export interface IAdvFilters {
   ageFrom?: number;
   ageTo?: number;
   heightFrom?: number;
-  heightTo?: number;
+  heightTo?: number; // TODO: remove body-shaming filters
   constitution?: ConstitutionsEnum[];
 }
 
@@ -113,12 +113,12 @@ export namespace IGetSuitableAds {
   export interface Request {
     userId: number;
     filters: IAdvFilters;
+    location: { type: 'Point'; coordinates: [number, number] };
+    distance: number;
   }
   export interface Response {
     success: boolean;
-    result?: {
-      advertisements: Advertisement[];
-    };
+    result?: Advertisement[];
     error?:
       | Record<string, any>
       | {

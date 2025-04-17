@@ -42,7 +42,7 @@ export async function bootstrap() {
     ],
     generalRmqOpts,
   );
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
   app.use(cors());
   const config = new DocumentBuilder()

@@ -16,6 +16,8 @@ import { Chat } from '../../contracts/db/models/chat.entity';
 import { ChatUser } from '../../contracts/db/models/chat-user.entity';
 import { ChatTypesEnum } from '../../contracts/db/models/enums';
 import { Sequelize } from 'sequelize-typescript';
+import { Advertisement } from '../../contracts/db/models/advertisements.entity';
+import { User } from '../../contracts/db/models/user.entity';
 
 @Injectable()
 export class LikesService {
@@ -36,24 +38,34 @@ export class LikesService {
   ) {}
 
   async sendLike(user_id: number, advertisement_id: number) {
-    this.logger.log('Send like', { user_id, advertisement_id });
+    const context = { user_id, advertisement_id };
+    this.logger.log('Send like', context);
     const advertisement = await this.adsRepository.findOne({
       where: { id: advertisement_id },
     });
 
     if (!advertisement) {
-      this.logger.error('Send like: advertisement does not exist', {
-        user_id,
-        advertisement_id,
-      });
+      this.logger.error('Send like: advertisement does not exist', context);
       throw new NotFoundException('Advertisement does not exist');
     }
     if (advertisement.user_id === user_id) {
-      this.logger.error('Send like: user trying to like his own ad', {
-        user_id,
-        advertisement_id,
-      });
+      this.logger.error('Send like: user trying to like his own ad', context);
       throw new BadRequestException('User can not like its own advertisement');
+    }
+
+    const previousLike = await this.likeRepository.findOne({
+      where: {
+        rejected: true,
+        updatedAt: { [Op.gt]: new Date(Date.now() - 12 * 60 * 60 * 1000) },
+      },
+    });
+
+    if (previousLike) {
+      this.logger.error(
+        'Send like: like has been rejected less than 12 hours ago',
+        context,
+      );
+      throw new BadRequestException('User can not like this advertisement');
     }
 
     const userStats = await this.userStatsRepository.findOne<UserStats>({
@@ -85,15 +97,19 @@ export class LikesService {
 
     const transaction = await this.sequelizeInstance.transaction();
     try {
-      const updatedStats: [number, UserStats[]?] = await this.userStatsRepository.update<UserStats>({
-        available_likes: userStats!.available_likes - 1,
-      }, {
-        where: {
-          user_id,
-        },
-        returning: true,
-        transaction,
-      });
+      const updatedStats: [number, UserStats[]?] =
+        await this.userStatsRepository.update<UserStats>(
+          {
+            available_likes: userStats!.available_likes - 1,
+          },
+          {
+            where: {
+              user_id,
+            },
+            returning: true,
+            transaction,
+          },
+        );
       const stats = updatedStats[1]?.[0];
       const like = await this.likeRepository.create(
         {
@@ -154,7 +170,7 @@ export class LikesService {
           },
           {
             where: { user_id },
-            returning: true
+            returning: true,
           },
         );
       }
@@ -162,6 +178,77 @@ export class LikesService {
     } catch (e) {
       this.logger.error('Dismiss like', { user_id, advertisement_id, e });
       throw new InternalServerErrorException('Can not dismiss like.');
+    }
+  }
+
+  async rejectLike(userId: number, likeId: number): Promise<void> {
+    const context = { userId, likeId };
+    this.logger.log('Reject like', context);
+    const like = await this.likeRepository.findByPk(likeId, {
+      include: [
+        {
+          model: Advertisement,
+          as: 'advertisement',
+          attributes: ['user_id'],
+        },
+      ],
+    });
+    if (!like) {
+      this.logger.error('Reject like: like not found', context);
+      throw new NotFoundException('Like not found');
+    }
+
+    const adAuthorId = like.advertisement.user_id;
+    if (userId !== adAuthorId) {
+      this.logger.error('Reject like: userId not matched with ad author', {});
+      throw new BadRequestException('Current user can not reject this like');
+    }
+
+    const transaction = await this.sequelizeInstance.transaction();
+    try {
+      // update userStats of liker
+      const updatedLike: [number, Like[]?] = await this.likeRepository.update(
+        { rejected: true },
+        { where: { id: likeId }, returning: true, transaction },
+      );
+      this.logger.log('Reject like: like update', context);
+
+      if (updatedLike[1]?.length === 0) {
+        this.logger.error('Rejected like: can not update like', context);
+        throw new InternalServerErrorException(
+          'Something went wrong during like update',
+        );
+      }
+      this.logger.log('Reject like: like update success', context);
+
+      const oldUserStats = await this.userStatsRepository.findOne({
+        where: {
+          user_id: like.advertisement.user_id,
+        },
+      });
+      this.logger.log('Reject like: got old userStats', context);
+      const updatedUserStats: [number, UserStats[]?] =
+        await this.userStatsRepository.update(
+          {
+            available_likes:
+              oldUserStats?.available_likes &&
+              oldUserStats?.available_likes < 10
+                ? oldUserStats?.available_likes + 1
+                : oldUserStats?.available_likes,
+          },
+          { where: { user_id: like.user_id }, returning: true, transaction },
+        );
+      this.logger.log('Reject like: user stats update', context);
+      if (updatedUserStats[1]?.length === 0) {
+        this.logger.error('Reject like: user stats not updated', context);
+        throw new InternalServerErrorException('user stats are not updated');
+      }
+      await transaction.commit();
+      this.logger.log('Reject like: like reject success', context);
+    } catch (error) {
+      await transaction.rollback();
+      this.logger.error('Reject like error', error);
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
@@ -177,7 +264,7 @@ export class LikesService {
     }
 
     try {
-      const like: [number, Like[]?]  = await this.likeRepository.update(
+      const like: [number, Like[]?] = await this.likeRepository.update(
         {
           match: true,
         },
@@ -233,26 +320,28 @@ export class LikesService {
         throw new NotFoundException('User stats for matched users not found');
       }
 
-      const newAuthorStats: [number, UserStats[]?] = await this.userStatsRepository.update(
-        {
-          active_chats: authorUserStats!.active_chats + 1,
-        },
-        {
-          where: { id: authorUserStats!.id },
-          returning: true,
-          transaction,
-        },
-      );
-      const newLikerStats: [number, UserStats[]?] = await this.userStatsRepository.update(
-        {
-          active_chats: likeSenderUserStats!.active_chats + 1,
-        },
-        {
-          where: { id: likeSenderUserStats!.id },
-          returning: true,
-          transaction,
-        },
-      );
+      const newAuthorStats: [number, UserStats[]?] =
+        await this.userStatsRepository.update(
+          {
+            active_chats: authorUserStats!.active_chats + 1,
+          },
+          {
+            where: { id: authorUserStats!.id },
+            returning: true,
+            transaction,
+          },
+        );
+      const newLikerStats: [number, UserStats[]?] =
+        await this.userStatsRepository.update(
+          {
+            active_chats: likeSenderUserStats!.active_chats + 1,
+          },
+          {
+            where: { id: likeSenderUserStats!.id },
+            returning: true,
+            transaction,
+          },
+        );
       this.logger.log('Match: Stats are updated', { userId, likeId });
       await transaction.commit();
       return {
@@ -300,7 +389,7 @@ export class LikesService {
       },
       {
         where: { id: userId },
-        returning:  true
+        returning: true,
       },
     );
   }
