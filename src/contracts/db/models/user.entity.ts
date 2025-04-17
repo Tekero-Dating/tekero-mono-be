@@ -13,7 +13,10 @@ import {
 import { Media } from './mdeia.entity';
 import { UserProfile } from './user-profile.entity';
 
-@Table({ modelName: 'user' })
+@Table({
+  modelName: 'user',
+  indexes: [{ fields: ['dob'] }, { using: 'GIST', fields: ['location'] }],
+})
 export class User extends Model {
   @Length({ min: 2 })
   @AllowNull(false)
@@ -56,6 +59,11 @@ export class User extends Model {
     type: DataType.GEOGRAPHY('POINT', 4326),
   })
   location: { type: 'Point'; coordinates: [number, number] };
+
+  get age(): number {
+    const diff = Date.now() - new Date(this.dob).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+  }
 }
 
 export const UserRepository = {

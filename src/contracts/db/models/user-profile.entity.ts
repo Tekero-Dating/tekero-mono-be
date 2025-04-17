@@ -13,7 +13,23 @@ import {
 import { User } from './user.entity';
 import { ConstitutionsEnum, GendersEnum } from './enums';
 
-@Table({ modelName: 'user-profile' })
+@Table({
+  modelName: 'user-profile',
+  indexes: [
+    { fields: ['user_id'] },
+    {
+      name: 'user_profile_full_filter_idx',
+      fields: [
+        'user_id',
+        'constitution',
+        'sex',
+        'height',
+        'weight',
+        'gender_expression',
+      ],
+    },
+  ],
+})
 export class UserProfile extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)

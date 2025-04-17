@@ -13,6 +13,7 @@ import {
   IArchiveAdv,
   ICreateAdv,
   IEditAdv,
+  IGetSuitableAds,
   IPublishAdv,
 } from '../../contracts/ads-interface/ads.api-interface';
 import { ADS_SERVICE_NAME } from '../../contracts/ads-interface/ads.constants';
@@ -127,7 +128,20 @@ export class AdsController implements IAdsController {
   }
 
   @MessagePattern(ADS_MSG_PATTERNS.SUIT_ADS)
-  async getSuitableAdvertisements(@Payload() data, @Ctx() context) {
-    return { success: true };
+  async getSuitableAdvertisements(
+    @Payload() payload: IGetSuitableAds.Request,
+    @Ctx() context,
+  ) {
+    const { userId, filters, location } = payload;
+    try {
+      const ads = await this.addService.getSuitableAds(
+        userId,
+        filters,
+        location,
+      );
+      return { success: true, result: ads };
+    } catch (error) {
+      return { success: false, error: TekeroError(error) };
+    }
   }
 }

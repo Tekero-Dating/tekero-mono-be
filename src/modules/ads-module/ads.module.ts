@@ -12,6 +12,7 @@ import { AdvertisementMediaRepository } from '../../contracts/db/models/junction
 import { MediaRepository } from '../../contracts/db/models/mdeia.entity';
 import { getDbModule } from '../../utils/db-utils.nest';
 import { dbOpts } from '../../config/config';
+import { UserProfileRepository } from '../../contracts/db/models/user-profile.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { dbOpts } from '../../config/config';
     MediaRepository,
     AdvertisementsRepository,
     AdvertisementMediaRepository,
+    UserProfileRepository,
   ],
 })
 export class AdsModule {}

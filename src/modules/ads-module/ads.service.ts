@@ -9,6 +9,7 @@ import {
 import { MODELS_REPOSITORIES_ENUM } from '../../contracts/db/models/models.enum';
 import { Advertisement } from '../../contracts/db/models/advertisements.entity';
 import {
+  IAdvFilters,
   ICreateAdv,
   IEditAdv,
 } from '../../contracts/ads-interface/ads.api-interface';
@@ -16,12 +17,23 @@ import { AdStatusesEnum } from '../../contracts/db/models/enums/ad-statuses.enum
 import { AdTypesEnum } from '../../contracts/db/models/enums/ad-types.enum';
 import { AdvertisementMedia } from '../../contracts/db/models/junctions/advertisement-media.entity';
 import { Media } from '../../contracts/db/models/mdeia.entity';
-import { Op } from 'sequelize';
+import { literal, Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import {
+  UserProfile,
+  UserProfileRepository,
+} from '../../contracts/db/models/user-profile.entity';
+import { User } from '../../contracts/db/models/user.entity';
+import {
+  ConstitutionsEnum,
+  GendersEnum,
+} from '../../contracts/db/models/enums';
+import { makeTuple } from '../../utils/make-tuple';
 
 @Injectable()
 export class AdsService {
   private readonly logger = new Logger(AdsService.name);
+
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS)
     private advRepository: typeof Advertisement,
@@ -29,6 +41,8 @@ export class AdsService {
     private mediaRepository: typeof Media,
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS_MEDIA)
     private advMediaRepository: typeof AdvertisementMedia,
+    @Inject(MODELS_REPOSITORIES_ENUM.USER_PROFILE)
+    private userProfileRepository: typeof UserProfile,
     @Inject('SEQUELIZE')
     private readonly sequelizeInstance: Sequelize,
   ) {}
@@ -239,5 +253,181 @@ export class AdsService {
       this.logger.error('archiveAdv', { error, userId, advId });
       throw new InternalServerErrorException('Can not archive advertisement');
     }
+  }
+
+  async getSuitableAds(
+    userId: number,
+    filters: IAdvFilters,
+    location: { type: 'Point'; coordinates: [number, number] },
+  ): Promise<Advertisement[]> {
+    const context = { userId, filters };
+    this.logger.log('getSuitableAds', context);
+    const distanceInMeters = filters.distance || 20000; // TODO: make default distance configurable;
+    const {
+      coordinates: [lon, lat],
+    } = location;
+
+    const {
+      gender,
+      genderExpressionFrom,
+      genderExpressionTo,
+      ageFrom,
+      ageTo,
+      heightFrom,
+      heightTo,
+      constitution,
+    } = filters;
+
+    const genderFilter = gender ? `AND up.sex IN ${makeTuple(gender)}` : '';
+    const constitutionFilter = constitution
+      ? `AND up.constitution IN ${makeTuple(constitution)}`
+      : '';
+    const genderExpressionFilter =
+      genderExpressionFrom && genderExpressionTo
+        ? `AND up.gender_expression BETWEEN ${genderExpressionFrom}  AND ${genderExpressionTo}`
+        : '';
+    const heightFilter =
+      heightFrom && heightTo
+        ? `AND up.height BETWEEN ${heightFrom} AND ${heightTo}`
+        : '';
+    const ageFilter =
+      ageFrom != null && ageTo != null
+        ? `AND date_part('year', age(current_date, u.dob)) BETWEEN ${ageFrom} AND ${ageTo}`
+        : '';
+    this.logger.log('getSuitableAds: filters prepared', context);
+
+    const explorerUserProfile = await this.userProfileRepository.findOne({
+      where: { id: userId },
+      include: [
+        {
+          model: User,
+          as: 'profile_owner',
+          attributes: ['dob'],
+          required: true,
+        },
+      ],
+    });
+    this.logger.log('getSuitableAds: got explorerUserProfile', context);
+
+    if (!explorerUserProfile) {
+      this.logger.error('getSuitableAds: not found user', context);
+      throw new NotFoundException('User not found');
+    }
+
+    const suitableAds: Advertisement[] = [];
+    const pageSize = 10;
+    let lastId = 0;
+    let adsBatch: Advertisement[];
+    this.logger.log('getSuitableAds: loop batch by batch', context);
+    do {
+      adsBatch = await this.advRepository.findAll({
+        where: {
+          [Op.and]: [
+            literal(`
+        ST_DWithin(
+          "advertisement"."location",
+          ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326),
+          ${distanceInMeters}
+        )
+      `),
+            { id: { [Op.gt]: lastId } },
+            { user_id: { [Op.not]: userId } },
+            literal(`
+        EXISTS (
+          SELECT *
+          FROM "user-profiles" AS up
+          JOIN "users" AS u ON u.id = up.user_id
+          WHERE up.user_id = "advertisement"."user_id"
+            ${heightFilter}
+            ${genderExpressionFilter}
+            ${constitutionFilter}
+            ${genderFilter}
+            ${ageFilter}
+        )
+      `),
+          ],
+        },
+        limit: pageSize,
+        order: [['id', 'ASC']],
+      });
+
+      for (const ad of adsBatch) {
+        const { filter: mutualFilter } = ad;
+        const suitable = this.matchesMutualFilters(
+          explorerUserProfile,
+          mutualFilter,
+        );
+
+        if (suitable) {
+          suitableAds.push(ad);
+        }
+      }
+      if (adsBatch.length > 0) {
+        lastId = adsBatch[adsBatch.length - 1].id;
+      }
+    } while (adsBatch.length === pageSize);
+    this.logger.log('getSuitableAds: found advertisements', context);
+
+    if (!suitableAds.length) {
+      this.logger.error('getSuitableAds: not found ads', context);
+      throw new NotFoundException('Advertisements are not found.');
+    }
+    this.logger.log(
+      'getSuitableAds: found mutually matched advertisements',
+      context,
+    );
+    return suitableAds;
+  }
+
+  private matchesMutualFilters(
+    profile: UserProfile & { profile_owner: { age: number } },
+    filter: {
+      gender?: GendersEnum[];
+      ageFrom?: number;
+      ageTo?: number;
+      heightFrom?: number;
+      heightTo?: number;
+      constitution?: ConstitutionsEnum[];
+      genderExpressionFrom?: number;
+      genderExpressionTo?: number;
+    },
+  ): boolean {
+    if (Array.isArray(filter.gender) && filter.gender.length > 0) {
+      if (!filter.gender.includes(profile.sex!)) {
+        return false;
+      }
+    }
+
+    if (!!filter.ageFrom && !!filter.ageTo) {
+      const age = profile.profile_owner.age;
+      if (age < filter.ageFrom || age > filter.ageTo) {
+        return false;
+      }
+    }
+
+    if (!!filter.heightFrom && !!filter.heightTo) {
+      const h = profile.height!;
+      if (h < filter.heightFrom || h > filter.heightTo) {
+        return false;
+      }
+    }
+
+    if (Array.isArray(filter.constitution) && filter.constitution.length > 0) {
+      if (!filter.constitution.includes(profile.constitution!)) {
+        return false;
+      }
+    }
+
+    if (!!filter.genderExpressionFrom && !!filter.genderExpressionTo) {
+      const expr = profile.gender_expression!;
+      if (
+        expr < filter.genderExpressionFrom ||
+        expr > filter.genderExpressionTo
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

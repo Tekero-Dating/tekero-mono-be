@@ -6,6 +6,7 @@ import { Chat } from '../db/models/chat.entity';
 export const LIKES_MSG_PATTERNS = {
   SEND_LIKE: 'SEND_LIKE',
   DISMISS_LIKE: 'DISMISS_LIKE',
+  REJECT_LIKE: 'REJECT_LIKE',
   MATCH: 'MATCH',
 };
 
@@ -40,6 +41,22 @@ export namespace IUnlikeAd {
       like: Like;
       user_stats: UserStats;
     };
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
+
+export namespace IRejectLike {
+  export interface Request {
+    userId: number;
+    likeId: number;
+  }
+  export interface Response {
+    success: boolean;
     error?:
       | Record<string, any>
       | {
@@ -86,6 +103,15 @@ export interface ILikesController {
     payload: IUnlikeAd.Request,
     context: RmqContext,
   ) => Promise<IUnlikeAd.Response>;
+
+  /**
+   * Reject like, make refund to user
+   * who sent a like
+   */
+  rejectLike: (
+    payload: IRejectLike.Request,
+    context: RmqContext,
+  ) => Promise<IRejectLike.Response>;
 
   /**
    * Make a match with the user who liked.

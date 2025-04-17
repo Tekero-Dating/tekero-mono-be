@@ -24,7 +24,7 @@ export const getDbProviders = (dbConfigs: IDbModuleParams[], sync = false) => {
         (await sequelize
           .sync
           // Uncomment if you need to clean up and initialize all DB models from scratch
-          // { force: true }
+          // { force: true, alter: true },
           ());
 
       return sequelize;
@@ -37,6 +37,7 @@ export const getDbModule = (
   sync = false,
 ) => {
   const providers = getDbProviders(dbModuleParams, sync);
+
   @Module({
     providers: providers,
     exports: providers,

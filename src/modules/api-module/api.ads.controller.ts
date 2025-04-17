@@ -17,8 +17,10 @@ import {
 import { ADS_SERVICE_NAME } from '../../contracts/ads-interface/ads.constants';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  CoordinatesDTO,
   CreateAdvDTO,
   EditAdvDTO,
+  SuitableAdvDTO,
 } from '../../contracts/ads-interface/ads.api.dto';
 import { TekeroError } from '../../utils/error-handling-utils';
 import { rmqSend } from '../../utils/rmq-utils.nest';
@@ -58,6 +60,10 @@ export class ApiAdsController {
     @Request() req: JwtReq,
     @Res() res,
   ) {
+    console.log(
+      'Is CoordinatesDTO:',
+      payload.location instanceof CoordinatesDTO,
+    );
     const { userId } = req.user;
     if (!Object.keys(payload).length) {
       const { status, message } = TekeroError(
@@ -186,10 +192,36 @@ export class ApiAdsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
   @Get('suitable-advertisements')
   async getSuitableAdvertisements(
-    @Body() payload,
+    @Body() payload: SuitableAdvDTO,
     @Request() req: JwtReq,
     @Res() res,
-  ) {}
+  ) {
+    const { userId } = req.user;
+    await rmqSend(
+      this.client,
+      ADS_MSG_PATTERNS.SUIT_ADS,
+      {
+        userId,
+        filters: payload.filters,
+        location: payload.location,
+      },
+      ({ success, result, error }) => {
+        if (success) {
+          return res.status(200).send({ success, result });
+        } else {
+          const { status, message } = TekeroError(error);
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
+        }
+      },
+    );
+  }
 }

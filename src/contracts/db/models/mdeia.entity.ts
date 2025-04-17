@@ -14,7 +14,7 @@ import { Advertisement } from './advertisements.entity';
 import { AdvertisementMedia } from './junctions/advertisement-media.entity';
 import { MediaTypesEnum } from './enums/media-types.enum';
 
-@Table({ modelName: 'media' })
+@Table({ modelName: 'media', indexes: [{ fields: ['user_id'] }] })
 export class Media extends Model {
   @Column
   private: boolean;

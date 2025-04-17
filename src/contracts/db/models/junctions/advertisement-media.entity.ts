@@ -1,9 +1,11 @@
 import { Table, Column, Model, ForeignKey } from 'sequelize-typescript';
 import { Advertisement } from '../advertisements.entity';
 import { Media } from '../mdeia.entity';
-import { ActionsList } from '../actions-list.entity';
 
-@Table({ modelName: 'advertisement-media' })
+@Table({
+  modelName: 'advertisement-media',
+  indexes: [{ fields: ['advertisementId'] }, { fields: ['mediaId'] }],
+})
 export class AdvertisementMedia extends Model {
   @ForeignKey(() => Advertisement)
   @Column
