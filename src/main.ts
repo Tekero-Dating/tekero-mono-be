@@ -16,7 +16,7 @@ import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as crypto from 'crypto';
 
-// global.crypto = crypto; // TODO nest/schedule of version 5 sucks very hard
+global.crypto = crypto; // TODO nest/schedule of version 5 sucks very hard
 export {
   // @ts-ignore
   bootstrap,
@@ -57,7 +57,11 @@ export async function bootstrap() {
 
   await app.startAllMicroservices();
   console.log('bootstrap', new Date().toISOString(), process.pid, __filename);
-  await app.listen(+APP_PORT!);
+  await app.listen(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    +process.env.APP_PORT! || 3000,
+    process.env.APP_HOST || 'localhost',
+  );
   return app;
   // const api = app.get(QuestionnaireController);
   // await api.getQuestionnaire({ userId: 6 }, RmqContext as unknown as RmqContext);

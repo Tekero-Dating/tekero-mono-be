@@ -17,6 +17,12 @@ export const getDbProviders = (dbConfigs: IDbModuleParams[], sync = false) => {
     useFactory: async () => {
       const sequelize = new Sequelize({
         dialect: config.driver,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        },
         ...config,
       });
       sequelize.addModels(config.models);

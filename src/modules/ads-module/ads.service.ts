@@ -419,10 +419,10 @@ export class AdsService {
     }
 
     if (!!filter.genderExpressionFrom && !!filter.genderExpressionTo) {
-      const expr = profile.gender_expression!;
+      const genderExpression = profile.gender_expression!;
       if (
-        expr < filter.genderExpressionFrom ||
-        expr > filter.genderExpressionTo
+        genderExpression < filter.genderExpressionFrom ||
+        genderExpression > filter.genderExpressionTo
       ) {
         return false;
       }

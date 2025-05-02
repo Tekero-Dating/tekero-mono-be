@@ -5,11 +5,11 @@ import { AdvertisementMedia } from '../src/contracts/db/models/junctions/adverti
 import { AdStatusesEnum } from '../src/contracts/db/models/enums/ad-statuses.enum';
 import { JwtAuthGuard } from '../src/utils/jwt.auth-guard';
 import { AdsController } from '../src/modules/ads-module/ads.controller';
-import { AdTypesEnum } from '../src/contracts/db/models/enums/ad-types.enum';
-import { ConstitutionsEnum, GendersEnum, OpenersEnum } from '../src/contracts/db/models/enums';
+import { GendersEnum } from '../src/contracts/db/models/enums';
 import { mockUserAdvRequest } from './mocks/advertisement.mock';
 
-jest.spyOn(JwtAuthGuard.prototype, 'canActivate')
+jest
+  .spyOn(JwtAuthGuard.prototype, 'canActivate')
   .mockImplementation(() => true);
 
 describe('Advertisements module tests', () => {
@@ -29,10 +29,10 @@ describe('Advertisements module tests', () => {
     it('Confirm that usual adv can be created successfully', async () => {
       const advertisement = await adsController.createAdv(
         { fields: mockUserAdvRequest, userId: 2 },
-        null as any
+        null as any,
       );
-        const createdAdv = await Advertisement.findByPk(advertisement.result!.id);
-        expect(createdAdv).toBeTruthy();
+      const createdAdv = await Advertisement.findByPk(advertisement.result!.id);
+      expect(createdAdv).toBeTruthy();
     });
 
     it('Confirm that created adv can contain only photos that are belonged to user who creates the adv', async () => {
@@ -40,17 +40,17 @@ describe('Advertisements module tests', () => {
         {
           fields: {
             ...mockUserAdvRequest,
-              photos: [3, 4, 5]
+            photos: [1, 2, 3],
           },
-          userId: 1
+          userId: 1,
         },
-        null as any
+        null as any,
       );
       newAdvId = advertisement.result!.id;
       const advMedias = await AdvertisementMedia.findAll({
         where: {
-          advertisementId: newAdvId
-        }
+          advertisementId: newAdvId,
+        },
       });
 
       // TODO: fix advmedia
@@ -64,20 +64,20 @@ describe('Advertisements module tests', () => {
         {
           fields: {
             ...mockUserAdvRequest,
-            photos: [2, 3]
+            photos: [3, 4],
           },
-          userId: 2
+          userId: 2,
         },
-        null as any
+        null as any,
       );
       const newAdvId = advertisement.result!.id;
       const advMedias = await AdvertisementMedia.findAll({
         where: {
-          advertisementId: newAdvId
-        }
+          advertisementId: newAdvId,
+        },
       });
 
-      const privateMedia = advMedias.find(({ mediaId }) => mediaId === 2);
+      const privateMedia = advMedias.find(({ mediaId }) => mediaId === 4);
       expect(advMedias.length).toBe(1);
       expect(privateMedia).toBeUndefined();
     });
@@ -85,7 +85,7 @@ describe('Advertisements module tests', () => {
     it('User can edit any field of his advertisement', async () => {
       const advertisement = await adsController.createAdv(
         { fields: mockUserAdvRequest, userId: 2 },
-        null as any
+        null as any,
       );
 
       const createdAdv = await Advertisement.findByPk(advertisement.result!.id);
@@ -94,47 +94,50 @@ describe('Advertisements module tests', () => {
         {
           fields: {
             targetFilters: {
-              gender: [GendersEnum.TRANS_FEMALE, GendersEnum.FEMALE]
-            }
+              gender: [GendersEnum.TRANS_FEMALE, GendersEnum.FEMALE],
+            },
           },
           userId: 2,
-          advId: createdAdv!.id
+          advId: createdAdv!.id,
         },
-        null as any
+        null as any,
       );
 
       const editedAdv = await Advertisement.findByPk(createdAdv!.id);
 
-      expect(await adsController.editAdv(
-        {
-          fields: {
-            targetFilters: {
-              ageFrom: 26
-            }
+      expect(
+        await adsController.editAdv(
+          {
+            fields: {
+              targetFilters: {
+                ageFrom: 26,
+              },
+            },
+            userId: 2,
+            advId: createdAdv!.id,
           },
-          userId: 2,
-          advId: createdAdv!.id
-        },
-        null as any
-      )).toHaveProperty('error');
+          null as any,
+        ),
+      ).toHaveProperty('error');
       expect(createdAdv!.filter.gender[0]).toBe('TRANS_FEMALE');
       expect(editedAdv!.filter.gender[0]).toBe('TRANS_FEMALE');
       expect(editedAdv!.filter.gender[1]).toBe('FEMALE');
     });
   });
 
-
   describe('User can activate and de activate his advertisement', () => {
-    it ('activate', async () => {
+    it('activate', async () => {
       const advertisement = await adsController.createAdv(
         { fields: mockUserAdvRequest, userId: 2 },
-        null as any
+        null as any,
       );
       await adsController.publishAdv(
         { advId: advertisement.result!.id, userId: 2 },
-        null as any
+        null as any,
       );
-      const publishedAdv = await Advertisement.findByPk(advertisement.result!.id);
+      const publishedAdv = await Advertisement.findByPk(
+        advertisement.result!.id,
+      );
 
       expect(publishedAdv!.active).toBe(true);
       expect(publishedAdv!.status).toBe(AdStatusesEnum.ACTIVE);
@@ -144,15 +147,17 @@ describe('Advertisements module tests', () => {
     it('deactivate', async () => {
       const advertisement = await adsController.createAdv(
         { fields: mockUserAdvRequest, userId: 2 },
-        null as any
+        null as any,
       );
 
       await adsController.archiveAdv(
         { advId: advertisement.result!.id, userId: 2 },
-        null as any
+        null as any,
       );
 
-      const publishedAdv = await Advertisement.findByPk(advertisement.result!.id);
+      const publishedAdv = await Advertisement.findByPk(
+        advertisement.result!.id,
+      );
 
       expect(publishedAdv!.active).toBe(false);
       expect(publishedAdv!.status).toBe(AdStatusesEnum.ARCHIVED);
