@@ -34,7 +34,7 @@ jobs:
 
             - name: Build Docker image
               run: |
-                  docker build --platform=linux/amd64 -f Dockerfile.production -t $IMAGE_NAME ..
+                  docker build --platform=linux/amd64 -f ../Dockerfile.production -t $IMAGE_NAME ..
 
             - name: Tag & Push Docker image
               run: |
