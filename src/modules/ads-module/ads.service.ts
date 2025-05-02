@@ -17,7 +17,7 @@ import { AdStatusesEnum } from '../../contracts/db/models/enums/ad-statuses.enum
 import { AdTypesEnum } from '../../contracts/db/models/enums/ad-types.enum';
 import { AdvertisementMedia } from '../../contracts/db/models/junctions/advertisement-media.entity';
 import { Media } from '../../contracts/db/models/mdeia.entity';
-import { literal, Op } from 'sequelize';
+import { col, literal, Op, QueryTypes, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import {
   UserProfile,
@@ -262,7 +262,8 @@ export class AdsService {
   ): Promise<Advertisement[]> {
     const context = { userId, filters };
     this.logger.log('getSuitableAds', context);
-    const distanceInMeters = filters.distance || 20000; // TODO: make default distance configurable;
+
+    const distanceInMeters = filters.distance || 20000;
     const {
       coordinates: [lon, lat],
     } = location;
@@ -278,24 +279,30 @@ export class AdsService {
       constitution,
     } = filters;
 
-    const genderFilter = gender ? `AND up.sex IN ${makeTuple(gender)}` : '';
-    const constitutionFilter = constitution
-      ? `AND up.constitution IN ${makeTuple(constitution)}`
-      : '';
-    const genderExpressionFilter =
-      genderExpressionFrom && genderExpressionTo
-        ? `AND up.gender_expression BETWEEN ${genderExpressionFrom}  AND ${genderExpressionTo}`
+    const genderClause =
+      gender && gender.length ? `AND up.sex IN ${makeTuple(gender)}` : '';
+    const genderExprClause =
+      genderExpressionFrom != null && genderExpressionTo != null
+        ? `AND up.gender_expression BETWEEN ${genderExpressionFrom} AND ${genderExpressionTo}`
         : '';
-    const heightFilter =
-      heightFrom && heightTo
+    const heightClause =
+      heightFrom != null && heightTo != null
         ? `AND up.height BETWEEN ${heightFrom} AND ${heightTo}`
         : '';
-    const ageFilter =
-      ageFrom != null && ageTo != null
-        ? `AND date_part('year', age(current_date, u.dob)) BETWEEN ${ageFrom} AND ${ageTo}`
+    const constitutionClause =
+      constitution && constitution.length
+        ? `AND up.constitution IN ${makeTuple(constitution)}`
         : '';
+    const ageClause =
+      ageFrom != null && ageTo != null
+        ? `AND u.dob BETWEEN
+           (current_date - INTERVAL '${ageTo} years')
+         AND (current_date - INTERVAL '${ageFrom} years')`
+        : '';
+
     this.logger.log('getSuitableAds: filters prepared', context);
 
+    // fetch the explorer's own profile for the mutual-filter pass
     const explorerUserProfile = await this.userProfileRepository.findOne({
       where: { id: userId },
       include: [
@@ -308,70 +315,98 @@ export class AdsService {
       ],
     });
     this.logger.log('getSuitableAds: got explorerUserProfile', context);
-
     if (!explorerUserProfile) {
       this.logger.error('getSuitableAds: not found user', context);
       throw new NotFoundException('User not found');
     }
 
+    const sequelize = this.advRepository.sequelize;
+    const adTable = Advertisement.getTableName();
+    const profileTable = UserProfile.getTableName();
+    const userTable = User.getTableName();
+
     const suitableAds: Advertisement[] = [];
     const pageSize = 10;
     let lastId = 0;
-    let adsBatch: Advertisement[];
+    let adsBatch: any[];
+
     this.logger.log('getSuitableAds: loop batch by batch', context);
     do {
-      adsBatch = await this.advRepository.findAll({
-        where: {
-          [Op.and]: [
-            literal(`
-        ST_DWithin(
-          "advertisement"."location",
-          ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326),
-          ${distanceInMeters}
-        )
-      `),
-            { id: { [Op.gt]: lastId } },
-            { user_id: { [Op.not]: userId } },
-            literal(`
-        EXISTS (
-          SELECT *
-          FROM "user-profiles" AS up
-          JOIN "users" AS u ON u.id = up.user_id
-          WHERE up.user_id = "advertisement"."user_id"
-            ${heightFilter}
-            ${genderExpressionFilter}
-            ${constitutionFilter}
-            ${genderFilter}
-            ${ageFilter}
-        )
-      `),
-          ],
+      const sql = `
+        SELECT
+          a.*,
+          u."firstName"                AS "firstName",
+          u."lastName"                 AS "lastName",
+          date_part('year', age(current_date, u.dob)) AS age,
+          up.height                    AS height,
+          up.weight                    AS weight,
+          up.sex                       AS gender,
+          up.orientation               AS orientation,
+          up.constitution              AS constitution,
+--         up.languages                 AS languages, // TODO: add languages
+          up.gender_expression         AS gender_expression,
+          (
+            SELECT array_agg(am."mediaId")
+            FROM "advertisement-media" AS am
+            WHERE am."advertisementId" = a.id
+          ) AS advertisement_media
+        FROM "${adTable}" AS a
+
+               JOIN "${profileTable}" AS up
+                    ON up.user_id = a.user_id
+          ${heightClause}
+          ${genderExprClause}
+          ${constitutionClause}
+          ${genderClause}
+
+          JOIN "${userTable}" AS u
+        ON u.id = a.user_id
+          ${ageClause}
+
+        WHERE
+          ST_DWithin(
+          a.location,
+          ST_SetSRID(ST_MakePoint(:lon, :lat), 4326),
+          :distanceInMeters
+          )
+          AND a.id      > :lastId
+          AND a.user_id <> :userId
+
+        ORDER BY a.id ASC
+          LIMIT :pageSize;
+      `;
+
+      adsBatch = await sequelize!.query(sql, {
+        replacements: {
+          lon,
+          lat,
+          distanceInMeters,
+          lastId,
+          userId,
+          pageSize,
         },
-        limit: pageSize,
-        order: [['id', 'ASC']],
+        type: QueryTypes.SELECT,
+        raw: true,
+        nest: true,
       });
 
-      for (const ad of adsBatch) {
-        const { filter: mutualFilter } = ad;
-        const suitable = this.matchesMutualFilters(
-          explorerUserProfile,
-          mutualFilter,
-        );
-
-        if (suitable) {
-          suitableAds.push(ad);
+      for (const row of adsBatch) {
+        if (this.matchesMutualFilters(explorerUserProfile, row.filter)) {
+          suitableAds.push(row as Advertisement);
         }
       }
+
       if (adsBatch.length > 0) {
         lastId = adsBatch[adsBatch.length - 1].id;
       }
     } while (adsBatch.length === pageSize);
-    this.logger.log('getSuitableAds: found advertisements', context);
 
+    this.logger.log('getSuitableAds: found advertisements', context);
     if (!suitableAds.length) {
       this.logger.error('getSuitableAds: not found ads', context);
       throw new NotFoundException('Advertisements are not found.');
     }
+
     this.logger.log(
       'getSuitableAds: found mutually matched advertisements',
       context,
