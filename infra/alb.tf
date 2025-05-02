@@ -134,7 +134,7 @@ resource "aws_lb_target_group" "rabbitmq" {
 # Tekero API TG
 resource "aws_lb_target_group" "tekero_api" {
   name        = "${var.project}-${var.environment}-tg-api"
-  port        = 3000
+  port        = 3001
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = module.vpc.vpc_id
