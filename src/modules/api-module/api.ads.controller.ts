@@ -197,7 +197,7 @@ export class ApiAdsController {
       transform: true,
     }),
   )
-  @Get('suitable-advertisements')
+  @Post('suitable-advertisements')
   async getSuitableAdvertisements(
     @Body() payload: SuitableAdvDTO,
     @Request() req: JwtReq,

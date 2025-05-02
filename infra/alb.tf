@@ -15,6 +15,7 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     description = "Prometheus UI"
     from_port   = 9090
@@ -22,6 +23,7 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     description = "RabbitMQ Management UI"
     from_port   = 15672
@@ -29,10 +31,19 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
-    description = "Tekero API"
+    description = "Tekero API (old direct port)"
     from_port   = 3001
     to_port     = 3001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Tekero API (via ALB port 80)"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -50,6 +61,7 @@ resource "aws_security_group" "alb_sg" {
     Project     = var.project
   }
 }
+
 
 # 7.2. ALB
 resource "aws_lb" "alb" {
