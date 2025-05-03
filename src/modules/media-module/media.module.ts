@@ -11,6 +11,8 @@ import {
   MEDIA_SERVICE_NAME,
 } from '../../contracts/media-interface/media.constants';
 import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.entity';
+import { MessageRepository } from '../../contracts/db/models/message.entity';
+import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { MediaAccessRepository } from '../../contracts/db/models/mdeia-access.en
     MediaRepository,
     UserRepository,
     MediaAccessRepository,
+    MessageRepository,
+    ChatUserRepository,
   ],
 })
 export class MediaModule {}

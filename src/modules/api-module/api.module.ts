@@ -42,6 +42,8 @@ import {
   USERS_SERVICE_NAME,
 } from '../../contracts/users-interface/users.constants';
 import { ApiUsersController } from './api.users.controller';
+import { MessageRepository } from '../../contracts/db/models/message.entity';
+import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
 
 @Module({
   imports: [
@@ -89,6 +91,8 @@ import { ApiUsersController } from './api.users.controller';
     UserRepository,
     MediaRepository,
     MediaAccessRepository,
+    MessageRepository,
+    ChatUserRepository,
   ],
 })
 export class ApiModule {}

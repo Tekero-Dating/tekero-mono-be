@@ -74,3 +74,10 @@ jobs:
 
             - name: Terraform Apply
               run: terraform apply -auto-approve
+
+            - name: Force ECS service to redeploy (backend refresh)
+              run: |
+                  aws ecs update-service \
+                    --cluster $CLUSTER_NAME \
+                    --service $SERVICE_NAME \
+                    --force-new-deployment

@@ -3,6 +3,8 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
@@ -23,6 +25,9 @@ import { Media } from '../../contracts/db/models/mdeia.entity';
 import { User } from '../../contracts/db/models/user.entity';
 import { S3Service } from './s3.service';
 import { MediaAccess } from '../../contracts/db/models/mdeia-access.entity';
+import { MediaTypesEnum } from '../../contracts/db/models/enums';
+import { ChatUser } from '../../contracts/db/models/chat-user.entity';
+import { Message } from '../../contracts/db/models/message.entity';
 
 @Injectable()
 export class MediaService implements IMediaService {
@@ -31,6 +36,7 @@ export class MediaService implements IMediaService {
     accessKeyId: AWS_ACCESS_KEY,
     secretAccessKey: AWS_SECRET_KEY,
   });
+  logger = new Logger(MediaService.name);
 
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.MEDIA)
@@ -39,6 +45,10 @@ export class MediaService implements IMediaService {
     private readonly mediaAccessRepository: typeof MediaAccess,
     @Inject(MODELS_REPOSITORIES_ENUM.USER)
     private readonly userRepository: typeof User,
+    @Inject(MODELS_REPOSITORIES_ENUM.CHAT_USER)
+    private readonly chatUserRepository: typeof ChatUser,
+    @Inject(MODELS_REPOSITORIES_ENUM.MESSAGE)
+    private readonly messageRepository: typeof Message,
     @Inject(S3Service)
     private readonly s3Service: S3Service,
   ) {}
@@ -46,6 +56,8 @@ export class MediaService implements IMediaService {
   async uploadMedia(payload) {
     const { userId, expiration, file } = payload;
     const { originalname: name } = file;
+    const context = { userId, name };
+    this.logger.log('uploadMedia', context);
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -82,16 +94,70 @@ export class MediaService implements IMediaService {
   }
 
   async getMedia(userId: number, mediaId: number): Promise<{ url: string }> {
+    const context = { userId, mediaId };
     const media = await this.mediaRepository.findOne({
       where: { id: mediaId },
     });
     if (!media) {
       throw new NotFoundException('Media not found');
     }
+
+    // check user access to the private photo
+    if (media.private) {
+      this.logger.log('getMedia private', context);
+      const mediaAccess = await this.mediaAccessRepository.findOne({
+        where: {
+          accessor_id: userId,
+          media_id: mediaId,
+        },
+      });
+      if (!mediaAccess) {
+        this.logger.log('getMedia private: no access', context);
+        throw new NotAcceptableException(
+          'Current user can not access private media',
+        );
+      }
+    }
+
+    // check user access to chat
+    if (
+      media.media_type === MediaTypesEnum.MESSAGE_IMAGE ||
+      media.media_type === MediaTypesEnum.MESSAGE_AUDIO ||
+      media.media_type === MediaTypesEnum.MESSAGE_VIDEO
+    ) {
+      this.logger.log('getMedia: chat media', context);
+      const message = await this.messageRepository.findOne({
+        where: { media_id: mediaId },
+      });
+      if (!message) {
+        this.logger.error(
+          'getMedia: chat media, message does not exist',
+          context,
+        );
+        throw new NotFoundException('Message not found for this media');
+      }
+      const chatUser = await this.chatUserRepository.findOne({
+        where: {
+          chat_id: message.chat_id,
+          user_id: userId,
+        },
+      });
+      if (!chatUser) {
+        this.logger.error(
+          'getMedia: user does not have access to chat',
+          context,
+        );
+        throw new NotAcceptableException(
+          'User has no access to this chat media',
+        );
+      }
+    }
+
     try {
       const key = media.url.split('.com/')[1];
       const url = await this.s3Service.getPresignedUrl(key);
       if (!url) {
+        this.logger.error('getMedia: can not find media content in S3');
         throw new NotFoundException('Media content not found');
       }
       return { url };
