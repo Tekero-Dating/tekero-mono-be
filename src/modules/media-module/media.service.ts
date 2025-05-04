@@ -105,10 +105,14 @@ export class MediaService implements IMediaService {
     // check user access to the private photo
     if (media.private) {
       this.logger.log('getMedia private', context);
+      const mediaOwner = await this.mediaRepository.findOne({
+        where: { id: mediaId },
+      });
+
       const mediaAccess = await this.mediaAccessRepository.findOne({
         where: {
           accessor_id: userId,
-          media_id: mediaId,
+          owner_id: mediaOwner?.user_id,
         },
       });
       if (!mediaAccess) {
