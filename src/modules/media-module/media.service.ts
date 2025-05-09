@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
+import { uuid } from 'uuidv4';
 import {
   AWS_ACCESS_KEY,
   AWS_REGION,
@@ -66,10 +66,11 @@ export class MediaService implements IMediaService {
     }
 
     try {
+      const generatedId = uuid();
       const uploadedFileUrl = await this.s3_upload(
         file.buffer,
-        this.AWS_S3_BUCKET,
-        name,
+        this.AWS_S3_BUCKET!,
+        generatedId,
         file.mimetype,
       );
       if (uploadedFileUrl) {
@@ -159,6 +160,7 @@ export class MediaService implements IMediaService {
 
     try {
       const key = media.url.split('.com/')[1];
+      console.log({ key });
       const url = await this.s3Service.getPresignedUrl(key);
       if (!url) {
         this.logger.error('getMedia: can not find media content in S3');
@@ -270,16 +272,18 @@ export class MediaService implements IMediaService {
     }
   }
 
-  private async s3_upload(file, bucket, name, mimetype) {
-    const params = {
+  private async s3_upload(
+    file: Buffer,
+    bucket: string,
+    keyName: string,
+    mimetype: string,
+  ) {
+    const params: AWS.S3.PutObjectRequest = {
       Bucket: bucket,
-      Key: String(`${uuidv4()}_${name}`),
+      Key: keyName,
       Body: file,
       ContentType: mimetype,
       ContentDisposition: 'inline',
-      CreateBucketConfiguration: {
-        LocationConstraint: AWS_REGION,
-      },
     };
 
     try {

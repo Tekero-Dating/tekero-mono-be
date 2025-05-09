@@ -44,6 +44,11 @@ import {
 import { ApiUsersController } from './api.users.controller';
 import { MessageRepository } from '../../contracts/db/models/message.entity';
 import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
+import { ApiUserStatsController } from './api.user-stats.controller';
+import {
+  USER_STATS_MODULE_QUEUES,
+  USER_STATS_SERVICE_NAME,
+} from '../../contracts/user-stats-interface/user-stats.constants';
 
 @Module({
   imports: [
@@ -74,6 +79,9 @@ import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
     ClientsModule.register(
       generateRmqOptions(USERS_MODULE_QUEUES, USERS_SERVICE_NAME),
     ),
+    ClientsModule.register(
+      generateRmqOptions(USER_STATS_MODULE_QUEUES, USER_STATS_SERVICE_NAME),
+    ),
   ],
   controllers: [
     ApiController,
@@ -83,6 +91,7 @@ import { ChatUserRepository } from '../../contracts/db/models/chat-user.entity';
     ApiMediaController,
     ApiLikesController,
     ApiUsersController,
+    ApiUserStatsController,
   ],
   providers: [
     ApiService,

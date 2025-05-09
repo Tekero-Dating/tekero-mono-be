@@ -15,6 +15,7 @@ import cors from 'cors';
 import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface/notifications.constants';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as crypto from 'crypto';
+import { USER_STATS_MODULE_QUEUES } from './contracts/user-stats-interface/user-stats.constants';
 
 global.crypto = crypto; // TODO nest/schedule of version 5 sucks very hard
 export {
@@ -39,6 +40,7 @@ export async function bootstrap() {
       ...USERS_MODULE_QUEUES,
       ...CHAT_MODULE_QUEUES,
       ...NOTIFICATIONS_MODULE_QUEUES,
+      ...USER_STATS_MODULE_QUEUES,
     ],
     generalRmqOpts,
   );

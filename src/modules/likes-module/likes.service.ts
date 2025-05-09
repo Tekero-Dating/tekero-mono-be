@@ -73,7 +73,7 @@ export class LikesService {
         user_id,
       },
     });
-    if (userStats && userStats.dataValues.available_likes === 0) {
+    if (userStats && userStats.dataValues.available_likes_to_send === 0) {
       this.logger.log('Send like: user do not have enough likes', {
         user_id,
         advertisement_id,
@@ -100,7 +100,7 @@ export class LikesService {
       const updatedStats: [number, UserStats[]?] =
         await this.userStatsRepository.update<UserStats>(
           {
-            available_likes: userStats!.available_likes - 1,
+            available_likes_to_send: userStats!.available_likes_to_send - 1,
           },
           {
             where: {
@@ -163,10 +163,10 @@ export class LikesService {
           advertisement_id,
         },
       });
-      if (userStats!.dataValues.available_likes < 10) {
+      if (userStats!.dataValues.available_likes_to_send < 10) {
         await this.userStatsRepository.update(
           {
-            available_likes: userStats!.available_likes + 1,
+            available_likes_to_send: userStats!.available_likes_to_send + 1,
           },
           {
             where: { user_id },
@@ -230,11 +230,11 @@ export class LikesService {
       const updatedUserStats: [number, UserStats[]?] =
         await this.userStatsRepository.update(
           {
-            available_likes:
-              oldUserStats?.available_likes &&
-              oldUserStats?.available_likes < 10
-                ? oldUserStats?.available_likes + 1
-                : oldUserStats?.available_likes,
+            available_likes_to_send:
+              oldUserStats?.available_likes_to_send &&
+              oldUserStats?.available_likes_to_send < 10
+                ? oldUserStats?.available_likes_to_send + 1
+                : oldUserStats?.available_likes_to_send,
           },
           { where: { user_id: like.user_id }, returning: true, transaction },
         );
@@ -323,7 +323,7 @@ export class LikesService {
       const newAuthorStats: [number, UserStats[]?] =
         await this.userStatsRepository.update(
           {
-            active_chats: authorUserStats!.active_chats + 1,
+            active_chats: authorUserStats!.available_active_chats + 1,
           },
           {
             where: { id: authorUserStats!.id },
@@ -334,7 +334,7 @@ export class LikesService {
       const newLikerStats: [number, UserStats[]?] =
         await this.userStatsRepository.update(
           {
-            active_chats: likeSenderUserStats!.active_chats + 1,
+            active_chats: likeSenderUserStats!.available_active_chats + 1,
           },
           {
             where: { id: likeSenderUserStats!.id },
@@ -384,7 +384,7 @@ export class LikesService {
   private async refillUserLikes(userId: number, likes: number) {
     return this.userStatsRepository.update(
       {
-        available_likes: likes,
+        available_likes_to_send: likes,
         available_likes_refilled_date: Date.now(),
       },
       {

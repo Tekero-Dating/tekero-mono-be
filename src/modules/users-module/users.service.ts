@@ -53,7 +53,7 @@ export class UsersService {
         {
           user_id: user.id,
           active_chats: 0,
-          available_likes: 10,
+          available_likes_to_send: 10,
           available_likes_refilled_date: Date.now(),
         },
         { transaction },

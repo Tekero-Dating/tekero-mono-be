@@ -21,6 +21,7 @@ import { UsersModule } from './modules/users-module/users.module';
 import { ChatModule } from './modules/chat-module/chat.module';
 import { NotificationsModule } from './modules/notifications-service/notifications.module';
 import { PresenceModule } from './modules/presence-service/presence.module';
+import { UserStatsModule } from './modules/user-stats-module/user-stats.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { PresenceModule } from './modules/presence-service/presence.module';
     ChatModule,
     PresenceModule,
     NotificationsModule,
+    UserStatsModule,
   ],
   controllers: [AppController],
   providers: [

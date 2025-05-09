@@ -22,11 +22,15 @@ export class UserStats extends Model {
 
   @Max(5)
   @Column
-  active_chats: number;
+  available_active_chats: number;
 
   @Max(10)
   @Column
-  available_likes: number;
+  available_likes_to_send: number;
+
+  @Max(10)
+  @Column
+  available_likes_to_receive: number;
 
   @Column({
     type: DataType.DATE,
