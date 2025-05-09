@@ -37,6 +37,19 @@ export class LikesService {
     private readonly sequelizeInstance: Sequelize,
   ) {}
 
+  async getUserLikes(userId: number): Promise<Like[]> {
+    this.logger.log('get user likes', userId);
+    const likes = await this.likeRepository.findAll({
+      where: {
+        user_id: userId,
+      },
+    });
+    if (likes.length) {
+      return likes;
+    }
+    return [];
+  }
+
   async sendLike(user_id: number, advertisement_id: number) {
     const context = { user_id, advertisement_id };
     this.logger.log('Send like', context);

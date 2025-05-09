@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   Inject,
   Patch,
+  Get,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
@@ -33,6 +34,27 @@ export class ApiLikesController {
   }
   async onApplicationShutdown(signal?: string) {
     await this.client.close();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('get-user-likes')
+  async getUserLikes(@Req() req: JwtReq, @Res() res) {
+    const { userId } = req.user;
+    await rmqSend(
+      this.client,
+      LIKES_MSG_PATTERNS.GET_USER_LIKES,
+      { userId },
+      ({ success, result, error }) => {
+        if (success) {
+          return res.status(200).send({ success, result });
+        } else {
+          const { status, message } = TekeroError(error);
+          return res
+            .status(status)
+            .send({ success, error: { status, message } });
+        }
+      },
+    );
   }
 
   @UseGuards(JwtAuthGuard)

@@ -1,5 +1,6 @@
 import { Controller, Inject } from '@nestjs/common';
 import {
+  IGetUserLikes,
   ILikeAd,
   ILikesController,
   IMatchAd,
@@ -20,6 +21,23 @@ export class LikesController implements ILikesController {
     private readonly likesService: LikesService,
     @Inject(LIKES_SERVICE_NAME) private client: ClientProxy,
   ) {}
+
+  @MessagePattern(LIKES_MSG_PATTERNS.GET_USER_LIKES)
+  async getUserLikes(@Payload() payload: IGetUserLikes.Request) {
+    try {
+      const { userId } = payload;
+      const likes = await this.likesService.getUserLikes(userId);
+      return {
+        success: true,
+        result: likes,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: TekeroError(error),
+      };
+    }
+  }
 
   @MessagePattern(LIKES_MSG_PATTERNS.SEND_LIKE)
   @WithNotify(NotificationTypesEnum.LIKE_RECEIVED)

@@ -11,7 +11,6 @@ export class UserStatsController implements IUSerStatsController {
 
   @MessagePattern(USER_STATS_MSG_PATTERNS.GET)
   async getUserStats(payload) {
-    console.log('user statis get');
     try {
       const { userId } = payload;
       const result = await this.userStatsService.getUserStats(userId);

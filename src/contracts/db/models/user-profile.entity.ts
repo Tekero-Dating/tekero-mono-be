@@ -11,7 +11,7 @@ import {
   AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
-import { ConstitutionsEnum, GendersEnum } from './enums';
+import { ConstitutionsEnum, GendersEnum, OrientationsEnum } from './enums';
 
 @Table({
   modelName: 'user-profile',
@@ -42,10 +42,11 @@ export class UserProfile extends Model {
   @Column
   home_location?: string;
 
-  @Min(1)
-  @Max(100)
-  @Column
-  orientation?: number;
+  @Column({
+    type: DataType.ENUM,
+    values: Object.keys(OrientationsEnum),
+  })
+  orientation?: OrientationsEnum;
 
   @Column({
     type: DataType.ENUM,

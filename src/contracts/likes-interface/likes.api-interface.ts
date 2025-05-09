@@ -8,6 +8,7 @@ export const LIKES_MSG_PATTERNS = {
   DISMISS_LIKE: 'DISMISS_LIKE',
   REJECT_LIKE: 'REJECT_LIKE',
   MATCH: 'MATCH',
+  GET_USER_LIKES: 'GET_USER_LIKES',
 };
 
 export namespace ILikeAd {
@@ -87,6 +88,22 @@ export namespace IMatchAd {
   }
 }
 
+export namespace IGetUserLikes {
+  export interface Request {
+    userId: number;
+  }
+  export interface Response {
+    success: boolean;
+    result?: Like[];
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
+
 export interface ILikesController {
   /**
    * Send like
@@ -122,4 +139,8 @@ export interface ILikesController {
     payload: IMatchAd.Request,
     context: RmqContext,
   ) => Promise<IMatchAd.Response>;
+
+  getUserLikes: (
+    payload: IGetUserLikes.Request,
+  ) => Promise<IGetUserLikes.Response>;
 }
