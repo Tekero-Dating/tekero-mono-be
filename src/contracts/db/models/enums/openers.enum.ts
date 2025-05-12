@@ -1,8 +1,10 @@
 export enum OpenersEnum {
   TEXT = 'TEXT',
   VOICE = 'VOICE',
-  CALL = 'CALL',
   VIDEO = 'VIDEO',
-  QUESTION = 'QUESTION',
   MEDIA = 'MEDIA',
+  CALL = 'CALL',
+  VIDEO_CALL = 'VIDEO_CALL',
+  QUESTION = 'QUESTION',
+  GAME = 'GAME',
 }

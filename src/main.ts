@@ -62,7 +62,7 @@ export async function bootstrap() {
   await app.listen(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     +process.env.APP_PORT! || 3000,
-    process.env.APP_HOST || 'localhost',
+    // process.env.APP_HOST || 'localhost',
   );
   return app;
   // const api = app.get(QuestionnaireController);

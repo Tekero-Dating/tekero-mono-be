@@ -8,7 +8,7 @@ import {
 export const mockUserAdvRequest = {
   text: 'I just test the app',
   type: AdTypesEnum.DATE,
-  opener: OpenersEnum.TEXT,
+  openers: [OpenersEnum.TEXT],
   photos: [3, 4],
   targetFilters: {
     gender: [GendersEnum.TRANS_FEMALE],

@@ -1,6 +1,7 @@
 'use strict';
 
 import seedData from './initial-seed-data.json';
+import { OpenersEnum } from '../src/contracts/db/models/enums';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -60,6 +61,7 @@ module.exports = {
             JSON.stringify(ad.location),
           ),
           filter: JSON.stringify(ad.filter),
+          openers: ad.openers as string[],
           createdAt: new Date(),
           updatedAt: new Date(),
         })),

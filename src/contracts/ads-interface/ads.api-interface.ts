@@ -51,7 +51,7 @@ export interface IAdvFields {
   photos?: number[];
   type: AdTypesEnum;
   targetFilters?: IAdvFilters;
-  opener?: OpenersEnum;
+  openers?: string[];
   song?: string;
   location: { type: 'Point'; coordinates: [number, number] };
   travelsTo?: { type: 'Point'; coordinates: [number, number] };

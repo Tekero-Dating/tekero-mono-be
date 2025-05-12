@@ -16,6 +16,7 @@ import { IAdvFields } from './ads.api-interface';
 import { AdTypesEnum } from '../db/models/enums/ad-types.enum';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { DataType } from 'sequelize-typescript';
 
 /**
  * I fucked up with the default values for ads. The problem comes
@@ -150,8 +151,7 @@ export class CreateAdvDTO implements IAdvFields {
 
   @ApiProperty()
   @IsOptional()
-  @IsEnum(OpenersEnum)
-  opener?: OpenersEnum = OpenersEnum.QUESTION;
+  openers?: string[] = [OpenersEnum.QUESTION];
 
   @ApiProperty()
   @IsOptional()
@@ -264,8 +264,7 @@ export class EditAdvDTO implements Partial<IAdvFields> {
 
   @ApiProperty()
   @IsOptional()
-  @IsEnum(OpenersEnum)
-  opener?: OpenersEnum;
+  openers?: string[];
 
   @ApiProperty()
   @IsOptional()

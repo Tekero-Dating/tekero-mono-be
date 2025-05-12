@@ -94,10 +94,9 @@ export class Advertisement extends Model {
   travel_date_to?: Date;
 
   @Column({
-    type: DataType.ENUM,
-    values: Object.keys(OpenersEnum),
+    type: DataType.ARRAY(DataType.STRING),
   })
-  opener: OpenersEnum;
+  openers: string[];
 
   @Column
   song?: string;
