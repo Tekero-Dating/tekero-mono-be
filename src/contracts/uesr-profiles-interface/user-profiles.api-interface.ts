@@ -26,7 +26,7 @@ export namespace IGetUserProfile {
 
 export namespace IUpdateUserProfile {
   export interface request {
-    userId: number;
+    userId: string;
     height?: number;
     weight?: number;
     constitution?: ConstitutionsEnum;

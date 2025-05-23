@@ -35,7 +35,7 @@ export namespace ICreateUser {
 
 export namespace IDeleteUser {
   export interface Request {
-    userId: number;
+    userId: string;
     reason: string;
   }
   export interface Response {
@@ -51,8 +51,27 @@ export namespace IDeleteUser {
 
 export namespace IEditUser {
   export interface Request {
-    userId: number;
+    userId: string;
     fields: IUserFields;
+  }
+  export interface Response {
+    success: boolean;
+    result?: {
+      user: User;
+    };
+    error?:
+      | Record<string, any>
+      | {
+          status: number;
+          message: string;
+        };
+  }
+}
+
+export namespace IRegisterUser {
+  export interface Request {
+    userId: string;
+    email: string;
   }
   export interface Response {
     success: boolean;
@@ -92,4 +111,11 @@ export interface IUsersController {
     payload: IEditUser.Request,
     context: RmqContext,
   ) => Promise<IEditUser.Response>;
+
+  /**
+   * Register user, create a basic user record
+   */
+  registerUser: (
+    payload: IRegisterUser.Request,
+  ) => Promise<IRegisterUser.Response>;
 }

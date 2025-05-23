@@ -2,7 +2,7 @@ import { RmqContext } from '@nestjs/microservices';
 
 export namespace IUploadMedia {
   export interface Request {
-    userId: number;
+    userId: string;
     expiration?: number;
     file: Express.Multer.File;
   }
@@ -22,7 +22,7 @@ export namespace IUploadMedia {
 
 export namespace IGetMedia {
   export interface Request {
-    userId: number;
+    userId: string;
     mediaId: number;
   }
   export type Response = {
@@ -41,7 +41,7 @@ export namespace IGetMedia {
 
 export namespace IDeleteMedia {
   export interface Request {
-    userId: number;
+    userId: string;
     mediaId: number;
   }
   export interface Response {
@@ -57,7 +57,7 @@ export namespace IDeleteMedia {
 
 export namespace ISetMediaPrivacy {
   export interface Request {
-    userId: number;
+    userId: string;
     mediaId: number;
   }
   export interface Response {
@@ -76,8 +76,8 @@ export namespace ISetMediaPrivacy {
 
 export namespace IEditMediaAccess {
   export interface Request {
-    ownerId: number;
-    accessorId: number;
+    ownerId: string;
+    accessorId: string;
     giver: boolean;
   }
   export interface Response {

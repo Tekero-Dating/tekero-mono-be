@@ -13,7 +13,7 @@ export const LIKES_MSG_PATTERNS = {
 
 export namespace ILikeAd {
   export interface Request {
-    userId: number;
+    userId: string;
     advertisementId: number;
   }
   export interface Response {
@@ -33,7 +33,7 @@ export namespace ILikeAd {
 
 export namespace IUnlikeAd {
   export interface Request {
-    userId: number;
+    userId: string;
     advertisementId: number;
   }
   export interface Response {
@@ -53,7 +53,7 @@ export namespace IUnlikeAd {
 
 export namespace IRejectLike {
   export interface Request {
-    userId: number;
+    userId: string;
     likeId: number;
   }
   export interface Response {
@@ -69,7 +69,7 @@ export namespace IRejectLike {
 
 export namespace IMatchAd {
   export interface Request {
-    userId: number;
+    userId: string;
     likeId: number;
   }
   export interface Response {
@@ -90,7 +90,7 @@ export namespace IMatchAd {
 
 export namespace IGetUserLikes {
   export interface Request {
-    userId: number;
+    userId: string;
   }
   export interface Response {
     success: boolean;

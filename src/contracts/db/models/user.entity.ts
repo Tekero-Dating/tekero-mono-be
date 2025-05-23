@@ -9,6 +9,7 @@ import {
   Unique,
   AllowNull,
   HasOne,
+  PrimaryKey,
 } from 'sequelize-typescript';
 import { Media } from './mdeia.entity';
 import { UserProfile } from './user-profile.entity';
@@ -18,18 +19,22 @@ import { UserProfile } from './user-profile.entity';
   indexes: [{ fields: ['dob'] }, { using: 'GIST', fields: ['location'] }],
 })
 export class User extends Model {
-  @Length({ min: 2 })
-  @AllowNull(false)
-  @Column
-  firstName: string;
+  @PrimaryKey
+  @Column(DataType.UUID)
+  override id: string;
 
   @Length({ min: 2 })
   @AllowNull(false)
   @Column
-  lastName: string;
+  firstName?: string;
+
+  @Length({ min: 2 })
+  @AllowNull(false)
+  @Column
+  lastName?: string;
 
   @Column
-  dob: Date;
+  dob?: Date;
 
   @Unique
   @IsEmail
@@ -37,20 +42,7 @@ export class User extends Model {
   email: string;
 
   @Column
-  password: string;
-
-  @AllowNull(true)
-  @Column
-  validated?: boolean;
-
-  @AllowNull(true)
-  @Column
-  balance?: number; // TODO: move to userStats
-
-  @ForeignKey(() => Media)
-  @AllowNull(true)
-  @Column
-  profile_pic_id?: number;
+  password?: string;
 
   @HasOne(() => UserProfile)
   userProfile: UserProfile;
@@ -61,7 +53,7 @@ export class User extends Model {
   location: { type: 'Point'; coordinates: [number, number] };
 
   get age(): number {
-    const diff = Date.now() - new Date(this.dob).getTime();
+    const diff = Date.now() - new Date(this.dob || 0).getTime();
     return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
   }
 }

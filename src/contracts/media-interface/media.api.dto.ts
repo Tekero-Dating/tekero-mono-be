@@ -11,7 +11,6 @@ import { Transform, Type } from 'class-transformer';
 import { Multer } from 'multer';
 import { ApiProperty } from '@nestjs/swagger';
 
-
 class IsMulterFile {
   validate(file: Express.Multer.File | undefined): boolean {
     return (
@@ -31,7 +30,7 @@ export class UploadMediaDto implements IUploadMedia.Request {
   @ApiProperty()
   @Type(() => Number)
   @IsNumber()
-  userId: number;
+  userId: string;
 
   @ApiProperty()
   @Type(() => Number)
@@ -71,7 +70,7 @@ export class EditMediaAccessDto implements Partial<IEditMediaAccess.Request> {
   @ApiProperty()
   @Type(() => Number)
   @IsNumber()
-  accessorId: number;
+  accessorId: string;
 
   @ApiProperty()
   @Transform(({ value }: { value: any }) => {

@@ -44,7 +44,7 @@ export class MediaController implements IMediaController {
     this.logger.log('getMedia', { payload });
     try {
       const { userId, mediaId } = payload;
-      const result = await this.mediaService.getMedia(+userId, +mediaId);
+      const result = await this.mediaService.getMedia(userId, +mediaId);
       return {
         success: true,
         result,

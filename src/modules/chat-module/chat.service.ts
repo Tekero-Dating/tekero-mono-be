@@ -15,6 +15,7 @@ import {
   MessageTypesEnum,
 } from '../../contracts/db/models/enums';
 import { User } from '../../contracts/db/models/user.entity';
+import { Model } from 'sequelize';
 
 @Injectable()
 export class ChatService {
@@ -40,7 +41,7 @@ export class ChatService {
   }
 
   private async checkIfUserAllowedInChat(
-    userId: number,
+    userId: string,
     chatId: number,
   ): Promise<boolean> {
     this.logger.log(`Private func checkIfUserAllowedInChat`, {
@@ -61,7 +62,7 @@ export class ChatService {
   }
 
   async sendMessage(
-    userId: number,
+    userId: string,
     chatId: number,
     content: string,
   ): Promise<Message> {
@@ -106,9 +107,22 @@ export class ChatService {
   }
 
   async getChatHistory(
-    userId: number,
+    userId: string,
     chatId: number,
-  ): Promise<(Message & { user: { firstName: string } })[]> {
+  ): Promise<
+    (Omit<
+      Message,
+      | keyof Model<any, any>
+      | '$get'
+      | '$add'
+      | '$set'
+      | '$count'
+      | '$create'
+      | '$has'
+      | '$remove'
+      | 'user'
+    > & { user: { firstName: string } })[]
+  > {
     this.logger.log('getChatHistory: ', { userId, chatId });
     const validChat = await this.checkIfChatTypeValid(chatId);
     this.logger.log('getChatHistory: valid chat?', {
@@ -149,7 +163,10 @@ export class ChatService {
         ],
         order: [['createdAt', 'ASC']],
       });
-      return messages;
+      return messages.map((message) => ({
+        ...(message as Message),
+        user: { firstName: message.user.firstName || 'Donny' },
+      }));
     } catch (error) {
       this.logger.error(
         'getChatHistory: Something critical happen on the server: ',

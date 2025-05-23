@@ -37,7 +37,7 @@ export class LikesService {
     private readonly sequelizeInstance: Sequelize,
   ) {}
 
-  async getUserLikes(userId: number): Promise<Like[]> {
+  async getUserLikes(userId: string): Promise<Like[]> {
     this.logger.log('get user likes', userId);
     const likes = await this.likeRepository.findAll({
       where: {
@@ -50,7 +50,7 @@ export class LikesService {
     return [];
   }
 
-  async sendLike(user_id: number, advertisement_id: number) {
+  async sendLike(user_id: string, advertisement_id: number) {
     const context = { user_id, advertisement_id };
     this.logger.log('Send like', context);
     const advertisement = await this.adsRepository.findOne({
@@ -194,7 +194,7 @@ export class LikesService {
     }
   }
 
-  async rejectLike(userId: number, likeId: number): Promise<void> {
+  async rejectLike(userId: string, likeId: number): Promise<void> {
     const context = { userId, likeId };
     this.logger.log('Reject like', context);
     const like = await this.likeRepository.findByPk(likeId, {
@@ -265,7 +265,7 @@ export class LikesService {
     }
   }
 
-  async match(userId: number, likeId: number) {
+  async match(userId: string, likeId: number) {
     const context = { userId, likeId };
     this.logger.log('Match', context);
     const transaction = await this.sequelizeInstance.transaction();
@@ -394,7 +394,7 @@ export class LikesService {
     });
   }
 
-  private async refillUserLikes(userId: number, likes: number) {
+  private async refillUserLikes(userId: string, likes: number) {
     return this.userStatsRepository.update(
       {
         available_likes_to_send: likes,

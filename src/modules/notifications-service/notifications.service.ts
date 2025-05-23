@@ -17,6 +17,7 @@ import { Like } from '../../contracts/db/models/like.entity';
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
+
   constructor(
     @Inject(MODELS_REPOSITORIES_ENUM.ADVERTISEMENTS)
     private advertisementRepository: typeof Advertisement,
@@ -30,7 +31,7 @@ export class NotificationsService {
   ) {}
 
   async notifyAdOwnerAboutLike(
-    userId: number,
+    userId: string,
     advertisementId: number,
     likeId: number,
   ): Promise<void> {
@@ -82,17 +83,17 @@ export class NotificationsService {
     }
   }
 
-  async notifyLikeSenderAboutMatch(adOwnerId: number, likeId: number) {
+  async notifyLikeSenderAboutMatch(adOwnerId: string, likeId: number) {
     const context = { adOwnerId, likeId };
     this.logger.log('notifyLikeSenderAboutMatch: started', { context });
 
     const like = await this.likeRepository.findOne({
       where: { id: likeId },
-      attributes: ['user_id', 'advertisement_id']
+      attributes: ['user_id', 'advertisement_id'],
     });
 
     if (!like) {
-      this.logger.error('notifyLikeSenderAboutMatch like not found', context)
+      this.logger.error('notifyLikeSenderAboutMatch like not found', context);
       throw new NotFoundException('Like not found');
     }
 
@@ -101,16 +102,22 @@ export class NotificationsService {
         user_id: like?.user_id,
         payload: {
           likeId,
-          advertisementId: like?.advertisement_id
+          advertisementId: like?.advertisement_id,
         },
         type: NotificationTypesEnum.MATCH,
         acknowledged: false,
       });
-      this.logger.log('notifyLikeSenderAboutMatch: completed notification', context);
+      this.logger.log(
+        'notifyLikeSenderAboutMatch: completed notification',
+        context,
+      );
 
       const isOnline = await this.presenceService.isOnline(like?.user_id);
       if (isOnline) {
-        this.logger.log('notifyLikeSenderAboutMatch user online. Sending to presence gateway', context)
+        this.logger.log(
+          'notifyLikeSenderAboutMatch user online. Sending to presence gateway',
+          context,
+        );
         await this.presenceGateway.sendInAppNotification({
           userId: like?.user_id,
           notificationId: notification.id,

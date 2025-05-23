@@ -17,7 +17,7 @@ export const ADS_MSG_PATTERNS = {
 
 export namespace ICreateAdv {
   export interface Request {
-    userId: number;
+    userId: string;
     fields: IAdvFields;
   }
   export interface Response {
@@ -61,7 +61,7 @@ export interface IAdvFields {
 
 export namespace IEditAdv {
   export interface Request {
-    userId: number;
+    userId: string;
     advId: number;
     fields: Partial<IAdvFields>;
   }
@@ -79,7 +79,7 @@ export namespace IEditAdv {
 
 export namespace IArchiveAdv {
   export interface Request {
-    userId: number;
+    userId: string;
     advId: number;
   }
   export interface Response {
@@ -95,7 +95,7 @@ export namespace IArchiveAdv {
 
 export namespace IPublishAdv {
   export interface Request {
-    userId: number;
+    userId: string;
     advId: number;
   }
   export interface Response {
@@ -111,7 +111,7 @@ export namespace IPublishAdv {
 
 export namespace IGetSuitableAds {
   export interface Request {
-    userId: number;
+    userId: string;
     filters: IAdvFilters;
     location: { type: 'Point'; coordinates: [number, number] };
     distance: number;

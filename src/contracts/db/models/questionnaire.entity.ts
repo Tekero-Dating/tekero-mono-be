@@ -14,8 +14,8 @@ import { validateResponse } from './validators/questionnaire.validator';
 export class Questionnaire extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Column
-  user_id!: number;
+  @Column(DataType.UUID)
+  user_id!: string;
   @BelongsTo(() => User)
   questionnaire_owner!: User;
 
@@ -41,8 +41,11 @@ export class Questionnaire extends Model {
   })
   responses!: Record<
     string,
-    string | number | boolean | string[] |
-    Record<string, string | { type: string; coordinates: number[]}>
+    | string
+    | number
+    | boolean
+    | string[]
+    | Record<string, string | { type: string; coordinates: number[] }>
   >;
 }
 

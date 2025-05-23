@@ -5,6 +5,7 @@ import {
   BelongsTo,
   ForeignKey,
   DataType,
+  AllowNull,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Advertisement } from './advertisements.entity';
@@ -28,8 +29,9 @@ export class Like extends Model {
   advertisement!: Advertisement;
 
   @ForeignKey(() => User)
-  @Column
-  user_id!: number;
+  @AllowNull(false)
+  @Column(DataType.UUID)
+  user_id!: string;
 
   @BelongsTo(() => User, 'user_id')
   user!: User;
