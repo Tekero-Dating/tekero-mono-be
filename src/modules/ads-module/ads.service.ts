@@ -52,7 +52,7 @@ export class AdsService {
    *  these particular photos to his advertisement. Private
    *  photos can't be attached.
    */
-  private async prepareMediaToAttach(mediaIds: number[] = [], userId: number) {
+  private async prepareMediaToAttach(mediaIds: number[] = [], userId: string) {
     this.logger.log('prepareMediaToAttach', { userId, mediaIds });
     const mediaToAttach: number[] = [];
     if (mediaIds && mediaIds.length) {
@@ -72,7 +72,7 @@ export class AdsService {
   }
 
   async createAd(
-    userId: number,
+    userId: string,
     payload: ICreateAdv.Request['fields'],
   ): Promise<Advertisement> {
     this.logger.log('createAd', { userId });
@@ -136,7 +136,7 @@ export class AdsService {
   }
 
   async editAd(
-    userId: number,
+    userId: string,
     advId: number,
     payload: IEditAdv.Request['fields'],
   ): Promise<Advertisement> {
@@ -198,7 +198,7 @@ export class AdsService {
     }
   }
 
-  async publishAdv(userId: number, advId: number) {
+  async publishAdv(userId: string, advId: number) {
     this.logger.log('publishAdv', { userId, advId });
     const advBelongedToUser = await this.advRepository.findOne({
       where: { id: advId, user_id: userId },
@@ -227,7 +227,7 @@ export class AdsService {
     }
   }
 
-  async archiveAdv(userId: number, advId: number) {
+  async archiveAdv(userId: string, advId: number) {
     this.logger.log('archiveAdv', { userId, advId });
     const advBelongedToUser = await this.advRepository.findOne({
       where: { id: advId, user_id: userId },
@@ -256,7 +256,7 @@ export class AdsService {
   }
 
   async getSuitableAds(
-    userId: number,
+    userId: string,
     filters: IAdvFilters,
     location: { type: 'Point'; coordinates: [number, number] },
   ): Promise<Advertisement[]> {
@@ -304,7 +304,7 @@ export class AdsService {
 
     // fetch the explorer's own profile for the mutual-filter pass
     const explorerUserProfile = await this.userProfileRepository.findOne({
-      where: { id: userId },
+      where: { user_id: userId },
       include: [
         {
           model: User,

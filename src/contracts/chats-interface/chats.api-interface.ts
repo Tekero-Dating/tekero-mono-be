@@ -1,9 +1,10 @@
 import { RmqContext } from '@nestjs/microservices';
 import { Message } from '../db/models/message.entity';
+import { Model } from 'sequelize';
 
 export namespace ISendMessage {
   export interface Request {
-    userId: number;
+    userId: string;
     chatId: number;
     message: string;
   }
@@ -20,7 +21,7 @@ export namespace ISendMessage {
 
 export namespace ISendMedia {
   export interface Request {
-    userId: number;
+    userId: string;
     chatId: number;
     mediaId: number;
   }
@@ -38,12 +39,23 @@ export namespace ISendMedia {
 
 export namespace IGetChatHistory {
   export interface Request {
-    userId: number;
+    userId: string;
     chatId: number;
   }
   export interface Response {
     success: boolean;
-    result?: (Message & { user: { firstName: string } })[];
+    result?: (Omit<
+      Message,
+      | keyof Model<any, any>
+      | '$get'
+      | '$add'
+      | '$set'
+      | '$count'
+      | '$create'
+      | '$has'
+      | '$remove'
+      | 'user'
+    > & { user: { firstName: string } })[];
     error?:
       | Record<string, any>
       | {

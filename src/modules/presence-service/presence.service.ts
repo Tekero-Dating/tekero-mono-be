@@ -15,12 +15,12 @@ export class PresenceService {
     });
   }
 
-  async setOnline(userId: number, clientId: string, ttl = 300): Promise<void> {
+  async setOnline(userId: string, clientId: string, ttl = 300): Promise<void> {
     await this.redisClient.set(`online:user:${userId}`, clientId, 'EX', ttl);
     this.logger.log(`✅ User ${userId} is now online (Client: ${clientId})`);
   }
 
-  async removeOnline(userId: number): Promise<void> {
+  async removeOnline(userId: string): Promise<void> {
     const deleted = await this.redisClient.del(`online:user:${userId}`);
     if (deleted) {
       this.logger.log(`❌ User ${userId} is now offline`);
@@ -29,7 +29,7 @@ export class PresenceService {
     }
   }
 
-  async isOnline(userId: number): Promise<boolean> {
+  async isOnline(userId: string): Promise<boolean> {
     const result = await this.redisClient.get(`online:user:${userId}`);
     const online = result !== null;
     this.logger.log(`📡 User ${userId} online status: ${online}`);

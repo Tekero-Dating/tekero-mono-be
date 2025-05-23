@@ -7,4 +7,5 @@ export const USERS_MSG_PATTERNS = {
   DELETE: 'DELETE',
   PAUSE: 'PAUSE',
   EDIT: 'EDIT',
+  REGISTER: 'REGISTER',
 };

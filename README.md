@@ -65,7 +65,7 @@ Declare business methods and the corresponding types:
 ```typescript
 export namespace IEditAdv {
   export interface Request {
-    userId: number;
+    userId: string;
     fields: Partial<IAdvFields>;
   };
   export interface Response {
@@ -152,7 +152,7 @@ export class ApiQuestionnaireController {
 
   @Get('get-questionnaire/:userId')
   async getQuestionnaire(
-    @Param('userId') userId: number,
+    @Param('userId') userId: string,
     @Res() res
   ) {
     rmqSend<IGetQuestionnaire.Request, IGetQuestionnaire.Response>(

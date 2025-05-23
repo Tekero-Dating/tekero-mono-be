@@ -1,6 +1,6 @@
 'use strict';
 
-import seedData from './initial-seed-data.json';
+import seedData from './initial-seed-data-uuid.json';
 import { OpenersEnum } from '../src/contracts/db/models/enums';
 
 /** @type {import('sequelize-cli').Migration} */

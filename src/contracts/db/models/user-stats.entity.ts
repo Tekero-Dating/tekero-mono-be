@@ -14,8 +14,8 @@ import { User } from './user.entity';
 export class UserStats extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Column
-  user_id!: number;
+  @Column(DataType.UUID)
+  user_id!: string;
 
   @BelongsTo(() => User)
   profile_owner!: User;

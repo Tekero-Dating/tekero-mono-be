@@ -109,7 +109,7 @@ export class UsersService {
     }
   }
 
-  async editUser(userId: number, fields: IEditUser.Request['fields']) {
+  async editUser(userId: string, fields: IEditUser.Request['fields']) {
     this.logger.log('Edit user start', { userId });
     try {
       const [numberOfAffectedRows, [updatedRecord]] =
@@ -126,6 +126,18 @@ export class UsersService {
     } catch (error) {
       this.logger.error('Error appeared', { userId, error });
       throw new InternalServerErrorException('Can not update the user.');
+    }
+  }
+
+  async register(userId: string, email: string): Promise<User> {
+    try {
+      const user = await this.userRepository.create({
+        id: userId,
+      });
+      this.logger.log('User registered');
+      return user;
+    } catch (error) {
+      throw new BadRequestException('User id must be unique');
     }
   }
 }

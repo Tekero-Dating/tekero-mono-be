@@ -21,8 +21,9 @@ export class Message extends Model {
   chat!: Chat;
 
   @ForeignKey(() => User)
-  @Column
-  user_id!: number;
+  @AllowNull(false)
+  @Column(DataType.UUID)
+  user_id!: string;
   @BelongsTo(() => User, 'user_id')
   user!: User;
 

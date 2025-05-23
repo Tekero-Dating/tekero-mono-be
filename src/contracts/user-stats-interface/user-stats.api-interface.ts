@@ -2,7 +2,7 @@ import { UserStats } from '../db/models/user-stats.entity';
 
 export namespace IGetUSerStats {
   export interface Request {
-    userId: number;
+    userId: string;
   }
   export interface Response {
     success: boolean;
@@ -18,7 +18,7 @@ export namespace IGetUSerStats {
 
 export namespace ISetLikesToSendLimit {
   export interface Request {
-    userId: number;
+    userId: string;
     amountToSet: number;
   }
   export interface Response {
@@ -35,7 +35,7 @@ export namespace ISetLikesToSendLimit {
 
 export namespace ISetLikesToReceiveLimit {
   export interface Request {
-    userId: number;
+    userId: string;
     amountToSet: number;
   }
   export interface Response {
@@ -52,7 +52,7 @@ export namespace ISetLikesToReceiveLimit {
 
 export namespace ISetActiveChatLimit {
   export interface Request {
-    userId: number;
+    userId: string;
     amountToSet: number;
   }
   export interface Response {

@@ -10,7 +10,7 @@ export class UserStatsService {
     private readonly userStatsRepository: typeof UserStats,
   ) {}
 
-  async getUserStats(userId: number) {
+  async getUserStats(userId: string) {
     this.logger.log(`Getting user stats for ${userId}`);
     const userStats = await this.userStatsRepository.findOne({
       where: {

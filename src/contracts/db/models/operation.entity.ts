@@ -2,6 +2,7 @@ import {
   AllowNull,
   BelongsTo,
   Column,
+  DataType,
   ForeignKey,
   Model,
   Table,
@@ -13,8 +14,8 @@ import { ActionsList } from './actions-list.entity';
 export class Operation extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Column
-  user_id!: number;
+  @Column(DataType.UUID)
+  user_id!: string;
 
   @BelongsTo(() => User, { foreignKeyConstraint: true })
   user!: User;

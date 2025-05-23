@@ -3,6 +3,7 @@ import {
   ICreateUser,
   IDeleteUser,
   IEditUser,
+  IRegisterUser,
   IUsersController,
 } from '../../contracts/users-interface/users.api-interface';
 import {
@@ -73,6 +74,21 @@ export class UsersController implements IUsersController {
         payload.fields,
       );
       return { success: true, result: { user: updatedUser } };
+    } catch (error) {
+      return { success: false, error: TekeroError(error) };
+    }
+  }
+
+  @MessagePattern(USERS_MSG_PATTERNS.REGISTER)
+  async registerUser(
+    @Payload() payload: IRegisterUser.Request,
+  ): Promise<IRegisterUser.Response> {
+    try {
+      const user = await this.usersService.register(
+        payload.userId,
+        payload.email,
+      );
+      return { success: true, result: { user } };
     } catch (error) {
       return { success: false, error: TekeroError(error) };
     }

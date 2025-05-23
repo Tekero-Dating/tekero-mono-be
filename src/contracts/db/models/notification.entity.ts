@@ -1,4 +1,5 @@
 import {
+  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -12,8 +13,9 @@ import { NotificationTypesEnum } from './enums/notification-types.enum';
 @Table({ modelName: 'notification' })
 export class Notification extends Model {
   @ForeignKey(() => User)
-  @Column
-  user_id!: number;
+  @AllowNull(false)
+  @Column(DataType.UUID)
+  user_id!: string;
 
   @BelongsTo(() => User, 'user_id')
   userId!: User;
@@ -24,7 +26,7 @@ export class Notification extends Model {
   payload: Record<string, unknown>;
 
   @Column({
-    type: DataType.ENUM(...Object.values(NotificationTypesEnum))
+    type: DataType.ENUM(...Object.values(NotificationTypesEnum)),
   })
   type: NotificationTypesEnum;
 

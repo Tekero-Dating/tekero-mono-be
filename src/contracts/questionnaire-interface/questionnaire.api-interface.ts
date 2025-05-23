@@ -9,7 +9,7 @@ export const QUESTIONNAIRE_MSG_PATTERNS = {
 
 export namespace IGetQuestionnaire {
   export interface Request {
-    userId: number;
+    userId: string;
   }
   export interface Response {
     success: boolean;
@@ -33,7 +33,7 @@ export namespace IGetQuestionnaire {
 
 export namespace ISubmitQuestionByShortcode {
   export interface Request {
-    userId: number;
+    userId: string;
     response: {
       shortcode: QuestionnaireSteps['question']['shortcode'];
       response: string | number | boolean;

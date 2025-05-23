@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { extractUserFingerprint } from './extract-metadata-from-request';
 import { Op } from 'sequelize';
 
-export type JwtReq = Request & { user: { userId: number; email: string } };
+export type JwtReq = Request & { user: { userId: string; email: string } };
 
 @Injectable()
 export class AuthJwtStrategy extends PassportStrategy(Strategy) {

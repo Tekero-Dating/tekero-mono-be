@@ -42,7 +42,7 @@ export class ApiUserProfileController {
       transform: true,
     }),
   )
-  async getUserProfile(@Param('userId') userId: number, @Res() res) {
+  async getUserProfile(@Param('userId') userId: string, @Res() res) {
     await rmqSend(
       this.client,
       USER_PROFILES_MSG_PATTERNS.GET,

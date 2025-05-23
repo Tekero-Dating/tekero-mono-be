@@ -23,7 +23,7 @@ export class QuestionnaireService {
     private readonly questionnaireStepsRepository: typeof QuestionnaireSteps,
   ) {}
 
-  async getQuestionnaire(userId: number) {
+  async getQuestionnaire(userId: string) {
     this.logger.log(`Lookup for questionnaire for user ${userId}`);
     const [questionnaireStatus, questions] = await Promise.all([
       await this.questionnaireRepository.findOne<Questionnaire>({
@@ -94,7 +94,7 @@ export class QuestionnaireService {
   }
 
   async submitQuestionByShortcode(
-    userId: number,
+    userId: string,
     response: ISubmitQuestionByShortcode.Request['response'],
   ) {
     const { shortcode, response: answer } = response;
@@ -112,11 +112,10 @@ export class QuestionnaireService {
         'Trying to submit response to inactive question',
       );
     } else if (
-      (
-        question.type === 'string' ||
+      (question.type === 'string' ||
         question.type === 'number' ||
-        question.type === 'boolean'
-      ) && question.type !== typeof answer
+        question.type === 'boolean') &&
+      question.type !== typeof answer
     ) {
       throw new BadRequestException('Response provided in wrong format');
     }

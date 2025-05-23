@@ -75,7 +75,7 @@ export class PresenceGateway
 
   @MessagePattern(NOTIFICATIONS_MSG_PATTERNS.NOTIFY)
   async sendInAppNotification(payload: {
-    userId: number;
+    userId: string;
     notificationId: number;
   }): Promise<void> {
     this.logger.log('sendInAppNotification', { payload });

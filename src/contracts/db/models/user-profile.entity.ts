@@ -12,6 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { ConstitutionsEnum, GendersEnum, OrientationsEnum } from './enums';
+import { Media } from './mdeia.entity';
 
 @Table({
   modelName: 'user-profile',
@@ -33,8 +34,8 @@ import { ConstitutionsEnum, GendersEnum, OrientationsEnum } from './enums';
 export class UserProfile extends Model {
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Column
-  user_id!: number;
+  @Column(DataType.UUID)
+  user_id!: string;
 
   @BelongsTo(() => User)
   profile_owner!: User;
@@ -82,6 +83,11 @@ export class UserProfile extends Model {
     values: Object.keys(ConstitutionsEnum),
   })
   constitution?: ConstitutionsEnum;
+
+  @ForeignKey(() => Media)
+  @AllowNull(true)
+  @Column
+  profile_pic_id?: number;
 }
 
 export const UserProfileRepository = {

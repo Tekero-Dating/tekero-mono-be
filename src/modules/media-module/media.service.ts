@@ -94,7 +94,7 @@ export class MediaService implements IMediaService {
     }
   }
 
-  async getMedia(userId: number, mediaId: number): Promise<{ url: string }> {
+  async getMedia(userId: string, mediaId: number): Promise<{ url: string }> {
     const context = { userId, mediaId };
     const media = await this.mediaRepository.findOne({
       where: { id: mediaId },
@@ -172,7 +172,7 @@ export class MediaService implements IMediaService {
     }
   }
 
-  async deleteMedia(userId: number, mediaId: number): Promise<void> {
+  async deleteMedia(userId: string, mediaId: number): Promise<void> {
     const media = await this.mediaRepository.findOne({
       where: {
         user_id: userId,
@@ -198,7 +198,7 @@ export class MediaService implements IMediaService {
   }
 
   async setMediaPrivacy(
-    userId: number,
+    userId: string,
     mediaId: number,
   ): Promise<ISetMediaPrivacy.Response['result']> {
     const media = await this.mediaRepository.findOne({

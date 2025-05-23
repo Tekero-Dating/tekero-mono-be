@@ -1,6 +1,8 @@
 import {
+  AllowNull,
   BelongsTo,
   Column,
+  DataType,
   ForeignKey,
   Model,
   Table,
@@ -11,8 +13,9 @@ import { Chat } from './chat.entity';
 @Table({ modelName: 'chat-user' })
 export class ChatUser extends Model {
   @ForeignKey(() => User)
-  @Column
-  user_id!: number;
+  @AllowNull(false)
+  @Column(DataType.UUID)
+  user_id!: string;
   @BelongsTo(() => User, 'user_id')
   user!: User;
 
