@@ -24,12 +24,12 @@ export class User extends Model {
   override id: string;
 
   @Length({ min: 2 })
-  @AllowNull(false)
+  @AllowNull(true)
   @Column
   firstName?: string;
 
   @Length({ min: 2 })
-  @AllowNull(false)
+  @AllowNull(true)
   @Column
   lastName?: string;
 

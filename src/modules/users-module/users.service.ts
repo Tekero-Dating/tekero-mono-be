@@ -18,6 +18,7 @@ import { UserSettings } from '../../contracts/db/models/user-settings.entity';
 import { hashPassword } from '../../utils/hash-password';
 import { Sequelize } from 'sequelize-typescript';
 import { Session } from '../../contracts/db/models/sessions.entity';
+import { Questionnaire } from '../../contracts/db/models/questionnaire.entity';
 
 @Injectable()
 export class UsersService {
@@ -31,6 +32,8 @@ export class UsersService {
     private userProfileRepository: typeof UserProfile,
     @Inject(MODELS_REPOSITORIES_ENUM.USER_SETTINGS)
     private userSettingsRepository: typeof UserSettings,
+    @Inject(MODELS_REPOSITORIES_ENUM.QUESTIONNAIRE)
+    private questionnaireRepository: typeof Questionnaire,
     @Inject(MODELS_REPOSITORIES_ENUM.SESSIONS)
     private sessionRepository: typeof Session,
     @Inject('SEQUELIZE')
@@ -73,6 +76,15 @@ export class UsersService {
         { transaction },
       );
       this.logger.log('User Settings created');
+
+      const userQuestionnaire = await this.questionnaireRepository.create(
+        {
+          user_id: user.id,
+          questionnaire_started: false,
+          is_completed: false,
+        },
+        { transaction },
+      );
       await transaction.commit();
       return { user, userStats, userProfile, userSettings };
     } catch (error) {
@@ -130,13 +142,52 @@ export class UsersService {
   }
 
   async register(userId: string, email: string): Promise<User> {
+    const transaction = await this.sequelizeInstance.transaction();
     try {
+      this.logger.log('Register user', { userId, email });
       const user = await this.userRepository.create({
         id: userId,
+        email,
       });
-      this.logger.log('User registered');
+      this.logger.log('User created');
+      const userStats = await this.userStatsRepository.create(
+        {
+          user_id: userId,
+          active_chats: 0,
+          available_likes_to_send: 10,
+          available_likes_refilled_date: Date.now(),
+        },
+        { transaction },
+      );
+      this.logger.log('User Stats created');
+      const userProfile = await this.userProfileRepository.create(
+        {
+          user_id: userId,
+        },
+        { transaction },
+      );
+      this.logger.log('User Profile created');
+      const userSettings = await this.userSettingsRepository.create(
+        {
+          user_id: userId,
+        },
+        { transaction },
+      );
+      this.logger.log('User Settings created');
+
+      const userQuestionnaire = await this.questionnaireRepository.create(
+        {
+          user_id: userId,
+          questionnaire_started: false,
+          is_completed: false,
+        },
+        { transaction },
+      );
+      await transaction.commit();
       return user;
     } catch (error) {
+      this.logger.error('Register user failed', { userId, email, error });
+      await transaction.rollback();
       throw new BadRequestException('User id must be unique');
     }
   }

@@ -14,6 +14,7 @@ import { UserSettingsRepository } from '../../contracts/db/models/user-settings.
 import { getDbModule } from '../../utils/db-utils.nest';
 import { dbOpts } from '../../config/config';
 import { SessionsRepository } from '../../contracts/db/models/sessions.entity';
+import { QuestionnaireRepository } from '../../contracts/db/models/questionnaire.entity';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SessionsRepository } from '../../contracts/db/models/sessions.entity';
     UserProfileRepository,
     UserSettingsRepository,
     SessionsRepository,
+    QuestionnaireRepository,
   ],
 })
 export class UsersModule {}
