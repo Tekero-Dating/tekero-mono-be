@@ -85,7 +85,7 @@ export class UsersController implements IUsersController {
   ): Promise<IRegisterUser.Response> {
     try {
       const user = await this.usersService.register(
-        payload.userId,
+        payload.user_id,
         payload.email,
       );
       return { success: true, result: { user } };

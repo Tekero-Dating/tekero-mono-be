@@ -70,7 +70,7 @@ export namespace IEditUser {
 
 export namespace IRegisterUser {
   export interface Request {
-    userId: string;
+    user_id: string;
     email: string;
   }
   export interface Response {
