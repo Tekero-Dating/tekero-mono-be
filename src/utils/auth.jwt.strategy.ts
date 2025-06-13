@@ -1,53 +1,90 @@
-import { Inject, Injectable } from '@nestjs/common';
+// src/auth/strategies/auth-jwt.strategy.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
-import { JWT_SECRET } from '../config/config';
-import { areFingerprintsMatch } from './compare-fingerprints';
-import { MODELS_REPOSITORIES_ENUM } from '../contracts/db/models/models.enum';
-import { Session } from '../contracts/db/models/sessions.entity';
-import { SessionStatesEnum } from '../contracts/db/models/enums/session-states.enum';
+import { Strategy } from 'passport-strategy';
 import { Request } from 'express';
-import { extractUserFingerprint } from './extract-metadata-from-request';
-import { Op } from 'sequelize';
+import fetch from 'node-fetch';
+import { decode } from 'jsonwebtoken';
+
+export interface JwtPayload {
+  sub: string; // userId
+  email: string;
+  // при необходимости можно добавить другие поля из пейлоада
+}
 
 export type JwtReq = Request & { user: { userId: string; email: string } };
 
 @Injectable()
-export class AuthJwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @Inject(MODELS_REPOSITORIES_ENUM.SESSIONS)
-    private sessionsRepository: typeof Session,
-  ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: JWT_SECRET,
-      usernameField: 'email',
-      passReqToCallback: true,
-    } as StrategyOptionsWithRequest);
+export class AuthJwtStrategy extends PassportStrategy(Strategy, 'authService') {
+  constructor() {
+    super();
   }
 
-  async validate(req: Request, payload) {
-    console.log('validate');
-    const userSession = await this.sessionsRepository.findOne({
-      where: {
-        user_id: payload.sub,
-        session_state: SessionStatesEnum.ACTIVE,
-        at_expiration_date: {
-          [Op.gt]: new Date(),
+  override validate(
+    ...args
+  ): Promise<false | unknown | null> | false | unknown | null {
+    console.log({ args: args });
+    return args;
+  }
+
+  override async authenticate(req: Request): Promise<void> {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return this.fail('No token provided', 401);
+      }
+
+      const parts = authHeader.split(' ');
+      const token = parts[1];
+
+      const response = await fetch(
+        'http://tekero-dating-auth-service:8080/api/v1/jwt/validate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token }),
         },
-      },
-    });
-    if (userSession) {
-      const newFingerprint = extractUserFingerprint(req);
-      const matchOfFingerprints = areFingerprintsMatch(
-        userSession!.fingerprint,
-        newFingerprint,
       );
-      console.log({ matchOfFingerprints });
-      // if (!matchOfFingerprints) return null;
-      return { userId: payload.sub, email: payload.email };
+
+      if (!response.ok) {
+        let errorMsg: string;
+        try {
+          const errJson = await response.json();
+          errorMsg = errJson?.message || JSON.stringify(errJson);
+        } catch {
+          errorMsg = await response.text();
+        }
+        return this.fail(
+          `Token validation failed: ${errorMsg}`,
+          response.status,
+        );
+      }
+
+      const body = await response.json();
+      const validToken: string = body.token;
+      if (!validToken) {
+        return this.fail('No token returned from auth service', 401);
+      }
+
+      const decoded = decode(validToken);
+      if (!decoded || typeof decoded !== 'object') {
+        return this.fail('Cannot decode token payload', 401);
+      }
+
+      const payload = decoded as JwtPayload;
+      const userId = payload.sub;
+      const email = payload.email;
+      if (!userId || !email) {
+        return this.fail('Token payload missing required fields', 401);
+      }
+
+      const user = { userId, email };
+      return this.success(user);
+    } catch (err) {
+      console.error('AuthJwtStrategy error:', err);
+      return this.error(new UnauthorizedException('Authentication error'));
     }
-    return null;
   }
 }

@@ -180,6 +180,7 @@ export class UsersService {
           user_id: userId,
           questionnaire_started: false,
           is_completed: false,
+          responses: {},
         },
         { transaction },
       );

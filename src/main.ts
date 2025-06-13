@@ -16,6 +16,8 @@ import { NOTIFICATIONS_MODULE_QUEUES } from './contracts/notifications-interface
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as crypto from 'crypto';
 import { USER_STATS_MODULE_QUEUES } from './contracts/user-stats-interface/user-stats.constants';
+import passport from 'passport';
+import { AuthJwtStrategy } from './utils/auth.jwt.strategy';
 
 global.crypto = crypto; // TODO nest/schedule of version 5 sucks very hard
 export {
