@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "tf-state-tekero"
+    bucket         = "tekero-terrafrom"
     key            = "tekero/dev/terraform.tfstate"
     region         = "eu-central-1"
-    dynamodb_table = "tf-locks-tekero"
+    dynamodb_table = "tekero-terraform"
     encrypt        = true
   }
 }

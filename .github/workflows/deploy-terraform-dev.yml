@@ -8,7 +8,7 @@ on:
 env:
     IMAGE_NAME: tekero-dev-backend
     AWS_REGION: eu-central-1
-    ECR_REGISTRY: 682033469710.dkr.ecr.eu-central-1.amazonaws.com
+    ECR_REGISTRY: 530330389517.dkr.ecr.eu-central-1.amazonaws.com
     CLUSTER_NAME: tekero-dev-ecs-cluster
     SERVICE_NAME: tekero-dev-backend
 

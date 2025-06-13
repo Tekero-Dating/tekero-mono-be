@@ -4,7 +4,6 @@ import {
   Get,
   Inject,
   Logger,
-  Param,
   Post,
   Res,
   Request,
@@ -21,6 +20,7 @@ import {
 } from '../../contracts/questionnaire-interface/questionnaire.api-interface';
 import { JwtAuthGuard } from '../../utils/jwt.auth-guard';
 import { JwtReq } from '../../utils/auth.jwt.strategy';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/questionnaire')
 export class ApiQuestionnaireController {
